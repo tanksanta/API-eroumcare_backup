@@ -1,0 +1,82 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '2.2.4.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+    id 'org.asciidoctor.convert' version "1.5.9.2"
+}
+
+group 'kr.co.thkc'
+version '1.0.0'
+compileJava {
+    sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
+}
+
+processResources {
+    filesMatching('**/application.properties') {
+        expand(project.properties)
+    }
+}
+
+bootJar{
+    test
+    archiveFileName = 'EroumServer_'+version+'_'+new Date().format('yyyyMMdd_HHmm')+'.jar'
+    destinationDirectory = file(project.buildDir)
+}
+
+configurations {
+    developmentOnly
+    runtimeClasspath {
+        extendsFrom developmentOnly
+    }
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+
+    compile.exclude module: 'spring-boot-starter-logging'
+
+}
+
+repositories {
+    mavenCentral()
+    maven { url "http://maven.jahia.org/maven2"}
+}
+
+dependencies {
+    compile fileTree(dir:'lib', include: ['*.jar'])
+    compileOnly('org.projectlombok:lombok')
+    annotationProcessor('org.projectlombok:lombok')
+
+    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.1.3'
+    implementation 'org.apache.commons:commons-compress:1.20'
+    implementation 'org.apache.commons:commons-collections4:4.4'
+    implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
+    implementation group: 'org.codehaus.jettison', name: 'jettison', version: '1.4.1'
+
+
+    implementation 'org.springframework.boot:spring-boot-starter-web:2.2.4.RELEASE'
+    implementation 'org.springframework.boot:spring-boot-starter-log4j2:2.2.4.RELEASE'
+    implementation 'org.springframework.boot:spring-boot-autoconfigure:2.2.4.RELEASE'
+    implementation 'org.springframework.boot:spring-boot-configuration-processor:2.2.4.RELEASE'
+    implementation "org.springframework.boot:spring-boot-starter-aop:2.2.4.RELEASE"
+
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.10.3'
+    implementation 'com.googlecode.json-simple:json-simple:1.1.1'
+    implementation 'org.apache.commons:commons-dbcp2:2.7.0'
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.3'
+    implementation group: 'com.mortennobel', name: 'java-image-scaling', version: '0.8.5'
+
+
+    implementation 'org.mariadb.jdbc:mariadb-java-client:2.6.0'
+    implementation 'org.asciidoctor:asciidoctorj:1.5.5'
+
+    compileOnly 'org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4:1.16'
+
+    asciidoctor 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+    testImplementation 'org.springframework.restdocs:spring-restdocs-restassured'
+    testImplementation ('org.springframework.boot:spring-boot-starter-test:2.2.4.RELEASE')
+    testCompile 'io.rest-assured:rest-assured:3.0.2'
+
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+}
+

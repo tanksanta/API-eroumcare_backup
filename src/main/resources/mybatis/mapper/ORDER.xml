@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="order">
+
+    <select id="selectNewPenOrdId" resultType="string">
+        SELECT	IFNULL(
+                          CONCAT(SUBSTR(B.NEW_PEN_ORD_ID, 1, 14), LPAD( (SUBSTR(B.NEW_PEN_ORD_ID, 15, 6)) + 1 , 6, '0'))
+                      ,	CONCAT('ORDER-',  DATE_FORMAT(NOW(), '%Y%m%d'), '000001')
+                      ) AS NEW_PEN_ORD_ID
+        FROM	(
+                    SELECT	MAX(A.PEN_ORD_ID)  AS NEW_PEN_ORD_ID
+                    FROM	PEN5000 A
+                    WHERE	1=1
+                      AND	A.PEN_ORD_ID LIKE CONCAT('ORDER-',  DATE_FORMAT(NOW(), '%Y%m%d'), '%')
+                ) B
+    </select>
+
+    <select id="selectOrderList" parameterType="hashmap" resultType="camelMap" fetchSize="10000">
+
+        SELECT
+            PEN.PEN_ORD_ID
+            ,PEN.PEN_STA_SEQ
+            ,PEN.PEN_ID
+            ,PEN.USR_ID
+            ,PEN.ENT_ID
+            ,PEN.UUID
+            ,PEN.PROD_ID
+            ,PEN.PROD_NM
+            ,PEN.ITEM_ID
+            ,PEN.ITEM_NM
+            ,PEN.PROD_OFL_PRICE
+            ,PEN.PROD_PAY_CODE
+            ,PEN.PROD_COLOR
+            ,PEN.PROD_SIZE
+            ,PEN.PROD_OPTION3
+            ,PEN.PROD_OPTION4
+            ,PEN.PROD_OPTION5
+            ,PEN.ORD_DTM
+            ,PEN.DEL_GBN_CD
+            ,PEN.ORD_WAY_NUM
+            ,PEN.DEL_SER_CD
+            ,PEN.ORD_NM
+            ,PEN.ORD_CONT
+            ,PEN.ORD_MEMO
+            ,PEN.ORD_ZIP
+            ,PEN.ORD_ADDR
+            ,PEN.ORD_ADDR_DTL
+            ,PEN.FIN_PAYMENT
+            ,PEN.ORD_STATUS
+            ,PEN.ORD_LEND_STR_DTM
+            ,PEN.ORD_LEND_END_DTM
+            ,PEN.PAY_MEH_CD
+            ,PEN.STA_ORD_CD
+            ,PEN.REASON
+            ,PEN.EXTN_YN
+            ,PEN.REG_DTM
+            ,PEN.REG_USR_ID
+            ,PEN.REG_USR_IP
+            ,PEN.MODIFY_DTM
+            ,PEN.MODIFY_USR_ID
+            ,PEN.MODIFY_USR_IP
+            ,PEN.EFORM_YN
+            ,PEN.HIST_ID
+            ,PEN.STO_ID
+            ,PEN.LGS_STO_ID
+            ,STOCK.PROD_BAR_NUM
+            <if test="downloadUrl!=null and !downloadUrl.equals('')">
+            ,CONCAT(#{downloadUrl},<![CDATA['uuid=',PEN.UUID,'&path=',EFORM_FILE_PATH,'&gubn=',DOCUMENT_ID) AS EFORM_URL]]>
+            </if>
+        FROM PEN5000 PEN
+        LEFT JOIN (SELECT STO_ID, PROD_BAR_NUM FROM PRO1103) STOCK ON STOCK.STO_ID = PEN.STO_ID
+        <if test="downloadUrl!=null and !downloadUrl.equals('')">
+        JOIN (SELECT DISTINCT UUID, EFORM_FILE_PATH, DOCUMENT_ID FROM eform_filelist_table WHERE DOCUMENT_ID = 'ALL') EFROM ON EFROM.UUID = PEN.UUID
+        </if>
+        WHERE PEN_ORD_ID = #{penOrdId}
+        <if test="penStaSeq!=null and !penStaSeq.equals('')">AND PEN_STA_SEQ = #{penStaSeq}</if>
+    </select>
+
+    <!--수급자별 대상 금액율-->
+    <select id="selectDiscount" parameterType="hashmap" resultType="int">
+        SELECT
+            SUB_CD_REF1
+        FROM cmm1100
+        WHERE MST_CD = 'PEN00002'
+        AND SUB_CD = (SELECT PEN_TYPE_CD FROM pen1000 WHERE PEN_ID = #{penId})
+    </select>
+
+    <insert id="insertOrder" parameterType="hashmap">
+        INSERT INTO PEN5000
+        (
+        PEN_ORD_ID, PEN_STA_SEQ
+        ,PEN_ID, USR_ID, ENT_ID, UUID
+        ,PROD_ID, PROD_NM, ITEM_ID, ITEM_NM, PROD_OFL_PRICE, PROD_PAY_CODE, PROD_BAR_NUM, PROD_COLOR, PROD_SIZE
+        ,ORD_DTM, DEL_GBN_CD, ORD_WAY_NUM, DEL_SER_CD, ORD_NM, ORD_CONT, ORD_MEMO, ORD_ZIP, ORD_ADDR, ORD_ADDR_DTL
+        ,FIN_PAYMENT, ORD_STATUS, ORD_LEND_STR_DTM, ORD_LEND_END_DTM
+        ,PAY_MEH_CD, STA_ORD_CD, REASON, EXTN_YN
+        ,EFORM_YN, HIST_ID, STO_ID, LGS_STO_ID
+        ,REG_DTM, REG_USR_ID, REG_USR_IP, MODIFY_DTM, MODIFY_USR_ID, MODIFY_USR_IP
+        )
+        VALUES
+        (
+         #{penOrdId}, #{penStaSeq}
+        ,#{penId}, #{usrId}, #{entId}, #{uuid}
+        ,#{prodId}, #{prodNm}, #{itemId}, #{itemNm}, #{prodOflPrice}, #{prodPayCode}, #{prodBarNum}, #{prodColor}, #{prodSize}
+        ,CURRENT_TIMESTAMP, #{delGbnCd}, #{ordWayNum}, #{delSerCd}, #{ordNm}, #{ordCont}, #{ordMemo}, #{ordZip}, #{ordAddr}, #{ordAddrDtl}
+        ,#{finPayment}, #{ordStatus}, #{ordLendStrDtm}, #{ordLendEndDtm}
+        ,#{payMehCd}, '00', #{reason}, #{extnYn}
+        ,'N', #{histId}, #{stoId}, #{lgsStoId}
+        ,CURRENT_TIMESTAMP, #{usrId}, #{accessIp}, CURRENT_TIMESTAMP, #{usrId}, #{accessIp}
+        )
+    </insert>
+
+    <insert id="insertOrder_multi" parameterType="list">
+        INSERT INTO PEN5000
+        (
+        PEN_ORD_ID, PEN_STA_SEQ
+        ,PEN_ID, USR_ID, ENT_ID, UUID
+        ,PROD_ID, PROD_NM, ITEM_ID, ITEM_NM, PROD_OFL_PRICE, PROD_PAY_CODE, PROD_BAR_NUM, PROD_COLOR, PROD_SIZE
+        ,ORD_DTM, DEL_GBN_CD, ORD_WAY_NUM, DEL_SER_CD, ORD_NM, ORD_CONT, ORD_MEMO, ORD_ZIP, ORD_ADDR, ORD_ADDR_DTL
+        ,FIN_PAYMENT, ORD_STATUS, ORD_LEND_STR_DTM, ORD_LEND_END_DTM
+        ,PAY_MEH_CD, STA_ORD_CD, REASON, EXTN_YN
+        ,EFORM_YN, HIST_ID, STO_ID, LGS_STO_ID
+        ,REG_DTM, REG_USR_ID, REG_USR_IP, MODIFY_DTM, MODIFY_USR_ID, MODIFY_USR_IP
+        )
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+        (
+         #{item.penOrdId}, #{item.penStaSeq}
+        ,#{item.penId}, #{item.usrId}, #{item.entId}, #{item.uuid}
+        ,#{item.prodId}, #{item.prodNm}, #{item.itemId}, #{item.itemNm}, #{item.prodOflPrice}, #{item.prodPayCode}, #{item.prodBarNum}, #{item.prodColor}, #{item.prodSize}
+        ,CURRENT_TIMESTAMP, #{item.delGbnCd}, #{item.ordWayNum}, #{item.delSerCd}, #{item.ordNm}, #{item.ordCont}, #{item.ordMemoitem.}, #{item.ordZip}, #{item.ordAddr}, #{item.ordAddrDtl}
+        ,#{item.finPayment}, #{item.ordStatus}, #{item.ordLendStrDtm}, #{item.ordLendEndDtm}
+        ,#{item.payMehCd}, '00', #{item.reason}, #{item.extnYn}
+        ,'N', #{item.histId}, #{item.stoId}, #{item.lgsStoId}
+        ,CURRENT_TIMESTAMP, #{item.usrId}, #{item.accessIp}, CURRENT_TIMESTAMP, #{item.usrId}, #{item.accessIp}
+        )
+        </foreach>
+    </insert>
+
+
+    <update id="updateOrder" parameterType="hashmap">
+        UPDATE PEN5000 SET
+        MODIFY_DTM		= CURRENT_TIMESTAMP
+        ,MODIFY_USR_ID = #{usrId}
+        ,MODIFY_USR_IP = #{accessIp}
+        <if test="eformYn!=null and !eformYn.equals('')">,EFORM_YN= #{eformYn}</if>
+        <if test="delGbnCd!=null and !delGbnCd.equals('')">,DEL_GBN_CD = #{delGbnCd}</if>
+        <if test="ordWayNum!=null and !ordWayNum.equals('')">,ORD_WAY_NUM = #{ordWayNum}</if>
+        <if test="delSerCd!=null and !delSerCd.equals('')">,DEL_SER_CD = #{delSerCd}</if>
+        <if test="ordNm!=null and !ordNm.equals('')">,ORD_NM = #{ordNm}</if>
+        <if test="ordCont!=null and !ordCont.equals('')">,ORD_CONT = #{ordCont}</if>
+        <if test="ordMemo!=null and !ordMemo.equals('')">,ORD_MEMO = #{ordMemo}</if>
+        <if test="ordZip!=null and !ordZip.equals('')">,ORD_ZIP = #{ordZip}</if>
+        <if test="ordAddr!=null and !ordAddr.equals('')">,ORD_ADDR = #{ordAddr}</if>
+        <if test="ordAddrDtl!=null and !ordAddrDtl.equals('')">,ORD_ADDR_DTL = #{ordAddrDtl}</if>
+        <if test="staOrdCd!=null and !staOrdCd.equals('')">,STA_ORD_CD = #{staOrdCd}</if>
+        <if test="prodId!=null and !prodId.equals('')">,PROD_ID = #{prodId}</if>
+        <if test="prodColor!=null and !prodColor.equals('')">,PROD_COLOR = #{prodColor}</if>
+        <if test="prodSize!=null and !prodSize.equals('')">,PROD_SIZE = #{prodSize}</if>
+        <if test="prodBarNum!=null and !prodBarNum.equals('')">,PROD_BAR_NUM = #{prodBarNum}</if>
+        <if test="lgsStoId!=null and !lgsStoId.equals('')">,LGS_STO_ID = #{lgsStoId}</if>
+        <if test="ordLendStrDtm!=null and !ordLendStrDtm.equals('')">,ORD_LEND_STR_DTM = #{ordLendStrDtm}</if>
+        <if test="ordLendEndDtm!=null and !ordLendEndDtm.equals('')">,ORD_LEND_END_DTM = #{ordLendEndDtm}</if>
+        WHERE PEN_ORD_ID = #{penOrdId}
+        <if test="penStaSeq!=null and !penStaSeq.equals('')">AND PEN_STA_SEQ = #{penStaSeq}</if>
+        <if test="stoId!=null and !stoId.equals('')">AND STO_ID = #{stoId}</if>
+    </update>
+
+    <delete id="deleteOrder" parameterType="hashmap">
+        DELETE FROM PEN5000
+        WHERE PEN_ORD_ID = #{penOrdId}
+        <if test="penStaSeq!=null and !penStaSeq.equals('')">AND PEN_STA_SEQ = #{penStaSeq}</if>
+    </delete>
+</mapper>

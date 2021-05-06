@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="eform">
+
+
+    <select id="selectEformMaster" parameterType="hashmap" resultType="camelMap" fetchSize="10000">
+        SELECT
+            UUID,
+            CONTRACT_NUMBER,
+            PEN_ID,
+            EFORM_TYPE,
+            RETURN_URL,
+            EFORM_STATUS,
+            SEQ,
+            COMPANY_ID,
+            REGISTER_DATE
+        FROM EFORM_MASTER_TABLE
+        WHERE UUID = #{uuid}
+        AND CONTRACT_NUMBER = #{penOrdId}
+        <if test="eformType!=null and eformType.equals('')">
+            EFORM_TYPE = #eformType#
+        </if>
+    </select>
+
+
+    <insert id="insertEformMaster" parameterType="hashmap">
+        INSERT
+        INTO eform_master_table
+        (
+            UUID,
+            CONTRACT_NUMBER,
+            PEN_ID,
+            EFORM_TYPE,
+            RETURN_URL,
+            EFORM_STATUS,
+            CON_ACCO1,
+            CON_ACCO2,
+            SEQ,
+            COMPANY_ID,
+            BASE_YEAR,
+            BASE_MONTH,
+            REGISTER_DATE
+        )
+        VALUES
+        (
+            #{uuid},
+            #{penOrdId},
+            #{penId},
+            #{eformType},
+            #{returnUrl},
+            '00',
+            #{conAcco1},
+            #{conAcco2},
+            #{seq},
+            #{entId},
+            #{baseYear},
+            #{baseMonth},
+            CURRENT_TIMESTAMP
+        )
+    </insert>
+
+</mapper>

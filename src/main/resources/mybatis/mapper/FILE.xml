@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="file">
+
+    <select id="selectNewAtchFileId" resultType="string">
+        SELECT IFNULL(
+                       CONCAT(SUBSTR(B.NEW_PEN_ID, 1, 13), LPAD( (SUBSTR(B.NEW_PEN_ID, 14, 6)) + 1 , 6, '0'))
+                   ,CONCAT('FILE_', DATE_FORMAT(NOW(), '%Y%m%d'), '000001')
+                   ) AS NEW_ATCH_FILE_ID
+        FROM	(
+                    SELECT	MAX(A.ATCH_FILE_ID)  AS NEW_PEN_ID
+                    FROM	COMTNFILE A
+                    WHERE	1=1
+                      AND	A.ATCH_FILE_ID LIKE CONCAT('FILE_',  DATE_FORMAT(NOW(), '%Y%m%d'), '%')
+                ) B
+    </select>
+
+
+    <select id="selectFileList" parameterType="hashmap" resultType="camelMap" fetchSize="10000">
+        SELECT
+            ATCH_FILE_ID, FILE_CN, FILE_SN, FILE_STRE_COURS, STRE_FILE_NM,
+            FILE_EXTSN, ORIGNL_FILE_NM, FILE_SIZE
+        FROM
+            COMTNFILEDETAIL
+        WHERE
+            ATCH_FILE_ID = #{atchFileId}
+        <if test="fileSn!=null and !fileSn.equals('')">
+          AND FILE_SN = #{fileSn}
+        </if>
+        ORDER by FILE_SN
+    </select>
+
+    <insert id="insertFileMaster" parameterType="kr.co.thkc.vo.FileVO" >
+        INSERT INTO COMTNFILE
+            (ATCH_FILE_ID, CREAT_DT, USE_AT)
+        VALUES
+            ( #{atchFileId}, NOW(), 'Y')
+	</insert>
+
+    <insert id="insertFileDetail" parameterType="kr.co.thkc.vo.FileVO" >
+        INSERT INTO COMTNFILEDETAIL
+        (
+         ATCH_FILE_ID, FILE_SN, FILE_STRE_COURS, STRE_FILE_NM,
+          ORIGNL_FILE_NM, FILE_EXTSN, FILE_SIZE, FILE_CN
+        )
+        VALUES
+        (
+         #{atchFileId}, #{fileSn}, #{fileStreCours}, #{streFileNm},
+          #{orignlFileNm}, #{fileExtsn}, #{fileMg}, #{fileCn}
+        )
+	</insert>
+
+    <update id="deleteCOMTNFILE" parameterType="string" >
+        UPDATE COMTNFILE
+        SET USE_AT = 'N'
+        WHERE ATCH_FILE_ID = #{atchFileId}
+	</update>
+
+</mapper>

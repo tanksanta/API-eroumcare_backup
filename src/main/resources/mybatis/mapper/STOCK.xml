@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="stock">
+
+    <select id="selectNewPpcId" resultType="string">
+        SELECT	IFNULL(
+                          CONCAT(SUBSTR(B.NEW_PPC_ID, 1, 11), LPAD( (SUBSTR(B.NEW_PPC_ID, 12, 5)) + 1 , 5, '0'))
+                      ,	CONCAT('PPC',  DATE_FORMAT(NOW(), '%Y%m%d'), '00001')
+                      ) AS NEW_PPC_ID
+        FROM	(
+                    SELECT	MAX(A.PPC_ID)  AS NEW_PPC_ID
+                    FROM	PRO1102 A
+                    WHERE	1=1
+                      AND	A.PPC_ID LIKE CONCAT('PPC',  DATE_FORMAT(NOW(), '%Y%m%d'), '%')
+                ) B
+    </select>
+
+    <select id="selectNewStoId" resultType="string">
+        SELECT	IFNULL(
+                          CONCAT(SUBSTR(B.NEW_STO_ID, 1, 11), LPAD( (SUBSTR(B.NEW_STO_ID, 12, 5)) + 1 , 5, '0'))
+                      ,	CONCAT('STO',  DATE_FORMAT(NOW(), '%Y%m%d'), '00001')
+                      ) AS NEW_STO_ID
+        FROM	(
+                    SELECT	MAX(A.STO_ID)  AS NEW_STO_ID
+                    FROM	PRO1103 A
+                    WHERE	1=1
+                      AND	A.STO_ID LIKE CONCAT('STO',  DATE_FORMAT(NOW(), '%Y%m%d'), '%')
+                ) B
+    </select>
+
+    <select id="selectPpc" parameterType="hashmap" resultType="string">
+        SELECT PPC_ID
+        FROM PRO1102
+        WHERE DEL_YN = 'N'
+        AND PROD_ID = #{prodId}
+        AND ENT_ID = #{entId}
+        LIMIT 1
+    </select>
+
+    <select id="selectDuplicateBarNum" parameterType="hashmap" resultType="string">
+        SELECT
+            PROD_BAR_NUM
+        FROM PRO1103 A
+        JOIN PRO1102 B ON B.PPC_ID = A.PPC_ID
+        JOIN PRO1100 C ON C.PROD_ID = B.PROD_ID
+        WHERE A.DEL_YN = 'N' AND A.STATE_CD != '02'
+            AND PROD_BAR_NUM = #{prodBarNum}
+            AND B.PROD_ID = #{prodId}
+    </select>
+
+    <select id="selectBarNumList" parameterType="hashmap" resultType="camelMap" fetchSize="10000">
+        SELECT
+            D.PROD_BAR_NUM
+        FROM PRO1100 A
+            JOIN PRO1000 B ON A.ITEM_ID = B.ITEM_ID
+            JOIN PRO1102 C ON C.PROD_ID = A.PROD_ID AND C.DEL_YN = 'N'
+            JOIN PRO1103 D ON D.PPC_ID = C.PPC_ID AND D.DEL_YN = 'N'
+        WHERE D.DEL_YN = 'N' AND D.STATE_CD = '01'
+        <if test="prodColor!=null and !prodColor.equals('')">AND D.PROD_COLOR = #{prodColor}</if>
+        <if test="prodSize!=null and !prodSize.equals('')">AND D.PROD_SIZE = #{prodSize}</if>
+        <if test="stoId!=null and !stoId.equals('')">AND D.STO_ID = #{stoId}</if>
+        <if test="prodId!=null and !prodId.equals('')">AND A.PROD_ID = #{prodId}</if>
+        <if test="usrId!=null and !usrId.equals('')">AND D.REG_USR_ID = #{usrId}</if>
+        <if test="entId!=null and !entId.equals('')">AND C.ENT_ID = #{entId}</if>
+        ORDER BY D.REG_DTM
+    </select>
+
+    <select id="selectStockList" parameterType="hashmap" resultType="camelMap" fetchSize="10000">
+        SELECT
+            C.PPC_ID,
+            A.PROD_ID,
+            A.PROD_NM,
+            A.GUBUN,
+            B.ITEM_ID,
+            B.ITEM_NM,
+            A.PROD_SUP_YN,
+            A.PROD_PAY_CODE,
+            D.PROD_COLOR,
+            D.PROD_SIZE,
+            COUNT(*) QUANTITY
+        FROM PRO1100 A
+            JOIN PRO1000 B ON A.ITEM_ID = B.ITEM_ID
+            JOIN PRO1102 C ON C.PROD_ID = A.PROD_ID AND C.DEL_YN = 'N'
+            JOIN PRO1103 D ON D.PPC_ID = C.PPC_ID AND D.DEL_YN = 'N'
+        WHERE D.DEL_YN = 'N'
+        AND D.STATE_CD IN ('01'<if test="stateCd!=null and !stateCd.equals('')">,<foreach item="item" index="index" collection="stateCd" separator=",">#{item}</foreach></if>)
+        <if test="prodColor!=null and !prodColor.equals('')">AND D.PROD_COLOR = #{prodColor}</if>
+        <if test="prodSize!=null and !prodSize.equals('')">AND D.PROD_SIZE = #{prodSize}</if>
+        <if test="prodBarNum!=null and !prodBarNum.equals('')">AND D.PROD_BAR_NUM = #{prodBarNum}</if>
+        <if test="entId!=null and !entId.equals('')">AND C.ENT_ID = #{entId}</if>
+        <if test="usrId!=null and !usrId.equals('')">AND D.REG_USR_ID = #{usrId}</if>
+        <if test="stoId!=null and !stoId.equals('')">AND D.STO_ID = #{stoId}</if>
+        <if test="prodId!=null and !prodId.equals('')">AND A.PROD_ID = #{prodId}</if>
+        <if test="prodPayCode!=null and !prodPayCode.equals('')">AND A.PROD_PAY_CODE = #{prodPayCode}</if>
+        <if test="gubun!=null and !gubun.equals('')">AND A.GUBUN = #{gubun}</if>
+        GROUP BY PROD_NM,PROD_COLOR,PROD_SIZE
+        ORDER BY D.REG_DTM
+    </select>
+
+
+    <!--재고상세 목록-->
+    <select id="selectStockDetailListCnt" parameterType="hashmap" resultType="int">
+       SELECT
+           COUNT(*)
+       FROM PRO1100 A
+           JOIN PRO1000 B ON A.ITEM_ID = B.ITEM_ID
+           JOIN PRO1102 C ON C.PROD_ID = A.PROD_ID AND C.DEL_YN = 'N'
+           JOIN PRO1103 D ON D.PPC_ID = C.PPC_ID AND D.DEL_YN = 'N'
+            LEFT JOIN (
+                SELECT PEN_ORD_ID, PEN.UUID, STO_ID, PEN_ID, ORD_LEND_STR_DTM, ORD_LEND_END_DTM, REG_DTM
+                FROM pen5000 PEN
+                LEFT JOIN (SELECT DISTINCT UUID, EFORM_FILE_PATH, DOCUMENT_ID FROM eform_filelist_table WHERE DOCUMENT_ID = 'ALL') EFORM ON EFORM.UUID = PEN.UUID
+                WHERE STA_ORD_CD != '04'
+            ) ORD ON ORD.STO_ID = D.STO_ID AND ORD.REG_DTM = (SELECT MAX(REG_DTM) FROM pen5000 T1 WHERE T1.STO_ID = D.STO_ID)
+        WHERE D.DEL_YN = 'N'
+       <if test="stateCd!=null">AND D.STATE_CD IN
+           <foreach item="item" index="index" collection="stateCd" open=" (" separator="," close=")">#{item}</foreach>
+       </if>
+       <if test="prodColor!=null and !prodColor.equals('')">AND D.PROD_COLOR = #{prodColor}</if>
+       <if test="prodSize!=null and !prodSize.equals('')">AND D.PROD_SIZE = #{prodSize}</if>
+       <if test="prodBarNum!=null and !prodBarNum.equals('')">AND D.PROD_BAR_NUM = #{prodBarNum}</if>
+       <if test="entId!=null and !entId.equals('')">AND C.ENT_ID = #{entId}</if>
+       <if test="stoId!=null and !stoId.equals('')">AND D.STO_ID = #{stoId}</if>
+       <if test="prodId!=null and !prodId.equals('')">AND A.PROD_ID = #{prodId}</if>
+       ORDER BY D.REG_DTM
+   </select>
+    <select id="selectStockDetailList" parameterType="hashmap" resultType="camelMap" fetchSize="10000">
+        SELECT
+            D.STO_ID,
+            A.PROD_ID,
+            A.PROD_NM,
+            A.GUBUN,
+            (SELECT SUB_CD_NM FROM cmm1100 WHERE MST_CD = 'PRO00001' AND SUB_CD = A.GUBUN) AS GUBUN_NM,
+            B.ITEM_ID,
+            B.ITEM_NM,
+            A.PROD_SUP_YN,
+            CASE A.PROD_SUP_YN WHEN 'Y' THEN '유통' WHEN 'N' THEN '미유통' END AS PROD_SUP_NM,
+            A.PROD_PAY_CODE,
+            D.PROD_COLOR,
+            D.PROD_SIZE,
+            D.STATE_CD,
+            (SELECT SUB_CD_NM FROM cmm1100 WHERE MST_CD = 'PRO00003' AND SUB_CD = D.STATE_CD) AS STATE_NM,
+            CASE WHEN STATE_CD != '01' THEN EFORM_URL END AS EFORM_URL,
+            CASE WHEN STATE_CD != '01' THEN PEN_ORD_ID END AS PEN_ORD_ID,
+            CASE WHEN STATE_CD != '01' THEN ORD_LEND_STR_DTM END AS ORD_LEND_STR_DTM,
+            CASE WHEN STATE_CD != '01' THEN ORD_LEND_END_DTM END AS ORD_LEND_END_DTM,
+            ORD.PEN_ID PEN_ID,
+            (SELECT PEN_NM FROM pen1000 WHERE PEN_ID = ORD.PEN_ID) AS PEN_NM,
+            PROD_BAR_NUM,
+            D.MODIFY_DTM,
+            D.REG_DTM
+        FROM PRO1100 A
+            JOIN PRO1000 B ON A.ITEM_ID = B.ITEM_ID
+            JOIN PRO1102 C ON C.PROD_ID = A.PROD_ID AND C.DEL_YN = 'N'
+            JOIN PRO1103 D ON D.PPC_ID = C.PPC_ID AND D.DEL_YN = 'N'
+            LEFT JOIN (
+                SELECT PEN_ORD_ID, PEN.UUID, STO_ID, PEN_ID, ORD_LEND_STR_DTM, ORD_LEND_END_DTM, REG_DTM,
+                    CONCAT(#{downloadUrl},<![CDATA['uuid=',PEN.UUID,'&path=',EFORM_FILE_PATH,'&gubn=',DOCUMENT_ID) AS EFORM_URL ]]>
+                FROM pen5000 PEN
+                LEFT JOIN (SELECT DISTINCT UUID, EFORM_FILE_PATH, DOCUMENT_ID FROM eform_filelist_table WHERE DOCUMENT_ID = 'ALL') EFORM ON EFORM.UUID = PEN.UUID
+                WHERE STA_ORD_CD != '04'
+            ) ORD ON ORD.STO_ID = D.STO_ID AND ORD.REG_DTM = (SELECT MAX(REG_DTM) FROM pen5000 T1 WHERE T1.STO_ID = D.STO_ID)
+        WHERE D.DEL_YN = 'N'
+        <if test="stateCd!=null">AND D.STATE_CD IN
+            <foreach item="item" index="index"  collection="stateCd" open=" (" separator="," close=")">#{item}</foreach>
+        </if>
+        <if test="prodColor!=null and !prodColor.equals('')">AND D.PROD_COLOR = #{prodColor}</if>
+        <if test="prodSize!=null and !prodSize.equals('')">AND D.PROD_SIZE = #{prodSize}</if>
+        <if test="prodBarNum!=null and !prodBarNum.equals('')">AND D.PROD_BAR_NUM = #{prodBarNum}</if>
+        <if test="entId!=null and !entId.equals('')">AND C.ENT_ID = #{entId}</if>
+        <if test="stoId!=null and !stoId.equals('')">AND D.STO_ID = #{stoId}</if>
+        <if test="prodId!=null and !prodId.equals('')">AND A.PROD_ID = #{prodId}</if>
+        ORDER BY D.REG_DTM
+        <if test="pageSize > 0 and pageNum > 0">
+            LIMIT #{pageSize}
+            OFFSET #{offset}
+        </if>
+    </select>
+
+
+    <!--사업소별 재고 목록-->
+    <select id="selectStockListForEntCnt" parameterType="hashmap" resultType="int">
+        SELECT COUNT(*) FROM(
+            SELECT
+                COUNT(*)
+            FROM PRO1100 A
+            JOIN PRO1000 B ON A.ITEM_ID = B.ITEM_ID
+            JOIN PRO1102 C ON C.PROD_ID = A.PROD_ID AND C.DEL_YN = 'N'
+            JOIN PRO1103 D ON D.PPC_ID = C.PPC_ID AND D.DEL_YN = 'N'
+            WHERE D.DEL_YN = 'N'
+            <if test="entId!=null and !entId.equals('')">AND C.ENT_ID = #{entId}</if>
+            <if test="prodNm!=null and !prodNm.equals('')">AND A.PROD_NM like concat('%',#{prodNm},'%')</if>
+            <if test="prodId!=null and !prodId.equals('')">AND A.PROD_ID = #{prodId}</if>
+            <if test="prodPayCode!=null and !prodPayCode.equals('')">AND A.PROD_PAY_CODE = #{prodPayCode}</if>
+            <if test="gubun!=null and !gubun.equals('')">AND A.GUBUN = #{gubun}</if>
+            <if test="taxInfoCd!=null and !taxInfoCd.equals('')">AND A.TAX_INFO_CD = #{taxInfoCd}</if>
+            GROUP BY A.PROD_ID
+        ) A
+    </select>
+    <select id="selectStockListForEnt" parameterType="hashmap" resultType="camelMap" fetchSize="10000">
+        SELECT
+            C.ENT_ID,
+            C.PPC_ID,
+            A.PROD_ID,
+            A.PROD_NM,
+            A.GUBUN,
+            B.ITEM_ID,
+            B.ITEM_NM,
+            A.PROD_SUP_YN,
+            A.PROD_PAY_CODE,
+            SUM(CASE WHEN STATE_CD='01' THEN 1 ELSE 0 END) AS QUANTITY,
+            SUM(CASE WHEN (STATE_CD='02' OR STATE_CD='07' ) THEN 1 ELSE 0 END) AS ORDER_QUANTITY
+        FROM PRO1100 A
+            JOIN PRO1000 B ON A.ITEM_ID = B.ITEM_ID
+            JOIN PRO1102 C ON C.PROD_ID = A.PROD_ID AND C.DEL_YN = 'N'
+            JOIN PRO1103 D ON D.PPC_ID = C.PPC_ID AND D.DEL_YN = 'N'
+        WHERE D.DEL_YN = 'N'
+        <if test="entId!=null and !entId.equals('')">AND C.ENT_ID = #{entId}</if>
+        <if test="prodNm!=null and !prodNm.equals('')">AND A.PROD_NM like concat('%',#{prodNm},'%')</if>
+        <if test="prodId!=null and !prodId.equals('')">AND A.PROD_ID = #{prodId}</if>
+        <if test="prodPayCode!=null and !prodPayCode.equals('')">AND A.PROD_PAY_CODE = #{prodPayCode}</if>
+        <if test="gubun!=null and !gubun.equals('')">AND A.GUBUN = #{gubun}</if>
+        <if test="taxInfoCd!=null and !taxInfoCd.equals('')">AND A.TAX_INFO_CD = #{taxInfoCd}</if>
+        GROUP BY A.PROD_ID
+        ORDER BY A.REG_DTM
+        <if test="pageSize > 0 and pageNum > 0">
+            LIMIT #{pageSize}
+            OFFSET #{offset}
+        </if>
+    </select>
+
+
+
+    <!--재고정보조회-->
+    <select id="selectStockInfoList" parameterType="hashmap" resultType="camelMap" fetchSize="10000">
+        SELECT
+            D.STO_ID,
+            C.PPC_ID,
+            A.PROD_ID,
+            A.PROD_NM,
+            A.GUBUN,
+            A.PROD_OFL_PRICE,
+            A.PROD_SUP_PRICE,
+            A.RENTAL_PRICE,
+            A.RENTAL_PRICE_EXTN,
+            B.ITEM_ID,
+            B.ITEM_NM,
+            A.PROD_SUP_YN,
+            A.PROD_PAY_CODE,
+            D.PROD_COLOR,
+            D.PROD_SIZE,
+            D.PROD_BAR_NUM
+        FROM PRO1100 A
+            JOIN PRO1000 B ON A.ITEM_ID = B.ITEM_ID
+            JOIN PRO1102 C ON C.PROD_ID = A.PROD_ID AND C.DEL_YN = 'N'
+            JOIN PRO1103 D ON D.PPC_ID = C.PPC_ID AND D.DEL_YN = 'N'
+        AND D.STATE_CD = '01'
+        <if test="prodColor!=null and !prodColor.equals('')">AND D.PROD_COLOR = #{prodColor}</if>
+        <if test="prodSize!=null and !prodSize.equals('')">AND D.PROD_SIZE = #{prodSize}</if>
+        <if test="prodBarNum!=null and !prodBarNum.equals('')">AND D.PROD_BAR_NUM = #{prodBarNum}</if>
+        <if test="usrId!=null and !usrId.equals('')">AND D.REG_USR_ID = #{usrId}</if>
+        <if test="stoId!=null and !stoId.equals('')">AND D.STO_ID = #{stoId}</if>
+        <if test="prodId!=null and !prodId.equals('')">AND A.PROD_ID = #{prodId}</if>
+        <if test="gubun!=null and !gubun.equals('')">AND A.GUBUN = #{gubun}</if>
+        ORDER BY D.REG_DTM
+    </select>
+
+    <insert id="insertStock" parameterType="hashmap">
+        INSERT INTO PRO1103
+        (
+        STO_ID
+        ,PPC_ID,			STATE_CD, 			PROD_BAR_NUM
+        ,PROD_COLOR,		PROD_SIZE,          PROD_MANU_DATE,		STO_MEMO,	DEL_YN
+        ,REG_DTM,			REG_USR_ID, 		REG_USR_IP
+        ,MODIFY_DTM,		MODIFY_USR_ID,		MODIFY_USR_IP
+        )
+        VALUES
+        (
+        #{stoId}
+        ,#{ppcId},  		'06',				#{prodBarNum}
+        ,#{prodColor},		#{prodSize},       #{prodManuDate},		#{stoMemo},	'N'
+        ,CURRENT_TIMESTAMP,	#{usrId},			#{accessIp}
+        ,CURRENT_TIMESTAMP,	#{usrId},		#{accessIp}
+        )
+    </insert>
+
+    <insert id="insertStock_multi" parameterType="list">
+        INSERT INTO PRO1103
+        (
+        STO_ID
+        ,PPC_ID,			STATE_CD, 			PROD_BAR_NUM
+        ,PROD_COLOR,		PROD_SIZE,          PROD_MANU_DATE,		STO_MEMO,	DEL_YN
+        ,REG_DTM,			REG_USR_ID, 		REG_USR_IP
+        ,MODIFY_DTM,		MODIFY_USR_ID,		MODIFY_USR_IP
+        )
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+        (
+        #{item.stoId}
+        ,#{item.ppcId}
+        , '06', #{item.prodBarNum}
+        ,#{item.prodColor}, #{item.prodSize}, #{item.prodManuDate}, #{item.stoMemo}, 'N'
+        ,CURRENT_TIMESTAMP, #{item.usrId}, #{item.accessIp}
+        ,CURRENT_TIMESTAMP, #{item.usrId}, #{item.accessIp}
+        )
+        </foreach>
+    </insert>
+
+    <update id="updateStock" parameterType="hashmap">
+        UPDATE PRO1103 SET
+            MODIFY_DTM		= CURRENT_TIMESTAMP
+            ,MODIFY_USR_ID	= #{usrId}
+            ,MODIFY_USR_IP = #{accessIp}
+        <if test='ppcId != null and !ppcId.equals("")'>,PPC_ID= #{ppcId}</if>
+            ,PROD_BAR_NUM= #{prodBarNum}
+        <if test='stateCd != null and !stateCd.equals("")'>,STATE_CD = #{stateCd}</if>
+        <if test='prodColor != null and !prodColor.equals("")'>,PROD_COLOR = #{prodColor}</if>
+        <if test='prodSize != null and !prodSize.equals("")'>,PROD_SIZE = #{prodSize}</if>
+        <if test='prodManuDate != null and !prodManuDate.equals("")'>,PROD_MANU_DATE = #{prodManuDate}</if>
+        <if test='stoMemo != null and !stoMemo.equals("")'>,STO_MEMO = #{stoMemo}</if>
+        <if test='delYn != null and !delYn.equals("")'>,DEL_YN = #{delYn}</if>
+        WHERE STO_ID = #{stoId}
+    </update>
+
+    <delete id="deleteStock" parameterType="hashmap">
+        DELETE FROM PRO1103
+        WHERE STO_ID in<foreach item="item" index="index" collection="stoId" open=" (" separator="," close=")">#{item}</foreach>
+    </delete>
+
+</mapper>
