@@ -65,6 +65,10 @@
         ORDER BY D.REG_DTM
     </select>
 
+    <select id="selectStock" parameterType="hashmap" resultType="camelMap" fetchSize="10000">
+        SELECT * FROM PRO1103 WHERE STO_ID = #{stoId}
+    </select>
+
     <select id="selectStockList" parameterType="hashmap" resultType="camelMap" fetchSize="10000">
         SELECT
             C.PPC_ID,

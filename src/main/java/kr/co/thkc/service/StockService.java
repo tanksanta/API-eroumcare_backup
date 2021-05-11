@@ -231,10 +231,6 @@ public class StockService extends BaseService{
                 prod.put("usrId", MapUtils.getString(params, "usrId"));
                 prod.put("accessIp", MapUtils.getString(params, "accessIp"));
 
-                //재고 정보 조회
-                Map stockInfo = (Map)abstractDAO.selectOne("stock.selectStockDetailList", prod);
-                String stateCd = stockInfo.get("stateCd").toString();
-                if(!stateCd.equals("01")) throw new Exception("(stoId=" + stockInfo.get("stoId").toString() + ")대여중이거나 배송된 재고의 바코드는 변경할 수 없습니다.");
                 // 재고 수정
                 abstractDAO.update("stock.updateStock", prod);
                 //트랜잭션 때문에 이전에 동일 트랜잭션에서 바코드가 들어갔었을수도있음 그래서 트랜잭션 마지막에 개수체크
