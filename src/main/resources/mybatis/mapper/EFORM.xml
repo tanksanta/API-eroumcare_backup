@@ -22,6 +22,35 @@
         </if>
     </select>
 
+    <select id="selectEform001" parameterType="hashmap" resultType="camelMap" fetchSize="10000">
+        SELECT
+            UUID,
+            CONTRACT_NUMBER AS PEN_ORD_ID,
+            EFORM_TYPE,
+            T_01_211 AS ITEM_NM,
+            T_01_212 AS PROD_NM,
+            T_01_213 AS PROD_PAY_CODE,
+            T_01_214 AS PROD_BAR_NUM,
+            T_01_216 AS CONTRACT_DATE,
+            T_01_218 AS PROD_PRICE,
+            T_01_219 AS PEN_PRICE
+        FROM eform_thk001_purchaselist_view
+        WHERE CONTRACT_NUMBER = #{penOrdId}
+            UNION ALL
+        SELECT
+            UUID,
+            CONTRACT_NUMBER AS PEN_ORD_ID,
+            EFORM_TYPE,
+            T_01_511 AS ITEM_NM,
+            T_01_512 AS PROD_NM,
+            T_01_513 AS PROD_PAY_CODE,
+            T_01_514 AS PROD_BAR_NUM,
+            CONCAT(T_01_516,'-',T_01_517) AS CONTRACT_DATE,
+            T_01_518 AS PROD_PRICE,
+            T_01_519 AS PEN_PRICE
+        FROM eform_thk001_rentallist_view
+        WHERE CONTRACT_NUMBER = #{penOrdId}
+    </select>
 
     <insert id="insertEformMaster" parameterType="hashmap">
         INSERT
