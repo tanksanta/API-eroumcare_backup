@@ -105,7 +105,7 @@ public class FileService extends BaseService {
             }
 
             String newName = entId + ".png";
-            String orgNewName = entId + "org.png";
+            String orgNewName = entId + ".png";
             long size = file.getSize();
 
             if (!"".equals(orginFileName)) {
