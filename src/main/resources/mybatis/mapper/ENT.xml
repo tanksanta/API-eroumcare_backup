@@ -3,7 +3,7 @@
 <mapper namespace="ent">
 
     <!--사업소 아이디-->
-    <select id="selectNewEntId" resultType="camelMap">
+    <select id="selectNewEntId" resultType="string">
         SELECT	IFNULL(
                           CONCAT(SUBSTR(B.NEW_ENT_ID, 1, 11), LPAD( (SUBSTR(B.NEW_ENT_ID, 12, 5)) + 1 , 5, '0'))
                       ,	CONCAT('ENT',  DATE_FORMAT(NOW(), '%Y%m%d'), '00001')
@@ -157,7 +157,7 @@
         )
         VALUES
         (
-            #{entId},			#{entKey},
+            #{entId},			#{entId},
             60,		'N',		60,
             60,		60,			'N',		1,
             CURRENT_TIMESTAMP,	#{usrId},				#{accessIp},

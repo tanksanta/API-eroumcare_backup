@@ -128,15 +128,18 @@ public class EntService extends BaseService{
         }
 
         //카카오맵으로 위도 경도 구하기
-        String apiKey	= env.getProperty("kakao.apiKey");
-        String url 		= env.getProperty("kakao.localUrl");
+        //카카오맵으로 위도 경도 구하기
         String entAddr 	= MapUtils.getString(params,"entAddr");
-		String getUrl 	= (url + entAddr).replaceAll(" ", "%20");
+        if(entAddr != null) {
+            String apiKey	= env.getProperty("kakao.apiKey");
+            String url 		= env.getProperty("kakao.localUrl");
+            String getUrl = (url + entAddr).replaceAll(" ", "%20");
 
-        Map content = excuteHttpLocalClient(getUrl, apiKey);
+            Map content = excuteHttpLocalClient(getUrl, apiKey);
 
-        params.put("entLatitude", content.get("latitude"));
-        params.put("entLongitude", content.get("longitude"));
+            params.put("entLatitude", content.get("latitude"));
+            params.put("entLongitude", content.get("longitude"));
+        }
 
 
         String entId = newEntId();
@@ -190,6 +193,7 @@ public class EntService extends BaseService{
         //시스템 이용신청 추가
         abstractDAO.insert("set.insertReq",params);
 
+        response.setData(new HashMap(){{put("entId",entId);}});
         response.setResult(ResultCode.RC_OK);
 
         return response;
@@ -216,16 +220,17 @@ public class EntService extends BaseService{
         }
 
         //카카오맵으로 위도 경도 구하기
-        String apiKey	= env.getProperty("kakao.apiKey");
-        String url 		= env.getProperty("kakao.localUrl");
         String entAddr 	= MapUtils.getString(params,"entAddr");
-		String getUrl 	= (url + entAddr).replaceAll(" ", "%20");
+        if(entAddr != null) {
+            String apiKey	= env.getProperty("kakao.apiKey");
+            String url 		= env.getProperty("kakao.localUrl");
+            String getUrl = (url + entAddr).replaceAll(" ", "%20");
 
-        Map content = excuteHttpLocalClient(getUrl, apiKey);
+            Map content = excuteHttpLocalClient(getUrl, apiKey);
 
-        params.put("entLatitude", content.get("latitude"));
-        params.put("entLongitude", content.get("longitude"));
-
+            params.put("entLatitude", content.get("latitude"));
+            params.put("entLongitude", content.get("longitude"));
+        }
         //변경전 사업소정보 조회
         Map entInfo = (Map) abstractDAO.selectOne("ent.selectEntInfo",params);
 

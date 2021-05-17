@@ -53,6 +53,13 @@ public class FileService extends BaseService {
         } else {
             storePathString = env.getProperty(storePath);
         }
+
+        if ("".equals(atchFileId) || atchFileId == null) {
+            atchFileIdString = newAtchFileId();
+        } else {
+            atchFileIdString = atchFileId;
+        }
+
         //storePath 폴더 분류
         if(!"".equals(entId) && entId != null){
 

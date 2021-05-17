@@ -81,6 +81,8 @@ public class EntController {
 
         //file세팅
         Map<String, MultipartFile> fileMap = multipartRequest.getFileMap();
+        log.debug("fileMap:"+fileMap);
+
         //파라미터 세팅
         BaseRequest request = new BaseRequest();
         request.setParams(StringUtil.convertJSONstringToMap(params));
@@ -105,6 +107,8 @@ public class EntController {
 
         //file세팅
         Map<String,MultipartFile> fileMap = multipartRequest.getFileMap();
+        log.debug("fileMap:"+fileMap);
+
         //파라미터 세팅
         BaseRequest request = new BaseRequest();
         request.setParams(StringUtil.convertJSONstringToMap(params));
