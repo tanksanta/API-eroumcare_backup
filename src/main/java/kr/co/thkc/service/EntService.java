@@ -128,9 +128,8 @@ public class EntService extends BaseService{
         }
 
         //카카오맵으로 위도 경도 구하기
-        //카카오맵으로 위도 경도 구하기
         String entAddr 	= MapUtils.getString(params,"entAddr");
-        if(entAddr != null) {
+        if(entAddr != null && !entAddr.equals("")) {
             String apiKey	= env.getProperty("kakao.apiKey");
             String url 		= env.getProperty("kakao.localUrl");
             String getUrl = (url + entAddr).replaceAll(" ", "%20");
@@ -165,22 +164,22 @@ public class EntService extends BaseService{
 
         //첨부된 파일이 존재할 경우
         if(!fileMap.isEmpty()){
-
-            //실제 저장소에 파일을 등록하고 FileVO 리턴
-            List<FileVO> fileVoList = new ArrayList<FileVO>();
             if(fileMap.get("sealFile")!=null) {
+                List<FileVO> fileVoList = new ArrayList<FileVO>();
+
                 String atchFileId = newAtchFileId();
-                fileVoList.addAll(fileService.parseFileInfSeal(fileMap, 0, atchFileId, "", entId));
+                fileVoList = fileService.parseFileInfSeal(fileMap, 0, atchFileId, "", entId);
+                fileService.insertFileInfoList(fileVoList);
                 params.put("entSealAttr",atchFileId);
             }
             if(fileMap.get("crnFile")!=null) {
+                List<FileVO> fileVoList = new ArrayList<FileVO>();
+
                 String atchFileId = newAtchFileId();
-                fileVoList.addAll(fileService.parseFileInfo(fileMap, "OSL_", 0, atchFileId, "", "crn"));
+                fileVoList = fileService.parseFileInfo(fileMap, "OSL_", 0, atchFileId, "", "crn");
+                fileService.insertFileInfoList(fileVoList);
                 params.put("entCrnAttr",atchFileId);
             }
-            //파일 db에 저장
-            if(fileVoList.size() > 0)
-                fileService.insertFileInfoList(fileVoList);
         }
         //사업소 추가
         abstractDAO.insert("ent.insertEnt",params);
@@ -221,7 +220,7 @@ public class EntService extends BaseService{
 
         //카카오맵으로 위도 경도 구하기
         String entAddr 	= MapUtils.getString(params,"entAddr");
-        if(entAddr != null) {
+        if(entAddr != null && !entAddr.equals("")) {
             String apiKey	= env.getProperty("kakao.apiKey");
             String url 		= env.getProperty("kakao.localUrl");
             String getUrl = (url + entAddr).replaceAll(" ", "%20");
@@ -236,8 +235,9 @@ public class EntService extends BaseService{
 
         //첨부된 파일이 존재할 경우
         if(!fileMap.isEmpty()){
-            List<FileVO> fileVoList = new ArrayList<FileVO>();
             if(fileMap.get("sealFile")!=null) {
+                List<FileVO> fileVoList = new ArrayList<FileVO>();
+
                 String entSealAttr = MapUtils.getString(entInfo,"entSealAttr");
                 if(entSealAttr != null && !entSealAttr.equals("")){
                     //이전 이미지 조회해서 삭제처리
@@ -251,10 +251,13 @@ public class EntService extends BaseService{
                     abstractDAO.update("file.deleteCOMTNFILE",entSealAttr);
                 }
                 String atchFileId = newAtchFileId();
-                fileVoList.addAll(fileService.parseFileInfSeal(fileMap, 0, atchFileId, "", params.get("entId").toString()));
+                fileVoList = fileService.parseFileInfSeal(fileMap, 0, atchFileId, "", params.get("entId").toString());
+                fileService.insertFileInfoList(fileVoList);
                 params.put("entSealAttr",atchFileId);
             }
             if(fileMap.get("crnFile")!=null) {
+                List<FileVO> fileVoList = new ArrayList<FileVO>();
+
                 String entCrnAttr = MapUtils.getString(entInfo,"entCrnAttr");
                 if(entCrnAttr != null && !entCrnAttr.equals("")){
                     //이전 이미지 조회해서 삭제처리
@@ -268,12 +271,10 @@ public class EntService extends BaseService{
                     abstractDAO.update("file.deleteCOMTNFILE",entCrnAttr);
                 }
                 String atchFileId = newAtchFileId();
-                fileVoList.addAll(fileService.parseFileInfo(fileMap, "OSL_", 0, atchFileId, "", "crn"));
+                fileVoList = fileService.parseFileInfo(fileMap, "OSL_", 0, atchFileId, "", "crn");
+                fileService.insertFileInfoList(fileVoList);
                 params.put("entCrnAttr",atchFileId);
             }
-            //파일 db에 저장
-            if(fileVoList.size() > 0)
-                fileService.insertFileInfoList(fileVoList);
         }
         //사업소 수정
         abstractDAO.update("ent.updateEnt",params);

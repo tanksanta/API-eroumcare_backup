@@ -189,6 +189,8 @@
         <if test='bankTypeCd != null and !bankTypeCd.equals("")'>,BANK_TYPE_CD = #{bankTypeCd}</if>
         <if test='bankAccNum != null and !bankAccNum.equals("")'>,BANK_ACC_NUM = #{bankAccNum}</if>
         <if test='bankDepo != null and !bankDepo.equals("")'>,BANK_DEPO = #{bankDepo}</if>
+        <if test='entSealAttr != null and !entSealAttr.equals("")'>,ENT_SEAL_ATTR = #{entSealAttr}</if>
+        <if test='entCrnAttr != null and !entCrnAttr.equals("")'>,ENT_CRN_ATTR = #{entCrnAttr}</if>
         <if test='entConAcc01 != null and !entConAcc01.equals("")'>,ENT_CON_ACCO1 = #{entConAcc01}</if>
         <if test='entConAcc02 != null and !entConAcc02.equals("")'>,ENT_CON_ACCO2 = #{entConAcc02}</if>
         <if test='entBusiNum != null and !entBusiNum.equals("")'>,ENT_BUSI_NUM = #{entBusiNum}</if>
