@@ -211,9 +211,10 @@ public class EntService extends BaseService{
         if(usrPnum!=null && !usrPnum.equals("")) params.put("usrPnum",sdb.encrypt(usrPnum));
 
         //비밀번호 암호화
-        String usrId = MapUtils.getString(params,"usrId");
+        String usrId = MapUtils.getString(params,"entUsrId");
         String plainPw = MapUtils.getString(params,"usrPw");
         if(plainPw != null && !plainPw.equals("")) {
+            if(usrId == null || usrId.equals("")) throw new Exception("비밀번호 변경시 ID도 입력바랍니다.");
             String pw = SHA256Util.encryptPassword(plainPw, usrId);
             params.put("usrPw", pw);
         }

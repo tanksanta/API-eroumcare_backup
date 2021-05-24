@@ -120,6 +120,9 @@
        <if test="stateCd!=null">AND D.STATE_CD IN
            <foreach item="item" index="index" collection="stateCd" open=" (" separator="," close=")">#{item}</foreach>
        </if>
+       <if test="searchOption!=null and !searchOption.equals('')">
+          AND (D.PROD_SIZE like concat('%',#{searchOption},'%') OR D.PROD_COLOR like concat('%',#{searchOption},'%') )
+       </if>
        <if test="prodColor!=null and !prodColor.equals('')">AND D.PROD_COLOR = #{prodColor}</if>
        <if test="prodSize!=null and !prodSize.equals('')">AND D.PROD_SIZE = #{prodSize}</if>
        <if test="prodBarNum!=null and !prodBarNum.equals('')">AND D.PROD_BAR_NUM = #{prodBarNum}</if>
@@ -127,7 +130,7 @@
        <if test="stoId!=null and !stoId.equals('')">AND D.STO_ID = #{stoId}</if>
        <if test="prodId!=null and !prodId.equals('')">AND A.PROD_ID = #{prodId}</if>
        ORDER BY D.REG_DTM
-   </select>
+    </select>
     <select id="selectStockDetailList" parameterType="hashmap" resultType="camelMap" fetchSize="10000">
         SELECT
             D.STO_ID,
@@ -168,6 +171,9 @@
         <if test="stateCd!=null">AND D.STATE_CD IN
             <foreach item="item" index="index"  collection="stateCd" open=" (" separator="," close=")">#{item}</foreach>
         </if>
+        <if test="searchOption!=null and !searchOption.equals('')">
+          AND (D.PROD_SIZE like concat('%',#{searchOption},'%') OR D.PROD_COLOR like concat('%',#{searchOption},'%') )
+        </if>
         <if test="prodColor!=null and !prodColor.equals('')">AND D.PROD_COLOR = #{prodColor}</if>
         <if test="prodSize!=null and !prodSize.equals('')">AND D.PROD_SIZE = #{prodSize}</if>
         <if test="prodBarNum!=null and !prodBarNum.equals('')">AND D.PROD_BAR_NUM = #{prodBarNum}</if>
@@ -180,6 +186,7 @@
             OFFSET #{offset}
         </if>
     </select>
+
 
 
     <!--사업소별 재고 목록-->

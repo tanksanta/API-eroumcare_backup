@@ -114,6 +114,7 @@ public class EntController {
         request.setParams(StringUtil.convertJSONstringToMap(params));
         // requiredField add
         request.addRequiredField("entId", request.TYPE_STRING);
+        request.addRequiredField("usrId", request.TYPE_STRING);
 
         request.validRequiredField();
 

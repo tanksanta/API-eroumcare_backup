@@ -84,7 +84,8 @@
                 USR_POSITION,
                 USR_ZIP,
                 USR_ADDR,
-                USR_ADDR_DETAIL
+                USR_ADDR_DETAIL,
+                t1.REG_DTM
             FROM ENT1000 t1 JOIN ENT1100 t2 on t2.ENT_ID = t1.ENT_ID
         ) B ON A.ID = B.USR_ID
         ]]>
@@ -216,7 +217,7 @@
         <if test='usrAddr != null and !usrAddr.equals("")'>,USR_ADDR = #{usrAddr}</if>
         <if test='usrAddrDetail != null and !usrAddrDetail.equals("")'>,USR_ADDR_DETAIL = #{usrAddrDetail}</if>
         WHERE ENT_ID = #{entId}
-        AND USR_ID = #{usrId}
+        AND USR_ID = #{entUsrId}
     </update>
 
 </mapper>
