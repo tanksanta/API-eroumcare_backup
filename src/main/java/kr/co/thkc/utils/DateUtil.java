@@ -21,13 +21,12 @@ public class DateUtil {
 
         Period period = tmpStart.until(tmpEnd);
         int monthCnt = (period.getYears() * 12) + period.getMonths();
-        if(monthCnt==0) monthCnt = -1;
 
         //나머지 일 수 계산
-        endDate = endDate.plusDays(1);
         double startDayCnt = (double)(startDate.lengthOfMonth()-startDate.getDayOfMonth()) / (double)startDate.lengthOfMonth();
-        double endDayCnt = (double)endDate.getDayOfMonth() / (double)endDate.lengthOfMonth();
+        double endDayCnt = (double)(endDate.getDayOfMonth()+1) / (double)endDate.lengthOfMonth();
 
+        if(monthCnt==0 && (startDayCnt+endDayCnt)>1) monthCnt-=1;
 
         return startDayCnt+monthCnt+endDayCnt;
     }
