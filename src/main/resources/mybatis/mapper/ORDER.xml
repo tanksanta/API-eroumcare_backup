@@ -32,9 +32,6 @@
             ,PEN.PROD_PAY_CODE
             ,PEN.PROD_COLOR
             ,PEN.PROD_SIZE
-            ,PEN.PROD_OPTION3
-            ,PEN.PROD_OPTION4
-            ,PEN.PROD_OPTION5
             ,PEN.ORD_DTM
             ,PEN.DEL_GBN_CD
             ,PEN.ORD_WAY_NUM
