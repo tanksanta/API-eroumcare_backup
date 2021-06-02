@@ -30,6 +30,8 @@
             ,PEN.ITEM_NM
             ,PEN.PROD_OFL_PRICE
             ,PEN.PROD_PAY_CODE
+            ,PEN.PROD_COLOR
+            ,PEN.PROD_SIZE
             ,PEN.ORD_DTM
             ,PEN.DEL_GBN_CD
             ,PEN.ORD_WAY_NUM
