@@ -56,8 +56,6 @@
             JOIN PRO1102 C ON C.PROD_ID = A.PROD_ID AND C.DEL_YN = 'N'
             JOIN PRO1103 D ON D.PPC_ID = C.PPC_ID AND D.DEL_YN = 'N'
         WHERE D.DEL_YN = 'N' AND D.STATE_CD = '01'
-        <if test="prodColor!=null and !prodColor.equals('')">AND D.PROD_COLOR = #{prodColor}</if>
-        <if test="prodSize!=null and !prodSize.equals('')">AND D.PROD_SIZE = #{prodSize}</if>
         <if test="stoId!=null and !stoId.equals('')">AND D.STO_ID = #{stoId}</if>
         <if test="prodId!=null and !prodId.equals('')">AND A.PROD_ID = #{prodId}</if>
         <if test="usrId!=null and !usrId.equals('')">AND D.REG_USR_ID = #{usrId}</if>
@@ -88,8 +86,6 @@
             JOIN PRO1103 D ON D.PPC_ID = C.PPC_ID AND D.DEL_YN = 'N'
         WHERE D.DEL_YN = 'N'
         AND D.STATE_CD IN ('01'<if test="stateCd!=null and !stateCd.equals('')">,<foreach item="item" index="index" collection="stateCd" separator=",">#{item}</foreach></if>)
-        <if test="prodColor!=null and !prodColor.equals('')">AND D.PROD_COLOR = #{prodColor}</if>
-        <if test="prodSize!=null and !prodSize.equals('')">AND D.PROD_SIZE = #{prodSize}</if>
         <if test="prodBarNum!=null and !prodBarNum.equals('')">AND D.PROD_BAR_NUM = #{prodBarNum}</if>
         <if test="entId!=null and !entId.equals('')">AND C.ENT_ID = #{entId}</if>
         <if test="usrId!=null and !usrId.equals('')">AND D.REG_USR_ID = #{usrId}</if>
@@ -123,8 +119,6 @@
        <if test="searchOption!=null and !searchOption.equals('')">
           AND (D.PROD_SIZE like concat('%',#{searchOption},'%') OR D.PROD_COLOR like concat('%',#{searchOption},'%') )
        </if>
-       <if test="prodColor!=null and !prodColor.equals('')">AND D.PROD_COLOR = #{prodColor}</if>
-       <if test="prodSize!=null and !prodSize.equals('')">AND D.PROD_SIZE = #{prodSize}</if>
        <if test="prodBarNum!=null and !prodBarNum.equals('')">AND D.PROD_BAR_NUM = #{prodBarNum}</if>
        <if test="entId!=null and !entId.equals('')">AND C.ENT_ID = #{entId}</if>
        <if test="stoId!=null and !stoId.equals('')">AND D.STO_ID = #{stoId}</if>
@@ -174,8 +168,6 @@
         <if test="searchOption!=null and !searchOption.equals('')">
           AND (D.PROD_SIZE like concat('%',#{searchOption},'%') OR D.PROD_COLOR like concat('%',#{searchOption},'%') )
         </if>
-        <if test="prodColor!=null and !prodColor.equals('')">AND D.PROD_COLOR = #{prodColor}</if>
-        <if test="prodSize!=null and !prodSize.equals('')">AND D.PROD_SIZE = #{prodSize}</if>
         <if test="prodBarNum!=null and !prodBarNum.equals('')">AND D.PROD_BAR_NUM = #{prodBarNum}</if>
         <if test="entId!=null and !entId.equals('')">AND C.ENT_ID = #{entId}</if>
         <if test="stoId!=null and !stoId.equals('')">AND D.STO_ID = #{stoId}</if>
@@ -266,8 +258,6 @@
             JOIN PRO1102 C ON C.PROD_ID = A.PROD_ID AND C.DEL_YN = 'N'
             JOIN PRO1103 D ON D.PPC_ID = C.PPC_ID AND D.DEL_YN = 'N'
         AND D.STATE_CD = '01'
-        <if test="prodColor!=null and !prodColor.equals('')">AND D.PROD_COLOR = #{prodColor}</if>
-        <if test="prodSize!=null and !prodSize.equals('')">AND D.PROD_SIZE = #{prodSize}</if>
         <if test="prodBarNum!=null and !prodBarNum.equals('')">AND D.PROD_BAR_NUM = #{prodBarNum}</if>
         <if test="usrId!=null and !usrId.equals('')">AND D.REG_USR_ID = #{usrId}</if>
         <if test="stoId!=null and !stoId.equals('')">AND D.STO_ID = #{stoId}</if>
@@ -281,7 +271,7 @@
         (
         STO_ID
         ,PPC_ID,			STATE_CD, 			PROD_BAR_NUM
-        ,PROD_COLOR,		PROD_SIZE,          PROD_MANU_DATE,		STO_MEMO,	DEL_YN
+        ,PROD_MANU_DATE,		STO_MEMO,	DEL_YN
         ,REG_DTM,			REG_USR_ID, 		REG_USR_IP
         ,MODIFY_DTM,		MODIFY_USR_ID,		MODIFY_USR_IP
         )
@@ -289,7 +279,7 @@
         (
         #{stoId}
         ,#{ppcId},  		'06',				#{prodBarNum}
-        ,#{prodColor},		#{prodSize},       #{prodManuDate},		#{stoMemo},	'N'
+        ,#{prodManuDate},		#{stoMemo},	'N'
         ,CURRENT_TIMESTAMP,	#{usrId},			#{accessIp}
         ,CURRENT_TIMESTAMP,	#{usrId},		#{accessIp}
         )
@@ -300,7 +290,7 @@
         (
         STO_ID
         ,PPC_ID,			STATE_CD, 			PROD_BAR_NUM
-        ,PROD_COLOR,		PROD_SIZE,          PROD_MANU_DATE,		STO_MEMO,	DEL_YN
+        ,PROD_MANU_DATE,		STO_MEMO,	DEL_YN
         ,REG_DTM,			REG_USR_ID, 		REG_USR_IP
         ,MODIFY_DTM,		MODIFY_USR_ID,		MODIFY_USR_IP
         )
@@ -310,7 +300,7 @@
         #{item.stoId}
         ,#{item.ppcId}
         , '06', #{item.prodBarNum}
-        ,#{item.prodColor}, #{item.prodSize}, #{item.prodManuDate}, #{item.stoMemo}, 'N'
+        ,#{item.prodManuDate}, #{item.stoMemo}, 'N'
         ,CURRENT_TIMESTAMP, #{item.usrId}, #{item.accessIp}
         ,CURRENT_TIMESTAMP, #{item.usrId}, #{item.accessIp}
         )
@@ -325,8 +315,6 @@
         <if test='ppcId != null and !ppcId.equals("")'>,PPC_ID= #{ppcId}</if>
             ,PROD_BAR_NUM= #{prodBarNum}
         <if test='stateCd != null and !stateCd.equals("")'>,STATE_CD = #{stateCd}</if>
-        <if test='prodColor != null and !prodColor.equals("")'>,PROD_COLOR = #{prodColor}</if>
-        <if test='prodSize != null and !prodSize.equals("")'>,PROD_SIZE = #{prodSize}</if>
         <if test='prodManuDate != null and !prodManuDate.equals("")'>,PROD_MANU_DATE = #{prodManuDate}</if>
         <if test='stoMemo != null and !stoMemo.equals("")'>,STO_MEMO = #{stoMemo}</if>
         <if test='delYn != null and !delYn.equals("")'>,DEL_YN = #{delYn}</if>

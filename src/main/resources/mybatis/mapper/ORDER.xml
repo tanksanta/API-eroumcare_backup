@@ -30,11 +30,6 @@
             ,PEN.ITEM_NM
             ,PEN.PROD_OFL_PRICE
             ,PEN.PROD_PAY_CODE
-            ,PEN.PROD_COLOR
-            ,PEN.PROD_SIZE
-            ,PEN.PROD_OPTION3
-            ,PEN.PROD_OPTION4
-            ,PEN.PROD_OPTION5
             ,PEN.ORD_DTM
             ,PEN.DEL_GBN_CD
             ,PEN.ORD_WAY_NUM
@@ -70,7 +65,7 @@
         FROM PEN5000 PEN
         LEFT JOIN (SELECT STO_ID, PROD_BAR_NUM FROM PRO1103) STOCK ON STOCK.STO_ID = PEN.STO_ID
         <if test="downloadUrl!=null and !downloadUrl.equals('')">
-        JOIN (SELECT DISTINCT UUID, EFORM_FILE_PATH, DOCUMENT_ID FROM eform_filelist_table WHERE DOCUMENT_ID = 'ALL') EFROM ON EFROM.UUID = PEN.UUID
+        LEFT JOIN (SELECT DISTINCT UUID, EFORM_FILE_PATH, DOCUMENT_ID FROM eform_filelist_table WHERE DOCUMENT_ID = 'ALL') EFROM ON EFROM.UUID = PEN.UUID
         </if>
         WHERE PEN_ORD_ID = #{penOrdId}
         <if test="penStaSeq!=null and !penStaSeq.equals('')">AND PEN_STA_SEQ = #{penStaSeq}</if>
@@ -90,7 +85,7 @@
         (
         PEN_ORD_ID, PEN_STA_SEQ
         ,PEN_ID, USR_ID, ENT_ID, UUID
-        ,PROD_ID, PROD_NM, ITEM_ID, ITEM_NM, PROD_OFL_PRICE, PROD_PAY_CODE, PROD_BAR_NUM, PROD_COLOR, PROD_SIZE
+        ,PROD_ID, PROD_NM, ITEM_ID, ITEM_NM, PROD_OFL_PRICE, PROD_PAY_CODE, PROD_BAR_NUM
         ,ORD_DTM, DEL_GBN_CD, ORD_WAY_NUM, DEL_SER_CD, ORD_NM, ORD_CONT, ORD_MEMO, ORD_ZIP, ORD_ADDR, ORD_ADDR_DTL
         ,FIN_PAYMENT, ORD_STATUS, ORD_LEND_STR_DTM, ORD_LEND_END_DTM
         ,PAY_MEH_CD, STA_ORD_CD, REASON, EXTN_YN
@@ -101,7 +96,7 @@
         (
          #{penOrdId}, #{penStaSeq}
         ,#{penId}, #{usrId}, #{entId}, #{uuid}
-        ,#{prodId}, #{prodNm}, #{itemId}, #{itemNm}, #{prodOflPrice}, #{prodPayCode}, #{prodBarNum}, #{prodColor}, #{prodSize}
+        ,#{prodId}, #{prodNm}, #{itemId}, #{itemNm}, #{prodOflPrice}, #{prodPayCode}, #{prodBarNum}
         ,CURRENT_TIMESTAMP, #{delGbnCd}, #{ordWayNum}, #{delSerCd}, #{ordNm}, #{ordCont}, #{ordMemo}, #{ordZip}, #{ordAddr}, #{ordAddrDtl}
         ,#{finPayment}, #{ordStatus}, #{ordLendStrDtm}, #{ordLendEndDtm}
         ,#{payMehCd}, '00', #{reason}, #{extnYn}
@@ -115,7 +110,7 @@
         (
         PEN_ORD_ID, PEN_STA_SEQ
         ,PEN_ID, USR_ID, ENT_ID, UUID
-        ,PROD_ID, PROD_NM, ITEM_ID, ITEM_NM, PROD_OFL_PRICE, PROD_PAY_CODE, PROD_BAR_NUM, PROD_COLOR, PROD_SIZE
+        ,PROD_ID, PROD_NM, ITEM_ID, ITEM_NM, PROD_OFL_PRICE, PROD_PAY_CODE, PROD_BAR_NUM
         ,ORD_DTM, DEL_GBN_CD, ORD_WAY_NUM, DEL_SER_CD, ORD_NM, ORD_CONT, ORD_MEMO, ORD_ZIP, ORD_ADDR, ORD_ADDR_DTL
         ,FIN_PAYMENT, ORD_STATUS, ORD_LEND_STR_DTM, ORD_LEND_END_DTM
         ,PAY_MEH_CD, STA_ORD_CD, REASON, EXTN_YN
@@ -127,7 +122,7 @@
         (
          #{item.penOrdId}, #{item.penStaSeq}
         ,#{item.penId}, #{item.usrId}, #{item.entId}, #{item.uuid}
-        ,#{item.prodId}, #{item.prodNm}, #{item.itemId}, #{item.itemNm}, #{item.prodOflPrice}, #{item.prodPayCode}, #{item.prodBarNum}, #{item.prodColor}, #{item.prodSize}
+        ,#{item.prodId}, #{item.prodNm}, #{item.itemId}, #{item.itemNm}, #{item.prodOflPrice}, #{item.prodPayCode}, #{item.prodBarNum}
         ,CURRENT_TIMESTAMP, #{item.delGbnCd}, #{item.ordWayNum}, #{item.delSerCd}, #{item.ordNm}, #{item.ordCont}, #{item.ordMemoitem.}, #{item.ordZip}, #{item.ordAddr}, #{item.ordAddrDtl}
         ,#{item.finPayment}, #{item.ordStatus}, #{item.ordLendStrDtm}, #{item.ordLendEndDtm}
         ,#{item.payMehCd}, '00', #{item.reason}, #{item.extnYn}
@@ -155,8 +150,6 @@
         <if test="ordAddrDtl!=null and !ordAddrDtl.equals('')">,ORD_ADDR_DTL = #{ordAddrDtl}</if>
         <if test="staOrdCd!=null and !staOrdCd.equals('')">,STA_ORD_CD = #{staOrdCd}</if>
         <if test="prodId!=null and !prodId.equals('')">,PROD_ID = #{prodId}</if>
-        <if test="prodColor!=null and !prodColor.equals('')">,PROD_COLOR = #{prodColor}</if>
-        <if test="prodSize!=null and !prodSize.equals('')">,PROD_SIZE = #{prodSize}</if>
         <if test="prodBarNum!=null and !prodBarNum.equals('')">,PROD_BAR_NUM = #{prodBarNum}</if>
         <if test="lgsStoId!=null and !lgsStoId.equals('')">,LGS_STO_ID = #{lgsStoId}</if>
         <if test="ordLendStrDtm!=null and !ordLendStrDtm.equals('')">,ORD_LEND_STR_DTM = #{ordLendStrDtm}</if>
