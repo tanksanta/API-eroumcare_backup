@@ -55,7 +55,9 @@
             ENT_NM,
             B.*,
             CONCAT('https://system.eroumcare.com/cmm/fms/getImage.do?fileSn=0&atchFileId=',ENT_CRN_ATTR) AS ENT_CRN_IMG,
-            CONCAT('https://system.eroumcare.com/cmm/fms/getImage.do?fileSn=0&atchFileId=',ENT_SEAL_ATTR) AS ENT_SEAL_IMG
+            CONCAT('https://ex.eroumcare.com/cmm/fms/getImage.do?fileSn=0&atchFileId=',ENT_SEAL_ATTR) AS ENT_SEAL_IMG
+            /*CONCAT('https://system.eroumcare.com/cmm/fms/getImage.do?fileSn=0&atchFileId=',ENT_CRN_ATTR) AS ENT_CRN_IMG,
+            CONCAT('https://system.eroumcare.com/cmm/fms/getImage.do?fileSn=0&atchFileId=',ENT_SEAL_ATTR) AS ENT_SEAL_IMG*/
         FROM login_view A
         LEFT JOIN (
             SELECT
