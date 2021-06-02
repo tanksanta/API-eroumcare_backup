@@ -3,8 +3,10 @@ package kr.co.thkc.utils;
 import com.ksign.securedb.api.SDBCrypto;
 import com.ksign.securedb.api.util.SDBException;
 import com.ksign.securedb.fileapi.SDBFileAPI;
+import lombok.extern.slf4j.Slf4j;
 
-public class SDBCryptUtil {
+@Slf4j
+public class SDBCryptUtil{
 	private static final String ServerIP = "175.125.94.165";
 	private static final int ServerPort = 9003;
 	private static final String schema = "dbsec";
@@ -20,6 +22,7 @@ public class SDBCryptUtil {
 			} catch (SDBException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				log.error(e.getMessage());
 			}
 		}
 	}
@@ -31,6 +34,7 @@ public class SDBCryptUtil {
         catch(Exception e){
 //        	e.printStackTrace();
         	System.out.println("SDB API encrypt fail : " + param);
+			log.error(e.getMessage());
         	return param;
         }
 	}
@@ -42,6 +46,8 @@ public class SDBCryptUtil {
         catch(Exception e){
 //        	e.printStackTrace();
         	System.out.println("SDB API decrypt fail : " + param);
+			log.error(e.getMessage());
+
         	return param;
         }
 	}
@@ -58,6 +64,8 @@ public class SDBCryptUtil {
 			return SDBFileAPI.encryptFileT(policyName, sourcePath, targetPath, true);
         } catch (Exception e) {
         	e.printStackTrace();
+			log.error(e.getMessage());
+
         	return false;
         }
     }
@@ -74,6 +82,8 @@ public class SDBCryptUtil {
 			return SDBFileAPI.decryptFileT(policyName, sourcePath, targetPath);
         } catch (Exception e) {
         	e.printStackTrace();
+			log.error(e.getMessage());
+
         	return false;
         }
     }
