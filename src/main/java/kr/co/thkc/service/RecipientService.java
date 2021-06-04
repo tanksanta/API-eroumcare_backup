@@ -87,6 +87,32 @@ public class RecipientService extends BaseService{
         return response;
     }
 
+    /**
+     * 욕구사정기록지 조회
+     * */
+    public BaseResponse selectRecipientRec(Map<String,Object> params) throws SQLException {
+        BaseResponse response = new BaseResponse();
+
+        //페이징 처리
+        int pageNum = MapUtils.getIntValue(params,"pageNum");
+        int pageSize = MapUtils.getIntValue(params,"pageSize");
+
+        int offset = pageSize * (pageNum - 1);
+
+        params.put("pageSize",pageSize);
+        params.put("pageNum",pageNum);
+        params.put("offset",offset);
+
+        Integer total = (Integer)abstractDAO.selectOne("recipient.selectRecipientRecCnt",params);
+        List result = abstractDAO.selectList("recipient.selectRecipientRecList",params);
+
+        response.setTotal(total == null ? 0 :total);
+        response.setData(result);
+        response.setResult(ResultCode.RC_OK);
+
+        return response;
+    }
+
 
     /**
      * 수급자추가
@@ -171,6 +197,35 @@ public class RecipientService extends BaseService{
         return response;
     }
 
+
+    /**
+     * 욕구사정기록지 추가
+    **/
+    public BaseResponse insertRecipientRec(Map<String,Object> params) throws SQLException {
+        BaseResponse response = new BaseResponse();
+
+        String recId = newRecId();
+        params.put("recId",recId);
+
+        abstractDAO.insert("recipient.insertRecipientRec",params);
+
+        response.setResult(ResultCode.RC_OK);
+
+        return response;
+    }
+
+    /**
+     * 욕구사정기록지 수정
+    **/
+    public BaseResponse updateRecipientRec(Map<String,Object> params) throws SQLException {
+        BaseResponse response = new BaseResponse();
+
+        abstractDAO.update("recipient.updateRecipientRec",params);
+
+        response.setResult(ResultCode.RC_OK);
+
+        return response;
+    }
 
     public BaseResponse updateEncrypt(Map<String,Object> params) throws SQLException {
             BaseResponse response = new BaseResponse();

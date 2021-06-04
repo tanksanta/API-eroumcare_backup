@@ -16,6 +16,20 @@
                 ) B
     </select>
 
+    <select id="selectNewRecId" resultType="string">
+        SELECT	IFNULL(
+                    CONCAT(SUBSTR(B.NEW_REC_ID, 1, 11), LPAD( (SUBSTR(B.NEW_REC_ID, 12, 5)) + 1 , 5, '0'))
+                ,	CONCAT('REC',  DATE_FORMAT(NOW(), '%Y%m%d'), '00001')
+            ) AS NEW_REC_ID
+        FROM	(
+                SELECT	MAX(A.REC_ID)  AS NEW_REC_ID
+                FROM	PEN1500 A
+                WHERE	1=1
+                AND	A.REC_ID LIKE CONCAT('REC',  DATE_FORMAT(NOW(), '%Y%m%d'), '%')
+            ) B
+    </select>
+
+
     <!--예비수급자 조회-->
     <sql id="spareRecipientList">
         SELECT
@@ -99,7 +113,7 @@
         ORDER BY REG_DTM DESC
     </sql>
 
-    <!--수그자조회-->
+    <!--수급자조회-->
     <sql id="recipientList">
         SELECT
             T1.* ,
@@ -157,13 +171,15 @@
                 A.REG_DTM ,
                 DATE_FORMAT(A.REG_DTM, '%Y.%m.%d') AS REG_DT ,
                 B.ORD_LEND_END_DTM ,
-                DATEDIFF(B.ORD_LEND_END_DTM, DATE_FORMAT(NOW(),'%Y%m%d')) AS ORD_LEND_REM_DAY
-        FROM (
+                DATEDIFF(B.ORD_LEND_END_DTM, DATE_FORMAT(NOW(),'%Y%m%d')) AS ORD_LEND_REM_DAY,
+                CASE WHEN REC_ID IS NULL THEN 'N' ELSE 'Y' END AS REC_YN
+            FROM (
                 SELECT *
                     FROM ENTPEN1000
                 WHERE ENT_ID = #{entId}
                 AND DEL_YN = 'N') C
             LEFT JOIN PEN1000 A ON C.PEN_ID = A.PEN_ID
+            LEFT JOIN pen1500 P15 ON P15.PEN_ID = A.PEN_ID
             LEFT OUTER JOIN (
                 SELECT B.PEN_ID, B.ORD_LEND_END_DTM
                 FROM (
@@ -184,7 +200,13 @@
             AND T1.APP_CD = #{appCd}
         </if>
         <if test="penNm!=null and !penNm.equals('')">
-            AND ( T1.PEN_NM LIKE CONCAT('%', #{penNm}, '%') OR T1.PEN_PRO_NM LIKE CONCAT('%', #{penNm}, '%') )
+            AND T1.PEN_NM LIKE CONCAT('%', #{penNm}, '%')
+        </if>
+        <if test="penProNm!=null and !penProNm.equals('')">
+            AND T1.PEN_PRO_NM LIKE CONCAT('%', #{penProNm}, '%')
+        </if>
+        <if test="penLtmNum!=null and !penLtmNum.equals('')">
+            AND T1.PEN_LTM_NUM LIKE CONCAT('%', #{penLtmNum}, '%')
         </if>
         <if test="penTypeCd!=null and !penTypeCd.equals('')">
             AND T1.PEN_TYPE_CD = #{penTypeCd}
@@ -199,6 +221,51 @@
             AND T1.USR_ID = #{usrId}
         </if>
         ORDER BY REG_DTM DESC
+    </sql>
+
+    <!--욕구사정기록지-->
+    <sql id="recipientRecList">
+        SELECT
+            A.*,
+            CASE WHEN A.HELPER_TYPE IS NULL THEN HELPER_TYPE_ETC ELSE
+            (SELECT SUB_CD_NM FROM cmm1100 WHERE MST_CD = 'REC00002' AND SUB_CD = A.HELPER_TYPE) END AS HELPER_TYPE_NM,
+            (SELECT SUB_CD_NM FROM cmm1100 WHERE MST_CD = 'REC00001' AND SUB_CD = A.PSCL_STATE1) AS PSCL_STATE1_NM,
+            (SELECT SUB_CD_NM FROM cmm1100 WHERE MST_CD = 'REC00001' AND SUB_CD = A.PSCL_STATE2) AS PSCL_STATE2_NM,
+            (SELECT SUB_CD_NM FROM cmm1100 WHERE MST_CD = 'REC00001' AND SUB_CD = A.PSCL_STATE3) AS PSCL_STATE3_NM,
+            (SELECT SUB_CD_NM FROM cmm1100 WHERE MST_CD = 'REC00001' AND SUB_CD = A.PSCL_STATE4) AS PSCL_STATE4_NM,
+            (SELECT SUB_CD_NM FROM cmm1100 WHERE MST_CD = 'REC00001' AND SUB_CD = A.PSCL_STATE5) AS PSCL_STATE5_NM,
+            (SELECT SUB_CD_NM FROM cmm1100 WHERE MST_CD = 'REC00001' AND SUB_CD = A.PSCL_STATE6) AS PSCL_STATE6_NM,
+            (SELECT SUB_CD_NM FROM cmm1100 WHERE MST_CD = 'REC00003' AND SUB_CD = A.HOME_ENV) AS HOME_ENV_NM,
+            (SELECT SUB_CD_NM FROM cmm1100 WHERE MST_CD = 'REC00004' AND SUB_CD = A.HOME_TYPE) AS HOME_TYPE_NM,
+            (SELECT SUB_CD_NM FROM cmm1100 WHERE MST_CD = 'REC00005' AND SUB_CD = A.INMATE) AS INMATE_NM,
+            (SELECT ENT_NM FROM ENT1000 WHERE ENT_ID = A.ENT_ID) AS ENT_NM,
+            (SELECT USR_NM FROM ENT1100 WHERE USR_ID = A.USR_ID) AS USR_NM,
+            (SELECT PEN_NM FROM PEN1000 WHERE PEN_ID = A.PEN_ID) AS PEN_NM
+        FROM pen1500 A
+        JOIN pen1000 p on p.PEN_ID = A.PEN_ID AND P.DEL_YN = 'N'
+        WHERE 1=1
+        <if test="entId!=null and !entId.equals('')">
+            AND A.ENT_ID = #{entId}
+        </if>
+        <if test="penNm!=null and !penNm.equals('')">
+            AND P.PEN_NM LIKE CONCAT('%', #{penNm}, '%')
+        </if>
+        <if test="penProNm!=null and !penProNm.equals('')">
+            AND P.PEN_PRO_NM LIKE CONCAT('%', #{penProNm}, '%')
+        </if>
+        <if test="penLtmNum!=null and !penLtmNum.equals('')">
+            AND P.PEN_LTM_NUM LIKE CONCAT('%', #{penLtmNum}, '%')
+        </if>
+        <if test="penRecGraCd!=null and !penRecGraCd.equals('')">
+            AND P.PEN_REC_GRA_CD = #{penRecGraCd}
+        </if>
+        <if test="penId!=null and !penId.equals('')">
+            AND A.PEN_ID = #{penId}
+        </if>
+        <if test="recId!=null and !recId.equals('')">
+            AND A.REC_ID = #{recId}
+        </if>
+        ORDER BY A.REG_DTM DESC
     </sql>
 
 <!--수급자조회-->
@@ -256,6 +323,21 @@
         ORDER BY ITEM_ID
     </select>
 
+<!--욕구사정기록지-->
+    <select id="selectRecipientRecCnt" parameterType="hashmap" resultType="int" >
+        SELECT
+            COUNT(*)
+        FROM (
+            <include refid="recipientRecList"></include>
+        ) T1
+    </select>
+    <select id="selectRecipientRecList" parameterType="hashmap" resultType="camelMap" fetchSize="10000">
+        <include refid="recipientRecList"></include>
+        <if test="pageSize > 0 and pageNum > 0">
+            LIMIT #{pageSize}
+            OFFSET #{offset}
+        </if>
+    </select>
 
     <insert id="insertRecipient" parameterType="hashmap">
         INSERT INTO PEN1000
@@ -311,6 +393,26 @@
          #{penId}
         , (SELECT IFNULL(MAX(T1.APP_SEQ),0)+1 FROM pen6000 T1), #{penOrdId}, '00', '00'
         ,CURRENT_TIMESTAMP,	#{usrId}, #{accessIp} ,CURRENT_TIMESTAMP, #{usrId}, #{accessIp}
+        )
+    </insert>
+
+    <!--욕구사정기록지 추가-->
+    <insert id="insertRecipientRec" parameterType="hashmap">
+        INSERT INTO pen1500
+        (
+            REC_ID, PEN_ID, ENT_ID, USR_ID,
+            PSCL_STATE1, PSCL_STATE2, PSCL_STATE3, PSCL_STATE4,
+            PSCL_STATE5, PSCL_STATE6, PSCL_REASON, RECOG_REASON, HELPER_YN, CHILD, HELPER_TYPE,
+            HELPER_TYPE_ETC, HOME_ENV, HOME_TYPE, INMATE, TOTAL_REVIEW,
+            REG_DTM, REG_USR_ID, REG_USR_IP,MODIFY_DTM, MODIFY_USR_ID, MODIFY_USR_IP
+        )
+        VALUES
+        (
+            #{recId}, #{penId}, #{entId}, #{usrId},
+            #{psclState1}, #{psclState2}, #{psclState3}, #{psclState4},
+            #{psclState5}, #{psclState6}, #{psclReason}, #{recogReason}, #{helperYn}, #{child}, #{helperType},
+            #{helperTypeEtc}, #{homeEnv}, #{homeType}, #{inmate}, #{totalReview},
+            CURRENT_TIMESTAMP,	#{usrId}, #{accessIp} ,CURRENT_TIMESTAMP, #{usrId}, #{accessIp}
         )
     </insert>
 
@@ -384,6 +486,36 @@
         <if test='delYn != null and !delYn.equals("")'>,DEL_YN = #{delYn}</if>
         WHERE PEN_ID = #{penId}
     </update>
+
+    <update id="updateRecipientRec" parameterType="hashmap">
+        UPDATE PEN1500 SET
+            MODIFY_DTM		= CURRENT_TIMESTAMP
+            ,MODIFY_USR_ID	= #{usrId}
+            ,MODIFY_USR_IP = #{accessIp}
+        <if test='usrId != null and !usrId.equals("")'>,USR_ID = #{usrId}</if>
+        <if test='psclState1 != null and !psclState1.equals("")'>,PSCL_STATE1 = #{psclState1}</if>
+        <if test='psclState2 != null and !psclState2.equals("")'>,PSCL_STATE2 = #{psclState2}</if>
+        <if test='psclState3 != null and !psclState3.equals("")'>,PSCL_STATE3 = #{psclState3}</if>
+        <if test='psclState4 != null and !psclState4.equals("")'>,PSCL_STATE4 = #{psclState4}</if>
+        <if test='psclState5 != null and !psclState5.equals("")'>,PSCL_STATE5 = #{psclState5}</if>
+        <if test='psclState6 != null and !psclState6.equals("")'>,PSCL_STATE6 = #{psclState6}</if>
+        <if test='psclReason != null and !psclReason.equals("")'>,PSCL_REASON = #{psclReason}</if>
+        <if test='recogReason != null and !recogReason.equals("")'>,RECOG_REASON = #{recogReason}</if>
+        <if test='helperYn != null and !helperYn.equals("")'>,HELPER_YN = #{helperYn}</if>
+        <if test='child != null and !child.equals("")'>,CHILD = #{child}</if>
+        <if test='helperType != null and !helperType.equals("")'>,HELPER_TYPE = #{helperType}</if>
+        <if test='helperTypeEtc != null and !helperTypeEtc.equals("")'>,HELPER_TYPE_ETC = #{helperTypeEtc}</if>
+        <if test='homeEnv != null and !homeEnv.equals("")'>,HOME_ENV = #{homeEnv}</if>
+        <if test='homeType != null and !homeType.equals("")'>,HOME_TYPE = #{homeType}</if>
+        <if test='inmate != null and !inmate.equals("")'>,INMATE = #{inmate}</if>
+        <if test='totalReview != null and !totalReview.equals("")'>,TOTAL_REVIEW = #{totalReview}</if>
+        WHERE REC_ID = #{recId}
+    </update>
+
+    <delete id="deleteRecipientRec" parameterType="hashmap">
+        DELETE FROM PEN1500
+        WHERE REC_ID = #{recId}
+    </delete>
 
     <select id="selectConNum" parameterType="hashmap" resultType="camelMap" fetchSize="10000">
         <![CDATA[
