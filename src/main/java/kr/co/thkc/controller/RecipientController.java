@@ -65,6 +65,21 @@ public class RecipientController {
     }
 
     /**
+     *  욕구사정기록지 조회
+     * */
+    @PostMapping(value = "selectRecList")
+    public BaseResponse selectRecipientRec(@RequestBody BaseRequest request) throws Exception {
+
+        // requiredField add
+        request.addRequiredField("usrId", request.TYPE_STRING);
+
+        request.validRequiredField();
+
+        // bussiness logic
+        return recipientService.selectRecipientRec(request.bindRequest());
+    }
+
+    /**
      *  수급자 추가
      * */
     @PostMapping(value = "insert")
@@ -95,6 +110,22 @@ public class RecipientController {
     }
 
     /**
+     *  욕구사정기록지 추가
+     * */
+    @PostMapping(value = "insertRec")
+    public BaseResponse insertRecipientRec(@RequestBody BaseRequest request) throws Exception {
+
+        // requiredField add
+        request.addRequiredField("usrId", request.TYPE_STRING);
+
+        request.validRequiredField();
+
+        // bussiness logic
+        return recipientService.insertRecipientRec(request.bindRequest());
+    }
+
+
+    /**
      *  수급자 수정
      * */
     @PostMapping(value = "update")
@@ -108,6 +139,22 @@ public class RecipientController {
 
         // bussiness logic
         return recipientService.updateRecipient(request.bindRequest());
+    }
+
+    /**
+     *  욕구사정기록지 수정
+     * */
+    @PostMapping(value = "updateRec")
+    public BaseResponse updateRecipientRec(@RequestBody BaseRequest request) throws Exception {
+
+        // requiredField add
+        request.addRequiredField("usrId", request.TYPE_STRING);
+        request.addRequiredField("recId", request.TYPE_STRING);
+
+        request.validRequiredField();
+
+        // bussiness logic
+        return recipientService.updateRecipientRec(request.bindRequest());
     }
 
     /**

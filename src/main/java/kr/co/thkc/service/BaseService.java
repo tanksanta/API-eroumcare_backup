@@ -34,6 +34,10 @@ public abstract class BaseService {
         return abstractDAO.selectOne("recipient.selectNewPenId",null).toString();
     }
 
+    public String newRecId(){
+        return abstractDAO.selectOne("recipient.selectNewRecId",null).toString();
+    }
+
     public String newPenOrdId(){
         return abstractDAO.selectOne("order.selectNewPenOrdId",null).toString();
     }

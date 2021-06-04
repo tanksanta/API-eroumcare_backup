@@ -35,6 +35,7 @@
     <select id="selectEntLogin" parameterType="hashMap" resultType="camelMap">
         SELECT
             ID
+            ,PW
             ,NM
             ,ENT_ID
             ,ENT_NM
