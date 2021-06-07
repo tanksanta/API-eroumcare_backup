@@ -87,6 +87,8 @@ public class ProdService extends BaseService{
 
         //제품추가
         abstractDAO.insert("prod.insertProd",params);
+        //상품옵션 추가
+        abstractDAO.insert("prod.insertOptionProd",params);
         //제품수정정보추가
         abstractDAO.insert("prod.insertProdModify",params);
 

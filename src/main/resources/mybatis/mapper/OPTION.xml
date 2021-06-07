@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="option">
+
+    <!--주문옵션 추가-->
+    <insert id="insertOptionOrd" parameterType="List">
+        INSERT INTO option_ord
+        (
+            PEN_ORD_ID, PEN_STA_SEQ,
+            OPTION_NAME,OPTION_ITEM,
+            REG_DTM,    REG_USR_IP,     REG_USR_ID,
+            MODIFY_DTM, MODIFY_USR_IP,  MODIFY_USR_ID
+        )
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+        (
+            #{item.penOrdId}, #{item.penStaSeq},
+            #{item.optionName}, #{item.optionItem},
+            CURRENT_TIMESTAMP,#{usrId},#{accessIp},
+            CURRENT_TIMESTAMP,#{usrId},#{accessIp}
+        )
+        </foreach>
+    </insert>
+
+    <!--재고옵션 추가-->
+    <insert id="insertOptionStock" parameterType="List">
+        INSERT INTO option_sto
+        (
+            STO_ID,
+            OPTION_NAME,OPTION_ITEM,
+            REG_DTM,    REG_USR_IP,     REG_USR_ID,
+            MODIFY_DTM, MODIFY_USR_IP,  MODIFY_USR_ID
+        )
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+        (
+            #{item.stoId},
+            #{item.optionName}, #{item.optionItem},
+            CURRENT_TIMESTAMP,#{usrId},#{accessIp},
+            CURRENT_TIMESTAMP,#{usrId},#{accessIp}
+        )
+        </foreach>
+    </insert>
+
+    <!--상품옵션 추가-->
+    <insert id="insertOptionProd" parameterType="List">
+        INSERT INTO option_prod
+        (
+            PROD_ID,
+            OPTION_NAME, OPTION_ITEM,
+            REG_DTM,    REG_USR_IP,     REG_USR_ID,
+            MODIFY_DTM, MODIFY_USR_IP,  MODIFY_USR_ID
+        )
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+        (
+            #{item.prodId},
+            #{item.optionName}, #{item.optionItem},
+            CURRENT_TIMESTAMP,#{usrId},#{accessIp},
+            CURRENT_TIMESTAMP,#{usrId},#{accessIp}
+        )
+        </foreach>
+    </insert>
+
+
+    <!--주문옵션 수정-->
+    <update id="updateOptionOrd" parameterType="hashmap">
+        UPDATE option_ord SET
+            MODIFY_DTM = CURRENT_TIMESTAMP
+            ,MODIFY_USR_ID = #{usrId}
+            ,MODIFY_USR_IP = #{accessIp}
+            <if test='optionName != null and !optionName.equals("")'>,OPTION_NAME = #{optionName}</if>
+            <if test='optionItem != null and !optionItem.equals("")'>,OPTION_ITEM = #{optionItem}</if>
+        WHERE 1=1
+        AND PEN_ORD_ID = #{penOrdId}
+        AND PEN_STA_SEQ = #{penStaSeq}
+    </update>
+
+    <!--재고옵션 수정-->
+    <update id="updateOptionStock" parameterType="hashmap">
+        UPDATE option_sto SET
+            MODIFY_DTM = CURRENT_TIMESTAMP
+            ,MODIFY_USR_ID = #{usrId}
+            ,MODIFY_USR_IP = #{accessIp}
+            <if test='optionName != null and !optionName.equals("")'>,OPTION_NAME = #{optionName}</if>
+            <if test='optionItem != null and !optionItem.equals("")'>,OPTION_ITEM = #{optionItem}</if>
+        WHERE 1=1
+        AND STO_ID = #{stoId}
+    </update>
+
+    <!--상품옵션 수정-->
+    <update id="updateOptionProd" parameterType="hashmap">
+        UPDATE option_prod SET
+            MODIFY_DTM = CURRENT_TIMESTAMP
+            ,MODIFY_USR_ID = #{usrId}
+            ,MODIFY_USR_IP = #{accessIp}
+            <if test='optionName != null and !optionName.equals("")'>,OPTION_NAME = #{optionName}</if>
+            <if test='optionItem != null and !optionItem.equals("")'>,OPTION_ITEM = #{optionItem}</if>
+        WHERE 1=1
+        AND PROD_ID = #{prodId}
+    </update>
+
+</mapper>
