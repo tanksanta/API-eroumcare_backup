@@ -70,7 +70,7 @@ dependencies {
     implementation 'org.mariadb.jdbc:mariadb-java-client:2.6.0'
     implementation 'org.asciidoctor:asciidoctorj:1.5.5'
 
-    compileOnly 'org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4:1.16'
+    implementation 'org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4:1.16'
 
     asciidoctor 'org.springframework.restdocs:spring-restdocs-asciidoctor'
     testImplementation 'org.springframework.restdocs:spring-restdocs-restassured'

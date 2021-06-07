@@ -25,33 +25,17 @@
     <select id="selectEform001" parameterType="hashmap" resultType="camelMap" fetchSize="10000">
         SELECT
             UUID,
-            CONTRACT_NUMBER AS PEN_ORD_ID,
-            EFORM_TYPE,
-            '00' AS GUBUN,
-            T_01_211 AS ITEM_NM,
-            T_01_212 AS PROD_NM,
-            T_01_213 AS PROD_PAY_CODE,
-            T_01_214 AS PROD_BAR_NUM,
-            T_01_216 AS CONTRACT_DATE,
-            T_01_218 AS PROD_PRICE,
-            T_01_219 AS PEN_PRICE
-        FROM eform_thk001_purchaselist_view
-        WHERE CONTRACT_NUMBER = #{penOrdId}
-            UNION ALL
-        SELECT
-            UUID,
-            CONTRACT_NUMBER AS PEN_ORD_ID,
-            EFORM_TYPE,
-            '01' AS GUBUN,
-            T_01_511 AS ITEM_NM,
-            T_01_512 AS PROD_NM,
-            T_01_513 AS PROD_PAY_CODE,
-            T_01_514 AS PROD_BAR_NUM,
-            CONCAT(T_01_516,'-',T_01_517) AS CONTRACT_DATE,
-            T_01_518 AS PROD_PRICE,
-            T_01_519 AS PEN_PRICE
-        FROM eform_thk001_rentallist_view
-        WHERE CONTRACT_NUMBER = #{penOrdId}
+            A.PEN_ORD_ID AS PEN_ORD_ID,
+            A.ORD_STATUS AS GUBUN,
+            A.ITEM_NM AS ITEM_NM,
+            A.PROD_NM AS PROD_NM,
+            A.PROD_PAY_CODE AS PROD_PAY_CODE,
+            A.PROD_BAR_NUM AS PROD_BAR_NUM,
+            CASE WHEN A.ORD_STATUS='00' THEN A.ORD_DTM ELSE CONCAT(A.ORD_LEND_STR_DTM,'-',A.ORD_LEND_END_DTM) END AS CONTRACT_DATE,
+            A.PROD_OFL_PRICE AS PROD_PRICE,
+            FN_PEN_PRICE(A.PEN_ID, A.PROD_OFL_PRICE) AS PEN_PRICE
+        FROM pen5000 A
+        WHERE PEN_ORD_ID = #{penOrdId}
     </select>
 
     <insert id="insertEformMaster" parameterType="hashmap">
