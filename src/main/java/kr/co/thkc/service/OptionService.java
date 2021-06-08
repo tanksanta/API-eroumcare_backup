@@ -21,11 +21,9 @@ public class OptionService {
     @Autowired
     private AbstractDAO abstractDAO;
 
-
-    public BaseResponse insertOptionOrd(Map<String,Object> params) throws SQLException {
+    /*주문옵션 추가*/
+    public BaseResponse insertOptionOrd(List<Map> params) throws SQLException {
         BaseResponse response = new BaseResponse();
-
-        List paramList;
 
         //주문옵션 추가
         abstractDAO.insert("option.insertOptionOrd",params);
@@ -34,11 +32,9 @@ public class OptionService {
 
         return response;
     }
-
-    public BaseResponse insertOptionStock(Map<String,Object> params) throws SQLException {
+    /*재고옵션 추가*/
+    public BaseResponse insertOptionStock(List<Map> params) throws SQLException {
         BaseResponse response = new BaseResponse();
-
-        List paramList;
 
         //재고옵션 추가
         abstractDAO.insert("option.insertOptionStock",params);
@@ -47,21 +43,51 @@ public class OptionService {
 
         return response;
     }
-
-    public BaseResponse insertOptionProd(Map<String,Object> params) throws SQLException {
+    /*상품옵션 추가*/
+    public BaseResponse insertOptionProd(List<Map> params) throws SQLException {
         BaseResponse response = new BaseResponse();
 
-        List paramList;
-        Iterator iterator = params.keySet().iterator();
-        while (iterator.hasNext()) {
-            String key = (String)iterator.next();
-            if(key.contains("itemName")){
-
-            }
-        }
         //상품옵션 추가
         abstractDAO.insert("option.insertOptionProd",params);
 
+        response.setResult(ResultCode.RC_OK);
+
+        return response;
+    }
+
+
+    /*주문옵션 수정*/
+    public BaseResponse updateOptionOrd(List<Map> params) throws SQLException {
+        BaseResponse response = new BaseResponse();
+
+        //주문옵션 추가
+        for(Map option:params) {
+            abstractDAO.update("option.updateOptionOrd", option);
+        }
+        response.setResult(ResultCode.RC_OK);
+
+        return response;
+    }
+    /*재고옵션 수정*/
+    public BaseResponse updateOptionStock(List<Map> params) throws SQLException {
+        BaseResponse response = new BaseResponse();
+
+        //재고옵션 추가
+        for(Map option:params) {
+            abstractDAO.update("option.updateOptionStock", option);
+        }
+        response.setResult(ResultCode.RC_OK);
+
+        return response;
+    }
+    /*상품옵션 수정*/
+    public BaseResponse updateOptionProd(List<Map> params) throws SQLException {
+        BaseResponse response = new BaseResponse();
+
+        //상품옵션 추가
+        for(Map option:params) {
+            abstractDAO.update("option.updateOptionProd", option);
+        }
         response.setResult(ResultCode.RC_OK);
 
         return response;

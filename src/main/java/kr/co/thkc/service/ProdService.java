@@ -27,6 +27,9 @@ public class ProdService extends BaseService{
     @Autowired
     private FileService fileService;
 
+    @Autowired
+    private OptionService optionService;
+
 
 
     /*
@@ -60,6 +63,9 @@ public class ProdService extends BaseService{
     public BaseResponse insertProd(Map<String,Object> params, Map<String,MultipartFile> fileMap) throws Exception {
         BaseResponse response = new BaseResponse();
 
+        String usrId = MapUtils.getString(params,"usrId");
+        String accessIp = MapUtils.getString(params,"accessIp");
+
         String prodDetail = MapUtils.getString(params,"prodDetail");
         params.put("prodDetail",prodDetail);
 
@@ -87,10 +93,18 @@ public class ProdService extends BaseService{
 
         //제품추가
         abstractDAO.insert("prod.insertProd",params);
-        //상품옵션 추가
-        abstractDAO.insert("prod.insertOptionProd",params);
         //제품수정정보추가
         abstractDAO.insert("prod.insertProdModify",params);
+        //옵션 추가
+        List<Map> optionList = (List) MapUtils.getObject(params,"option");
+        if(optionList!=null && optionList.size()>0) {
+            for(Map option:optionList){
+                option.put("prodId",prodId);
+                option.put("usrId",usrId);
+                option.put("accessIp",accessIp);
+            }
+            optionService.insertOptionProd(optionList);
+        }
 
         response.setData(params);
         response.setResult(ResultCode.RC_OK);
@@ -101,6 +115,10 @@ public class ProdService extends BaseService{
 
     public BaseResponse updateProd(Map<String,Object> params, Map<String,MultipartFile> fileMap) throws Exception {
         BaseResponse response = new BaseResponse();
+
+        String usrId = MapUtils.getString(params,"usrId");
+        String accessIp = MapUtils.getString(params,"accessIp");
+        String prodId = MapUtils.getString(params,"prodId");
 
         String prodDetail = MapUtils.getString(params,"prodDetail");
         params.put("prodDetail",prodDetail);
@@ -138,6 +156,16 @@ public class ProdService extends BaseService{
         abstractDAO.update("prod.updateProd",params);
         //제품수정정보추가
         abstractDAO.update("prod.updateProdModify",params);
+        //옵션 수정
+        List<Map> optionList = (List) MapUtils.getObject(params,"option");
+        if(optionList!=null && optionList.size()>0) {
+            for(Map option:optionList){
+                option.put("prodId",prodId);
+                option.put("usrId",usrId);
+                option.put("accessIp",accessIp);
+            }
+            optionService.updateOptionProd(optionList);
+        }
 
         response.setResult(ResultCode.RC_OK);
 

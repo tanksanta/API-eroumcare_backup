@@ -37,8 +37,37 @@
     </select>
 
     <select id="selectProdList" parameterType="hashmap" resultType="camelMap" fetchSize="10000">
-        SELECT *
-        FROM PRO1100
+        SELECT
+            A.PROD_ID,
+            A.GUBUN,
+            A.PROD_NM,
+            A.ITEM_ID,
+            A.SUB_ITEM,
+            A.PROD_SUP_YN,
+            A.PROD_SUP_PRICE,
+            A.PROD_OFL_PRICE,
+            A.RENTAL_PRICE,
+            A.RENTAL_PRICE_EXTN,
+            A.PROD_PAY_CODE,
+            A.SUP_ID,
+            A.PROD_SYM,
+            A.PROD_WEIG,
+            A.PROD_QTY,
+            A.PROD_DETAIL,
+            A.TAX_INFO_CD,
+            A.USE_CD,
+            A.PROD_IMG_ATTR,
+            A.PROD_STATE_CODE,
+            A.PROD_STOP,
+            A.PROD_STOP_DTM,
+            A.REG_DTM,
+            A.REG_USR_ID,
+            A.REG_USR_IP,
+            A.MODIFY_DTM,
+            A.MODIFY_USR_ID,
+            A.MODIFY_USR_IP
+        FROM PRO1100 A
+        LEFT JOIN OPTION_PROD B ON A.PROD_ID = B.PROD_ID
         WHERE PROD_ID = #{prodId}
     </select>
 
@@ -100,7 +129,7 @@
         ,PROD_PAY_CODE,		TAX_INFO_CD
         ,SUP_ID
         ,PROD_SYM,		    PROD_WEIG
-        ,PROD_SIZE_DETAIL ,  PROD_QTY,			PROD_DETAIL
+        ,PROD_QTY,			PROD_DETAIL
         ,PROD_IMG_ATTR
         ,REG_DTM,			REG_USR_ID,			REG_USR_IP
         ,MODIFY_DTM,		MODIFY_USR_ID,		MODIFY_USR_IP
@@ -115,24 +144,9 @@
             <otherwise>#{supId}</otherwise>
          </choose>
         ,#{prodSym},			#{prodWeig}
-        ,#{prodSizeDetail},    1,					#{prodDetail}
+        ,1,					#{prodDetail}
         ,#{prodImgAttr}
         ,CURRENT_TIMESTAMP,	#{usrId},			#{accessIp}
-        ,CURRENT_TIMESTAMP,	#{usrId},		#{accessIp}
-        )
-    </insert>
-
-    <insert id="insertProdOption" parameterType="hashmap">
-        INSERT INTO prodoption
-        (
-        PROD_ID,    ORD
-        ,OPTION_NAME    ,OPTION_DESC    ,OPTION_ITEM
-        ,MODIFY_DTM     ,MODIFY_USR_ID  ,MODIFY_USR_IP
-        )
-        VALUES
-        (
-         #{prodId}, #{ord}
-        , #{optionName}    , #{optionDesc}    , #{optionItem}
         ,CURRENT_TIMESTAMP,	#{usrId},		#{accessIp}
         )
     </insert>
@@ -187,18 +201,6 @@
         <if test='prodImgAttr != null and !prodImgAttr.equals("")'>,PROD_IMG_ATTR = #{prodImgAttr}</if>
         WHERE 1=1
         AND PROD_ID = #{prodId}
-    </update>
-
-    <update id="updateProdOption" parameterType="hashmap">
-        UPDATE prodoption SET
-        MODIFY_DTM = CURRENT_TIMESTAMP
-        ,MODIFY_USR_ID = #{usrId}
-        ,MODIFY_USR_IP = #{accessIp}
-        <if test='optionDesc != null and !optionDesc.equals("")'>,OPTION_NAME = #{optionDesc}</if>
-        <if test='optionItem != null and !optionItem.equals("")'>,OPTION_DESC = #{optionItem}</if>
-        WHERE 1=1
-        AND PROD_ID = #{prodId}
-        AND OPTION_NAME = #{optionName}
     </update>
 
     <delete id="deleteProd" parameterType="hashmap">

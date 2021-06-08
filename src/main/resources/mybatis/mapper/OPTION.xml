@@ -47,7 +47,7 @@
         INSERT INTO option_prod
         (
             PROD_ID,
-            OPTION_NAME, OPTION_ITEM,
+            OPTION_NAME, OPTION_ITEM, OPTION_DESC
             REG_DTM,    REG_USR_IP,     REG_USR_ID,
             MODIFY_DTM, MODIFY_USR_IP,  MODIFY_USR_ID
         )
@@ -55,7 +55,7 @@
         <foreach collection="list" item="item" separator=",">
         (
             #{item.prodId},
-            #{item.optionName}, #{item.optionItem},
+            #{item.optionName}, #{item.optionItem}, #{item.optionDesc}
             CURRENT_TIMESTAMP,#{usrId},#{accessIp},
             CURRENT_TIMESTAMP,#{usrId},#{accessIp}
         )
@@ -96,6 +96,7 @@
             ,MODIFY_USR_IP = #{accessIp}
             <if test='optionName != null and !optionName.equals("")'>,OPTION_NAME = #{optionName}</if>
             <if test='optionItem != null and !optionItem.equals("")'>,OPTION_ITEM = #{optionItem}</if>
+            <if test='optionDesc != null and !optionDesc.equals("")'>,OPTION_DESC = #{optionDesc}</if>
         WHERE 1=1
         AND PROD_ID = #{prodId}
     </update>

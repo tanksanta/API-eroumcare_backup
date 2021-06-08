@@ -77,8 +77,6 @@
             B.ITEM_NM,
             A.PROD_SUP_YN,
             A.PROD_PAY_CODE,
-            D.PROD_COLOR,
-            D.PROD_SIZE,
             COUNT(*) QUANTITY
         FROM PRO1100 A
             JOIN PRO1000 B ON A.ITEM_ID = B.ITEM_ID
@@ -93,19 +91,19 @@
         <if test="prodId!=null and !prodId.equals('')">AND A.PROD_ID = #{prodId}</if>
         <if test="prodPayCode!=null and !prodPayCode.equals('')">AND A.PROD_PAY_CODE = #{prodPayCode}</if>
         <if test="gubun!=null and !gubun.equals('')">AND A.GUBUN = #{gubun}</if>
-        GROUP BY PROD_NM,PROD_COLOR,PROD_SIZE
+        GROUP BY PROD_NM
         ORDER BY D.REG_DTM
     </select>
 
 
     <!--재고상세 목록-->
     <select id="selectStockDetailListCnt" parameterType="hashmap" resultType="int">
-       SELECT
-           COUNT(*)
-       FROM PRO1100 A
-           JOIN PRO1000 B ON A.ITEM_ID = B.ITEM_ID
-           JOIN PRO1102 C ON C.PROD_ID = A.PROD_ID AND C.DEL_YN = 'N'
-           JOIN PRO1103 D ON D.PPC_ID = C.PPC_ID AND D.DEL_YN = 'N'
+        SELECT
+            COUNT(*)
+        FROM PRO1100 A
+            JOIN PRO1000 B ON A.ITEM_ID = B.ITEM_ID
+            JOIN PRO1102 C ON C.PROD_ID = A.PROD_ID AND C.DEL_YN = 'N'
+            JOIN PRO1103 D ON D.PPC_ID = C.PPC_ID AND D.DEL_YN = 'N'
             LEFT JOIN (
                 SELECT PEN_ORD_ID, PEN.UUID, STO_ID, PEN_ID, ORD_LEND_STR_DTM, ORD_LEND_END_DTM, REG_DTM
                 FROM pen5000 PEN
@@ -117,7 +115,7 @@
            <foreach item="item" index="index" collection="stateCd" open=" (" separator="," close=")">#{item}</foreach>
        </if>
        <if test="searchOption!=null and !searchOption.equals('')">
-          AND (D.PROD_SIZE like concat('%',#{searchOption},'%') OR D.PROD_COLOR like concat('%',#{searchOption},'%') )
+            AND  = #{searchOption}
        </if>
        <if test="prodBarNum!=null and !prodBarNum.equals('')">AND D.PROD_BAR_NUM = #{prodBarNum}</if>
        <if test="entId!=null and !entId.equals('')">AND C.ENT_ID = #{entId}</if>
@@ -137,8 +135,6 @@
             A.PROD_SUP_YN,
             CASE A.PROD_SUP_YN WHEN 'Y' THEN '유통' WHEN 'N' THEN '미유통' END AS PROD_SUP_NM,
             A.PROD_PAY_CODE,
-            D.PROD_COLOR,
-            D.PROD_SIZE,
             D.STATE_CD,
             (SELECT SUB_CD_NM FROM cmm1100 WHERE MST_CD = 'PRO00003' AND SUB_CD = D.STATE_CD) AS STATE_NM,
             CASE WHEN STATE_CD != '01' THEN EFORM_URL END AS EFORM_URL,
@@ -166,7 +162,7 @@
             <foreach item="item" index="index"  collection="stateCd" open=" (" separator="," close=")">#{item}</foreach>
         </if>
         <if test="searchOption!=null and !searchOption.equals('')">
-          AND (D.PROD_SIZE like concat('%',#{searchOption},'%') OR D.PROD_COLOR like concat('%',#{searchOption},'%') )
+            AND = #{searchOption}
         </if>
         <if test="prodBarNum!=null and !prodBarNum.equals('')">AND D.PROD_BAR_NUM = #{prodBarNum}</if>
         <if test="entId!=null and !entId.equals('')">AND C.ENT_ID = #{entId}</if>
@@ -250,8 +246,6 @@
             B.ITEM_NM,
             A.PROD_SUP_YN,
             A.PROD_PAY_CODE,
-            D.PROD_COLOR,
-            D.PROD_SIZE,
             D.PROD_BAR_NUM
         FROM PRO1100 A
             JOIN PRO1000 B ON A.ITEM_ID = B.ITEM_ID

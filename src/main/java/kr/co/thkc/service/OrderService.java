@@ -33,6 +33,9 @@ public class OrderService extends BaseService {
     @Autowired
     private EformService eformService;
 
+    @Autowired
+    private OptionService optionService;
+
 
     /**
      * 주문 조회
@@ -95,9 +98,11 @@ public class OrderService extends BaseService {
         params.put("returnUrl",returnUrl);
 
 
-        //추가해야할 재고가 있을때 사용할 신규재로 목록
+        //추가해야할 재고가 있을때 사용할 신규재고 목록
         List<Map> newStockList = new ArrayList();
         List<Map> orderList = new ArrayList();
+        //추가해야할 옵션이 있을때 사용할 목록
+        List<Map> optionList = new ArrayList();
 
         int penStaSeq=1;    //주문등록 시퀀스
         List<Map> prodList = (List<Map>) MapUtils.getObject(params,"prods");
@@ -194,17 +199,34 @@ public class OrderService extends BaseService {
             }
             order.put("prodOflPrice", price);
             order.put("finPayment", finPayment);
+
+            //옵션
+            List<Map> option = (List<Map>)MapUtils.getObject(order,"option");
+            if(option != null && option.size()>0) {
+                for(Map item:option){
+                    item.put("penOrdId",penOrdId);
+                    item.put("penStaSeq",penStaSeq);
+                    item.put("accessIp", accessIp);
+                    item.put("usrId", usrId);
+                }
+                optionList.addAll(option);
+            }
+            //주문시퀀스 등록
             order.put("penStaSeq",penStaSeq++);
 
             resultStock.add(new HashMap(){{
                 put("stoId",order.get("stoId"));
                 put("ct_id",order.get("ct_id"));
             }});
+
         }
 
         //주문 추가
         abstractDAO.insert("order.insertOrder_multi", orderList);
-
+        //옵션 추가
+        if(optionList!=null && optionList.size()>0) {
+            optionService.insertOptionOrd(optionList);
+        }
         if(discount!=null && discount==0){
             abstractDAO.insert("recipient.insertRecipientReq",params);
         }
@@ -240,6 +262,8 @@ public class OrderService extends BaseService {
 
         //현재 주문 품목
         List<Map> ordList = abstractDAO.selectList("order.selectOrderList",params);
+        //옵션 추가를 위한 리스트
+        List<Map> optionList = new ArrayList();
         if(ordList.size() < 1) throw new Exception("penOrdId("+penOrdId+") 주문이 존재하지 않습니다.");
         //주문 수정
         abstractDAO.update("order.updateOrder", params);
@@ -276,6 +300,20 @@ public class OrderService extends BaseService {
                         put("ct_id",prod.get("ct_id"));
                     }});
                 }
+                //옵션
+                List<Map> option = (List<Map>)MapUtils.getObject(prod,"option");
+                if(option != null && option.size()>0) {
+                    for(Map item:option){
+                        item.put("penOrdId", penOrdId);
+                        item.put("accessIp", accessIp);
+                        item.put("usrId", usrId);
+                    }
+                    optionList.addAll(option);
+                }
+            }
+            //옵션 수정
+            if(optionList!=null && optionList.size()>0) {
+                optionService.updateOptionOrd(optionList);
             }
         }
 
