@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,45 @@ public class OptionService {
 
     @Autowired
     private AbstractDAO abstractDAO;
+
+
+    /*주문옵션 조회*/
+    public BaseResponse selectOptionOrd(Map params) throws SQLException {
+        BaseResponse response = new BaseResponse();
+
+        List optionList = new ArrayList();
+        try {
+            optionList = abstractDAO.selectList("option.selectOptionOrd",params);
+        }catch (Exception e){
+            log.error("조회된 옵션이 없습니다.");
+        }
+        //주문옵션 조회
+
+        response.setData(optionList);
+        response.setResult(ResultCode.RC_OK);
+        return response;
+    }
+    /*재고옵션 조회*/
+    public BaseResponse selectOptionStock(Map params) throws SQLException {
+        BaseResponse response = new BaseResponse();
+
+        //재고옵션 조회
+        abstractDAO.selectList("option.selectOptionStock",params);
+
+        response.setResult(ResultCode.RC_OK);
+        return response;
+    }
+    /*상품옵션 조회*/
+    public BaseResponse selectOptionProd(Map params) throws SQLException {
+        BaseResponse response = new BaseResponse();
+
+        //상품옵션 조회
+        abstractDAO.selectList("option.selectOptionProd",params);
+
+        response.setResult(ResultCode.RC_OK);
+        return response;
+    }
+
 
     /*주문옵션 추가*/
     public BaseResponse insertOptionOrd(List<Map> params) throws SQLException {

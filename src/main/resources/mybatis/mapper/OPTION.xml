@@ -2,6 +2,86 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="option">
 
+
+    <!--주문옵션 조회-->
+    <select id="selectOptionOrd" parameterType="hashmap" resultType="camelMap" fetchSize="10000">
+        SET @tsql = NULL;
+        SELECT
+               GROUP_CONCAT(
+                   CONCAT('"',OPTION_ITEM,'" AS ',OPTION_NAME)
+                )
+        INTO @tsql
+        FROM option_ord;
+
+
+        SET @tsql = CONCAT(
+            ' SELECT PEN_ORD_ID, ', @tsql,
+            ' FROM option_ord',
+            ' WHERE PEN_ORD_ID=','"',#{penOrdId},'"'
+        <if test='penStaSeq != null and !penStaSeq.equals("")'>' AND PEN_STA_SEQ=','"',#{penOrdId},'"',</if>
+        <if test='optionName != null and !optionName.equals("")'>' AND OPTION_NAME=','"',#{optionName},'"',</if>
+        <if test='optionItem != null and !optionItem.equals("")'>' AND OPTION_ITEM like ','"',CONCAT('%',#{optionItem},'%'),'"',</if>
+            ' group by PEN_ORD_ID, PEN_STA_SEQ'
+            );
+
+        PREPARE stmt FROM @tsql;
+        EXECUTE stmt;
+        DEALLOCATE PREPARE stmt;
+    </select>
+
+    <!--잭고옵션 조회-->
+    <select id="selectOptionStock" parameterType="hashmap" resultType="camelMap" fetchSize="10000">
+        SET @tsql = NULL;
+        SELECT
+               GROUP_CONCAT(
+                   CONCAT('"',OPTION_ITEM,'" AS ',OPTION_NAME)
+                )
+        INTO @tsql
+        FROM option_sto;
+
+
+        SET @tsql = CONCAT(
+            ' SELECT STO_ID, ', @tsql,
+            ' FROM option_sto',
+            ' WHERE 1=1=',
+        <if test='stoId != null and !stoId.equals("")'>' AND STO_ID=','"',#{stoId},'"',</if>
+        <if test='optionName != null and !optionName.equals("")'>' AND OPTION_NAME=','"',#{optionName},'"',</if>
+        <if test='optionItem != null and !optionItem.equals("")'>' AND OPTION_ITEM like ','"',CONCAT('%',#{optionItem},'%'),'"',</if>
+            ' group by STO_ID'
+            );
+
+        PREPARE stmt FROM @tsql;
+        EXECUTE stmt;
+        DEALLOCATE PREPARE stmt;
+    </select>
+
+    <!--상품옵션 조회-->
+    <select id="selectOptionProd" parameterType="hashmap" resultType="camelMap" fetchSize="10000">
+        SET @tsql = NULL;
+        SELECT
+               GROUP_CONCAT(
+                   CONCAT('"',OPTION_ITEM,'" AS ',OPTION_NAME)
+                )
+        INTO @tsql
+        FROM option_prod;
+
+
+        SET @tsql = CONCAT(
+            ' SELECT PROD_ID, ', @tsql,
+            ' FROM option_prod',
+            ' WHERE 1=1=',
+        <if test='prodId != null and !prodId.equals("")'>' AND PROD_ID=','"',#{prodId},'"',</if>
+        <if test='optionName != null and !optionName.equals("")'>' AND OPTION_NAME=','"',#{optionName},'"',</if>
+        <if test='optionItem != null and !optionItem.equals("")'>' AND OPTION_ITEM like ','"',CONCAT('%',#{optionItem},'%'),'"',</if>
+            ' group by PROD_ID'
+            );
+
+        PREPARE stmt FROM @tsql;
+        EXECUTE stmt;
+        DEALLOCATE PREPARE stmt;
+    </select>
+
+
     <!--주문옵션 추가-->
     <insert id="insertOptionOrd" parameterType="List">
         INSERT INTO option_ord

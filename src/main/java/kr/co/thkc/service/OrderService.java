@@ -43,8 +43,10 @@ public class OrderService extends BaseService {
     public BaseResponse selectOrderList(Map<String,Object> params) throws SQLException {
         BaseResponse response = new BaseResponse();
 
-        params.put("downloadUrl",env.getProperty("download.url"));
+        //옵션 조회
+        List orderOptions = (List) optionService.selectOptionOrd(params).getData();
 
+        params.put("downloadUrl",env.getProperty("download.url"));
         List orderList = abstractDAO.selectList("order.selectOrderList",params);
 
         response.setResultData(orderList);
