@@ -67,7 +67,7 @@
         FROM PEN5000 PEN
         LEFT JOIN (SELECT STO_ID, PROD_BAR_NUM FROM PRO1103) STOCK ON STOCK.STO_ID = PEN.STO_ID
         <if test="downloadUrl!=null and !downloadUrl.equals('')">
-        JOIN (SELECT DISTINCT UUID, EFORM_FILE_PATH, DOCUMENT_ID FROM eform_filelist_table WHERE DOCUMENT_ID = 'ALL') EFROM ON EFROM.UUID = PEN.UUID
+        LEFT JOIN (SELECT DISTINCT UUID, EFORM_FILE_PATH, DOCUMENT_ID FROM eform_filelist_table WHERE DOCUMENT_ID = 'ALL') EFROM ON EFROM.UUID = PEN.UUID
         </if>
         WHERE PEN_ORD_ID = #{penOrdId}
         <if test="penStaSeq!=null and !penStaSeq.equals('')">AND PEN_STA_SEQ = #{penStaSeq}</if>

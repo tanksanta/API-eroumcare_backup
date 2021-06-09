@@ -187,6 +187,7 @@ public class EntService extends BaseService{
         abstractDAO.insert("ent.insertEntAccount",params);
         //알림데이터 추가
         abstractDAO.insert("ent.insertSetAlm",params);
+
         //메뉴 추가
         abstractDAO.insert("set.insertSetMenuAll",params);
         //시스템 이용신청 추가

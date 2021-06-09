@@ -194,7 +194,6 @@
         MODIFY_DTM = CURRENT_TIMESTAMP
         ,MODIFY_USR_ID = #{usrId}
         ,MODIFY_USR_IP = #{accessIp}
-        ,PROD_QTY = 1
         <if test='optionDesc != null and !optionDesc.equals("")'>,OPTION_NAME = #{optionDesc}</if>
         <if test='optionItem != null and !optionItem.equals("")'>,OPTION_DESC = #{optionItem}</if>
         WHERE 1=1
