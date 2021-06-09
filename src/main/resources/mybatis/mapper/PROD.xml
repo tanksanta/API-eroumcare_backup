@@ -71,6 +71,7 @@
         ,SUP_ID
         ,PROD_SYM,			PROD_WEIG
         ,PROD_QTY,			PROD_DETAIL
+        ,PROD_COLOR,        PROD_SIZE,      PROD_SIZE_DETAIL
         ,USE_CD,			PROD_IMG_ATTR,		PROD_STATE_CODE
         ,REG_DTM,			REG_USR_ID,			REG_USR_IP
         ,MODIFY_DTM,		MODIFY_USR_ID,		MODIFY_USR_IP
@@ -86,6 +87,7 @@
          </choose>
 		,#{prodSym},		#{prodWeig}
         ,1,					#{prodDetail}
+        ,#{prodColor},      #{prodSize},        #{prodSizeDetail}
         ,'01',				#{prodImgAttr},		#{prodStateCode}
         ,CURRENT_TIMESTAMP,	#{usrId},			#{accessIp}
         ,CURRENT_TIMESTAMP,	#{usrId},		#{accessIp}
@@ -100,7 +102,8 @@
         ,PROD_PAY_CODE,		TAX_INFO_CD
         ,SUP_ID
         ,PROD_SYM,		    PROD_WEIG
-        ,PROD_SIZE_DETAIL ,  PROD_QTY,			PROD_DETAIL
+        ,PROD_COLOR,        PROD_SIZE          ,PROD_SIZE_DETAIL
+        ,PROD_QTY,			PROD_DETAIL
         ,PROD_IMG_ATTR
         ,REG_DTM,			REG_USR_ID,			REG_USR_IP
         ,MODIFY_DTM,		MODIFY_USR_ID,		MODIFY_USR_IP
@@ -114,25 +117,11 @@
             <when test='supId == null or supId.equals("")'>(SELECT SUP_ID FROM sup1000 WHERE USR_ID ='6178614330')</when>
             <otherwise>#{supId}</otherwise>
          </choose>
-        ,#{prodSym},			#{prodWeig}
-        ,#{prodSizeDetail},    1,					#{prodDetail}
+        ,#{prodSym},		#{prodWeig},
+        ,#{prodColor},      #{prodSize},        #{prodSizeDetail}
+        ,1,     	        #{prodDetail}
         ,#{prodImgAttr}
         ,CURRENT_TIMESTAMP,	#{usrId},			#{accessIp}
-        ,CURRENT_TIMESTAMP,	#{usrId},		#{accessIp}
-        )
-    </insert>
-
-    <insert id="insertProdOption" parameterType="hashmap">
-        INSERT INTO prodoption
-        (
-        PROD_ID,    ORD
-        ,OPTION_NAME    ,OPTION_DESC    ,OPTION_ITEM
-        ,MODIFY_DTM     ,MODIFY_USR_ID  ,MODIFY_USR_IP
-        )
-        VALUES
-        (
-         #{prodId}, #{ord}
-        , #{optionName}    , #{optionDesc}    , #{optionItem}
         ,CURRENT_TIMESTAMP,	#{usrId},		#{accessIp}
         )
     </insert>
@@ -159,6 +148,9 @@
         <if test='prodSym != null and !prodSym.equals("")'>,PROD_SYM = #{prodSym}</if>
         <if test='prodWeig != null and !prodWeig.equals("")'>,PROD_WEIG = #{prodWeig}</if>
         <if test='prodDetail != null and !prodDetail.equals("")'>,PROD_DETAIL = #{prodDetail}</if>
+        <if test='prodColor != null and !prodColor.equals("")'>,PROD_COLOR = #{prodColor}</if>
+        <if test='prodSize != null and !prodSize.equals("")'>,PROD_SIZE = #{prodSize}</if>
+        <if test='prodSizeDetail != null and !prodSizeDetail.equals("")'>,PROD_SIZE_DETAIL = #{prodSizeDetail}</if>
         <if test='prodImgAttr != null and !prodImgAttr.equals("")'>,PROD_IMG_ATTR = #{prodImgAttr}</if>
         WHERE 1=1
         AND PROD_ID = #{prodId}
@@ -184,22 +176,14 @@
         <if test='prodSym != null and !prodSym.equals("")'>,PROD_SYM = #{prodSym}</if>
         <if test='prodWeig != null and !prodWeig.equals("")'>,PROD_WEIG = #{prodWeig}</if>
         <if test='prodDetail != null and !prodDetail.equals("")'>,PROD_DETAIL = #{prodDetail}</if>
+        <if test='prodColor != null and !prodColor.equals("")'>,PROD_COLOR = #{prodColor}</if>
+        <if test='prodSize != null and !prodSize.equals("")'>,PROD_SIZE = #{prodSize}</if>
+        <if test='prodSizeDetail != null and !prodSizeDetail.equals("")'>,PROD_SIZE_DETAIL = #{prodSizeDetail}</if>
         <if test='prodImgAttr != null and !prodImgAttr.equals("")'>,PROD_IMG_ATTR = #{prodImgAttr}</if>
         WHERE 1=1
         AND PROD_ID = #{prodId}
     </update>
 
-    <update id="updateProdOption" parameterType="hashmap">
-        UPDATE prodoption SET
-        MODIFY_DTM = CURRENT_TIMESTAMP
-        ,MODIFY_USR_ID = #{usrId}
-        ,MODIFY_USR_IP = #{accessIp}
-        <if test='optionDesc != null and !optionDesc.equals("")'>,OPTION_NAME = #{optionDesc}</if>
-        <if test='optionItem != null and !optionItem.equals("")'>,OPTION_DESC = #{optionItem}</if>
-        WHERE 1=1
-        AND PROD_ID = #{prodId}
-        AND OPTION_NAME = #{optionName}
-    </update>
 
     <delete id="deleteProd" parameterType="hashmap">
         DELETE FROM PRO1100
@@ -236,6 +220,9 @@
                 , A.PROD_WEIG
                 , A.PROD_QTY
                 , A.PROD_DETAIL
+                , A.PROD_COLOR
+                , A.PROD_SIZE
+                , A.PROD_SIZE_DETAIL
                 , A.USE_CD
                 , A.PROD_IMG_ATTR
                 , A.PROD_STATE_CODE

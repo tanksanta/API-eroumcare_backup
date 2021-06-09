@@ -86,6 +86,7 @@
         INSERT INTO PEN5000
         (
         PEN_ORD_ID, PEN_STA_SEQ
+        ,PROD_COLOR     ,PROD_SIZE
         ,PEN_ID, USR_ID, ENT_ID, UUID
         ,PROD_ID, PROD_NM, ITEM_ID, ITEM_NM, PROD_OFL_PRICE, PROD_PAY_CODE, PROD_BAR_NUM
         ,ORD_DTM, DEL_GBN_CD, ORD_WAY_NUM, DEL_SER_CD, ORD_NM, ORD_CONT, ORD_MEMO, ORD_ZIP, ORD_ADDR, ORD_ADDR_DTL
@@ -97,6 +98,7 @@
         VALUES
         (
          #{penOrdId}, #{penStaSeq}
+        ,#{prodColor}     ,#{prodSize}
         ,#{penId}, #{usrId}, #{entId}, #{uuid}
         ,#{prodId}, #{prodNm}, #{itemId}, #{itemNm}, #{prodOflPrice}, #{prodPayCode}, #{prodBarNum}
         ,CURRENT_TIMESTAMP, #{delGbnCd}, #{ordWayNum}, #{delSerCd}, #{ordNm}, #{ordCont}, #{ordMemo}, #{ordZip}, #{ordAddr}, #{ordAddrDtl}
@@ -111,6 +113,7 @@
         INSERT INTO PEN5000
         (
         PEN_ORD_ID, PEN_STA_SEQ
+        ,PROD_COLOR     ,PROD_SIZE
         ,PEN_ID, USR_ID, ENT_ID, UUID
         ,PROD_ID, PROD_NM, ITEM_ID, ITEM_NM, PROD_OFL_PRICE, PROD_PAY_CODE, PROD_BAR_NUM
         ,ORD_DTM, DEL_GBN_CD, ORD_WAY_NUM, DEL_SER_CD, ORD_NM, ORD_CONT, ORD_MEMO, ORD_ZIP, ORD_ADDR, ORD_ADDR_DTL
@@ -123,6 +126,7 @@
         <foreach collection="list" item="item" separator=",">
         (
          #{item.penOrdId}, #{item.penStaSeq}
+        ,#{item.prodColor}     ,#{item.prodSize}
         ,#{item.penId}, #{item.usrId}, #{item.entId}, #{item.uuid}
         ,#{item.prodId}, #{item.prodNm}, #{item.itemId}, #{item.itemNm}, #{item.prodOflPrice}, #{item.prodPayCode}, #{item.prodBarNum}
         ,CURRENT_TIMESTAMP, #{item.delGbnCd}, #{item.ordWayNum}, #{item.delSerCd}, #{item.ordNm}, #{item.ordCont}, #{item.ordMemoitem.}, #{item.ordZip}, #{item.ordAddr}, #{item.ordAddrDtl}
@@ -153,6 +157,8 @@
         <if test="staOrdCd!=null and !staOrdCd.equals('')">,STA_ORD_CD = #{staOrdCd}</if>
         <if test="prodId!=null and !prodId.equals('')">,PROD_ID = #{prodId}</if>
         <if test="prodBarNum!=null and !prodBarNum.equals('')">,PROD_BAR_NUM = #{prodBarNum}</if>
+        <if test='prodColor != null and !prodColor.equals("")'>,PROD_COLOR = #{prodColor}</if>
+        <if test='prodSize != null and !prodSize.equals("")'>,PROD_SIZE = #{prodSize}</if>
         <if test="lgsStoId!=null and !lgsStoId.equals('')">,LGS_STO_ID = #{lgsStoId}</if>
         <if test="ordLendStrDtm!=null and !ordLendStrDtm.equals('')">,ORD_LEND_STR_DTM = #{ordLendStrDtm}</if>
         <if test="ordLendEndDtm!=null and !ordLendEndDtm.equals('')">,ORD_LEND_END_DTM = #{ordLendEndDtm}</if>

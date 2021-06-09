@@ -271,6 +271,7 @@
         (
         STO_ID
         ,PPC_ID,			STATE_CD, 			PROD_BAR_NUM
+        ,PROD_COLOR     ,PROD_SIZE
         ,PROD_MANU_DATE,		STO_MEMO,	DEL_YN
         ,REG_DTM,			REG_USR_ID, 		REG_USR_IP
         ,MODIFY_DTM,		MODIFY_USR_ID,		MODIFY_USR_IP
@@ -279,6 +280,7 @@
         (
         #{stoId}
         ,#{ppcId},  		'06',				#{prodBarNum}
+        ,#{prodColor}     ,#{prodSize}
         ,#{prodManuDate},		#{stoMemo},	'N'
         ,CURRENT_TIMESTAMP,	#{usrId},			#{accessIp}
         ,CURRENT_TIMESTAMP,	#{usrId},		#{accessIp}
@@ -290,6 +292,7 @@
         (
         STO_ID
         ,PPC_ID,			STATE_CD, 			PROD_BAR_NUM
+        ,PROD_COLOR     ,PROD_SIZE
         ,PROD_MANU_DATE,		STO_MEMO,	DEL_YN
         ,REG_DTM,			REG_USR_ID, 		REG_USR_IP
         ,MODIFY_DTM,		MODIFY_USR_ID,		MODIFY_USR_IP
@@ -298,8 +301,8 @@
         <foreach collection="list" item="item" separator=",">
         (
         #{item.stoId}
-        ,#{item.ppcId}
-        , '06', #{item.prodBarNum}
+        ,#{item.ppcId}, '06', #{item.prodBarNum}
+        ,#{item.prodColor}     ,#{item.prodSize}
         ,#{item.prodManuDate}, #{item.stoMemo}, 'N'
         ,CURRENT_TIMESTAMP, #{item.usrId}, #{item.accessIp}
         ,CURRENT_TIMESTAMP, #{item.usrId}, #{item.accessIp}
@@ -315,6 +318,8 @@
         <if test='ppcId != null and !ppcId.equals("")'>,PPC_ID= #{ppcId}</if>
             ,PROD_BAR_NUM= #{prodBarNum}
         <if test='stateCd != null and !stateCd.equals("")'>,STATE_CD = #{stateCd}</if>
+        <if test='prodColor != null and !prodColor.equals("")'>,PROD_COLOR = #{prodColor}</if>
+        <if test='prodSize != null and !prodSize.equals("")'>,PROD_SIZE = #{prodSize}</if>
         <if test='prodManuDate != null and !prodManuDate.equals("")'>,PROD_MANU_DATE = #{prodManuDate}</if>
         <if test='stoMemo != null and !stoMemo.equals("")'>,STO_MEMO = #{stoMemo}</if>
         <if test='delYn != null and !delYn.equals("")'>,DEL_YN = #{delYn}</if>
