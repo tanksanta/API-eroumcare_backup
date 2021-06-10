@@ -58,6 +58,9 @@
         WHERE D.DEL_YN = 'N' AND D.STATE_CD = '01'
         <if test="stoId!=null and !stoId.equals('')">AND D.STO_ID = #{stoId}</if>
         <if test="prodId!=null and !prodId.equals('')">AND A.PROD_ID = #{prodId}</if>
+        <if test='prodColor != null and !prodColor.equals("")'>AND D.PROD_COLOR = #{prodColor}</if>
+        <if test='prodSize != null and !prodSize.equals("")'>AND D.PROD_SIZE = #{prodSize}</if>
+        <if test='prodOption != null and !prodOption.equals("")'>AND D.PROD_OPTION = #{prodOption}</if>
         <if test="usrId!=null and !usrId.equals('')">AND D.REG_USR_ID = #{usrId}</if>
         <if test="entId!=null and !entId.equals('')">AND C.ENT_ID = #{entId}</if>
         ORDER BY D.REG_DTM
@@ -77,6 +80,9 @@
             B.ITEM_NM,
             A.PROD_SUP_YN,
             A.PROD_PAY_CODE,
+            D.PROD_COLOR,
+            D.PROD_SIZE,
+            D.PROD_OPTION,
             COUNT(*) QUANTITY
         FROM PRO1100 A
             JOIN PRO1000 B ON A.ITEM_ID = B.ITEM_ID
@@ -85,25 +91,28 @@
         WHERE D.DEL_YN = 'N'
         AND D.STATE_CD IN ('01'<if test="stateCd!=null and !stateCd.equals('')">,<foreach item="item" index="index" collection="stateCd" separator=",">#{item}</foreach></if>)
         <if test="prodBarNum!=null and !prodBarNum.equals('')">AND D.PROD_BAR_NUM = #{prodBarNum}</if>
+        <if test='prodColor != null and !prodColor.equals("")'>AND D.PROD_COLOR = #{prodColor}</if>
+        <if test='prodSize != null and !prodSize.equals("")'>AND D.PROD_SIZE = #{prodSize}</if>
+        <if test='prodOption != null and !prodOption.equals("")'>AND D.PROD_OPTION = #{prodOption}</if>
         <if test="entId!=null and !entId.equals('')">AND C.ENT_ID = #{entId}</if>
         <if test="usrId!=null and !usrId.equals('')">AND D.REG_USR_ID = #{usrId}</if>
         <if test="stoId!=null and !stoId.equals('')">AND D.STO_ID = #{stoId}</if>
         <if test="prodId!=null and !prodId.equals('')">AND A.PROD_ID = #{prodId}</if>
         <if test="prodPayCode!=null and !prodPayCode.equals('')">AND A.PROD_PAY_CODE = #{prodPayCode}</if>
         <if test="gubun!=null and !gubun.equals('')">AND A.GUBUN = #{gubun}</if>
-        GROUP BY PROD_NM
+        GROUP BY PROD_NM,PROD_COLOR,PROD_SIZE,PROD_OPTION
         ORDER BY D.REG_DTM
     </select>
 
 
     <!--재고상세 목록-->
     <select id="selectStockDetailListCnt" parameterType="hashmap" resultType="int">
-        SELECT
-            COUNT(*)
-        FROM PRO1100 A
-            JOIN PRO1000 B ON A.ITEM_ID = B.ITEM_ID
-            JOIN PRO1102 C ON C.PROD_ID = A.PROD_ID AND C.DEL_YN = 'N'
-            JOIN PRO1103 D ON D.PPC_ID = C.PPC_ID AND D.DEL_YN = 'N'
+       SELECT
+           COUNT(*)
+       FROM PRO1100 A
+           JOIN PRO1000 B ON A.ITEM_ID = B.ITEM_ID
+           JOIN PRO1102 C ON C.PROD_ID = A.PROD_ID AND C.DEL_YN = 'N'
+           JOIN PRO1103 D ON D.PPC_ID = C.PPC_ID AND D.DEL_YN = 'N'
             LEFT JOIN (
                 SELECT PEN_ORD_ID, PEN.UUID, STO_ID, PEN_ID, ORD_LEND_STR_DTM, ORD_LEND_END_DTM, REG_DTM
                 FROM pen5000 PEN
@@ -115,7 +124,11 @@
            <foreach item="item" index="index" collection="stateCd" open=" (" separator="," close=")">#{item}</foreach>
        </if>
        <if test="searchOption!=null and !searchOption.equals('')">
-            AND  = #{searchOption}
+          AND (D.PROD_SIZE like concat('%',#{searchOption},'%')
+                OR
+               D.PROD_COLOR like concat('%',#{searchOption},'%')
+                OR
+                REGEXP_REPLACE(D.PROD_OPTION,<![CDATA[ '\[gs\](.*?)\[gs\]' ]]>,'') like concat('%',#{searchOption},'%'))
        </if>
        <if test="prodBarNum!=null and !prodBarNum.equals('')">AND D.PROD_BAR_NUM = #{prodBarNum}</if>
        <if test="entId!=null and !entId.equals('')">AND C.ENT_ID = #{entId}</if>
@@ -123,6 +136,7 @@
        <if test="prodId!=null and !prodId.equals('')">AND A.PROD_ID = #{prodId}</if>
        ORDER BY D.REG_DTM
     </select>
+
     <select id="selectStockDetailList" parameterType="hashmap" resultType="camelMap" fetchSize="10000">
         SELECT
             D.STO_ID,
@@ -135,6 +149,9 @@
             A.PROD_SUP_YN,
             CASE A.PROD_SUP_YN WHEN 'Y' THEN '유통' WHEN 'N' THEN '미유통' END AS PROD_SUP_NM,
             A.PROD_PAY_CODE,
+            D.PROD_COLOR,
+            D.PROD_SIZE,
+            D.PROD_OPTION,
             D.STATE_CD,
             (SELECT SUB_CD_NM FROM cmm1100 WHERE MST_CD = 'PRO00003' AND SUB_CD = D.STATE_CD) AS STATE_NM,
             CASE WHEN STATE_CD != '01' THEN EFORM_URL END AS EFORM_URL,
@@ -162,7 +179,11 @@
             <foreach item="item" index="index"  collection="stateCd" open=" (" separator="," close=")">#{item}</foreach>
         </if>
         <if test="searchOption!=null and !searchOption.equals('')">
-            AND = #{searchOption}
+          AND (D.PROD_SIZE like concat('%',#{searchOption},'%')
+                OR
+               D.PROD_COLOR like concat('%',#{searchOption},'%')
+                OR
+                REGEXP_REPLACE(D.PROD_OPTION,<![CDATA[ '\[gs\](.*?)\[gs\]' ]]>,'') like concat('%',#{searchOption},'%'))
         </if>
         <if test="prodBarNum!=null and !prodBarNum.equals('')">AND D.PROD_BAR_NUM = #{prodBarNum}</if>
         <if test="entId!=null and !entId.equals('')">AND C.ENT_ID = #{entId}</if>
@@ -246,6 +267,9 @@
             B.ITEM_NM,
             A.PROD_SUP_YN,
             A.PROD_PAY_CODE,
+            D.PROD_COLOR,
+            D.PROD_SIZE,
+            D.PROD_OPTION,
             D.PROD_BAR_NUM
         FROM PRO1100 A
             JOIN PRO1000 B ON A.ITEM_ID = B.ITEM_ID
@@ -253,6 +277,9 @@
             JOIN PRO1103 D ON D.PPC_ID = C.PPC_ID AND D.DEL_YN = 'N'
         AND D.STATE_CD = '01'
         <if test="prodBarNum!=null and !prodBarNum.equals('')">AND D.PROD_BAR_NUM = #{prodBarNum}</if>
+        <if test='prodColor != null and !prodColor.equals("")'>AND D.PROD_COLOR = #{prodColor}</if>
+        <if test='prodSize != null and !prodSize.equals("")'>AND D.PROD_SIZE = #{prodSize}</if>
+        <if test='prodOption != null and !prodOption.equals("")'>AND D.PROD_OPTION = #{prodOption}</if>
         <if test="usrId!=null and !usrId.equals('')">AND D.REG_USR_ID = #{usrId}</if>
         <if test="stoId!=null and !stoId.equals('')">AND D.STO_ID = #{stoId}</if>
         <if test="prodId!=null and !prodId.equals('')">AND A.PROD_ID = #{prodId}</if>
@@ -265,7 +292,8 @@
         (
         STO_ID
         ,PPC_ID,			STATE_CD, 			PROD_BAR_NUM
-        ,PROD_MANU_DATE,		STO_MEMO,	DEL_YN
+        ,PROD_COLOR,        PROD_SIZE,          PROD_OPTION
+        ,PROD_MANU_DATE,	STO_MEMO,	        DEL_YN
         ,REG_DTM,			REG_USR_ID, 		REG_USR_IP
         ,MODIFY_DTM,		MODIFY_USR_ID,		MODIFY_USR_IP
         )
@@ -273,9 +301,10 @@
         (
         #{stoId}
         ,#{ppcId},  		'06',				#{prodBarNum}
-        ,#{prodManuDate},		#{stoMemo},	'N'
+        ,#{prodColor},      #{prodSize},        #{prodOption}
+        ,#{prodManuDate},	#{stoMemo},	        'N'
         ,CURRENT_TIMESTAMP,	#{usrId},			#{accessIp}
-        ,CURRENT_TIMESTAMP,	#{usrId},		#{accessIp}
+        ,CURRENT_TIMESTAMP,	#{usrId},		    #{accessIp}
         )
     </insert>
 
@@ -284,7 +313,8 @@
         (
         STO_ID
         ,PPC_ID,			STATE_CD, 			PROD_BAR_NUM
-        ,PROD_MANU_DATE,		STO_MEMO,	DEL_YN
+        ,PROD_COLOR,        PROD_SIZE,          PROD_OPTION
+        ,PROD_MANU_DATE,	STO_MEMO,	        DEL_YN
         ,REG_DTM,			REG_USR_ID, 		REG_USR_IP
         ,MODIFY_DTM,		MODIFY_USR_ID,		MODIFY_USR_IP
         )
@@ -292,8 +322,8 @@
         <foreach collection="list" item="item" separator=",">
         (
         #{item.stoId}
-        ,#{item.ppcId}
-        , '06', #{item.prodBarNum}
+        ,#{item.ppcId}, '06', #{item.prodBarNum}
+        ,#{item.prodColor}, #{item.prodSize},   #{item.prodOption}
         ,#{item.prodManuDate}, #{item.stoMemo}, 'N'
         ,CURRENT_TIMESTAMP, #{item.usrId}, #{item.accessIp}
         ,CURRENT_TIMESTAMP, #{item.usrId}, #{item.accessIp}
@@ -303,12 +333,15 @@
 
     <update id="updateStock" parameterType="hashmap">
         UPDATE PRO1103 SET
-            MODIFY_DTM		= CURRENT_TIMESTAMP
-            ,MODIFY_USR_ID	= #{usrId}
-            ,MODIFY_USR_IP = #{accessIp}
+        MODIFY_DTM		= CURRENT_TIMESTAMP
+        ,MODIFY_USR_ID	= #{usrId}
+        ,MODIFY_USR_IP = #{accessIp}
         <if test='ppcId != null and !ppcId.equals("")'>,PPC_ID= #{ppcId}</if>
-            ,PROD_BAR_NUM= #{prodBarNum}
+        ,PROD_BAR_NUM= #{prodBarNum}
         <if test='stateCd != null and !stateCd.equals("")'>,STATE_CD = #{stateCd}</if>
+        <if test='prodColor != null and !prodColor.equals("")'>,PROD_COLOR = #{prodColor}</if>
+        <if test='prodSize != null and !prodSize.equals("")'>,PROD_SIZE = #{prodSize}</if>
+        <if test='prodOption != null and !prodOption.equals("")'>,PROD_OPTION = #{prodOption}</if>
         <if test='prodManuDate != null and !prodManuDate.equals("")'>,PROD_MANU_DATE = #{prodManuDate}</if>
         <if test='stoMemo != null and !stoMemo.equals("")'>,STO_MEMO = #{stoMemo}</if>
         <if test='delYn != null and !delYn.equals("")'>,DEL_YN = #{delYn}</if>

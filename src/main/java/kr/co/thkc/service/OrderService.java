@@ -34,7 +34,7 @@ public class OrderService extends BaseService {
     private EformService eformService;
 
     @Autowired
-    private OptionService optionService;
+    private ProdService prodService;
 
 
     /**
@@ -42,9 +42,6 @@ public class OrderService extends BaseService {
      * */
     public BaseResponse selectOrderList(Map<String,Object> params) throws SQLException {
         BaseResponse response = new BaseResponse();
-
-        //옵션 조회
-        List orderOptions = (List) optionService.selectOptionOrd(params).getData();
 
         params.put("downloadUrl",env.getProperty("download.url"));
         List orderList = abstractDAO.selectList("order.selectOrderList",params);
@@ -103,8 +100,6 @@ public class OrderService extends BaseService {
         //추가해야할 재고가 있을때 사용할 신규재고 목록
         List<Map> newStockList = new ArrayList();
         List<Map> orderList = new ArrayList();
-        //추가해야할 옵션이 있을때 사용할 목록
-        List<Map> optionList = new ArrayList();
 
         int penStaSeq=1;    //주문등록 시퀀스
         List<Map> prodList = (List<Map>) MapUtils.getObject(params,"prods");
@@ -192,7 +187,7 @@ public class OrderService extends BaseService {
                 String ordLendStrDtm = MapUtils.getString(order,"ordLendStrDtm");       //수정 하려는 대여일자
                 String ordLendEndDtm = MapUtils.getString(order,"ordLendEndDtm");       //수정 하려는 대여일자
                 price = MapUtils.getIntValue(order, "rentalPrice");
-//                대여일자 계산해서 결제금액 계산
+                //대여일자 계산해서 결제금액 계산
                 if(ordLendStrDtm!=null && ordLendEndDtm!=null) {
                     rentalCnt = DateUtil.getDateDiffOrder(ordLendStrDtm, ordLendEndDtm);
                 }
@@ -202,17 +197,6 @@ public class OrderService extends BaseService {
             order.put("prodOflPrice", price);
             order.put("finPayment", finPayment);
 
-            //옵션
-            List<Map> option = (List<Map>)MapUtils.getObject(order,"option");
-            if(option != null && option.size()>0) {
-                for(Map item:option){
-                    item.put("penOrdId",penOrdId);
-                    item.put("penStaSeq",penStaSeq);
-                    item.put("accessIp", accessIp);
-                    item.put("usrId", usrId);
-                }
-                optionList.addAll(option);
-            }
             //주문시퀀스 등록
             order.put("penStaSeq",penStaSeq++);
 
@@ -220,15 +204,11 @@ public class OrderService extends BaseService {
                 put("stoId",order.get("stoId"));
                 put("ct_id",order.get("ct_id"));
             }});
-
         }
 
         //주문 추가
         abstractDAO.insert("order.insertOrder_multi", orderList);
-        //옵션 추가
-        if(optionList!=null && optionList.size()>0) {
-            optionService.insertOptionOrd(optionList);
-        }
+
         if(discount!=null && discount==0){
             abstractDAO.insert("recipient.insertRecipientReq",params);
         }
@@ -264,8 +244,6 @@ public class OrderService extends BaseService {
 
         //현재 주문 품목
         List<Map> ordList = abstractDAO.selectList("order.selectOrderList",params);
-        //옵션 추가를 위한 리스트
-        List<Map> optionList = new ArrayList();
         if(ordList.size() < 1) throw new Exception("penOrdId("+penOrdId+") 주문이 존재하지 않습니다.");
         //주문 수정
         abstractDAO.update("order.updateOrder", params);
@@ -302,20 +280,6 @@ public class OrderService extends BaseService {
                         put("ct_id",prod.get("ct_id"));
                     }});
                 }
-                //옵션
-                List<Map> option = (List<Map>)MapUtils.getObject(prod,"option");
-                if(option != null && option.size()>0) {
-                    for(Map item:option){
-                        item.put("penOrdId", penOrdId);
-                        item.put("accessIp", accessIp);
-                        item.put("usrId", usrId);
-                    }
-                    optionList.addAll(option);
-                }
-            }
-            //옵션 수정
-            if(optionList!=null && optionList.size()>0) {
-                optionService.updateOptionOrd(optionList);
             }
         }
 

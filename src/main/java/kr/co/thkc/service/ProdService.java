@@ -27,8 +27,6 @@ public class ProdService extends BaseService{
     @Autowired
     private FileService fileService;
 
-    @Autowired
-    private OptionService optionService;
 
 
 
@@ -103,7 +101,7 @@ public class ProdService extends BaseService{
                 option.put("usrId",usrId);
                 option.put("accessIp",accessIp);
             }
-            optionService.insertOptionProd(optionList);
+            abstractDAO.insert("prod.insertOptionProd",optionList);
         }
 
         response.setData(params);
@@ -164,7 +162,7 @@ public class ProdService extends BaseService{
                 option.put("usrId",usrId);
                 option.put("accessIp",accessIp);
             }
-            optionService.updateOptionProd(optionList);
+            abstractDAO.update("prod.updateOptionProd",optionList);
         }
 
         response.setResult(ResultCode.RC_OK);
@@ -214,14 +212,14 @@ public class ProdService extends BaseService{
     }
 
     public BaseResponse deletePpc(Map<String,Object> params) throws Exception {
-            BaseResponse response = new BaseResponse();
+        BaseResponse response = new BaseResponse();
 
-            //취급제품 삭제
-            abstractDAO.update("prod.deletePpc",params);
+        //취급제품 삭제
+        abstractDAO.update("prod.deletePpc",params);
 
-            response.setResult(ResultCode.RC_OK);
+        response.setResult(ResultCode.RC_OK);
 
-            return response;
-        }
+        return response;
+    }
 
 }

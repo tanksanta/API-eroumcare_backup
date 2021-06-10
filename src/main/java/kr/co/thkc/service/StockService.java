@@ -28,7 +28,8 @@ public class StockService extends BaseService{
     private AbstractDAO abstractDAO;
 
     @Autowired
-    private OptionService optionService;
+    private ProdService prodService;
+
 
     /**
      * 바코드 중복 체크
@@ -163,8 +164,6 @@ public class StockService extends BaseService{
 
         //결과를 위한 파라미터 리스트
         List stockList = new ArrayList();
-        //옵션 추가를 위한 리스트
-        List<Map> optionList = new ArrayList();
 
         String accessIp = MapUtils.getString(params,"accessIp");
         String usrId = MapUtils.getString(params,"usrId");
@@ -205,16 +204,6 @@ public class StockService extends BaseService{
             if(countBarNum(prod) > 0) {
                 throw new Exception("(prodBarNum=" + MapUtils.getString(prod,"prodBarNum") + ") 중복된 바코드는 사용할 수 없습니다.");
             }else {
-                //옵션
-                List<Map> option = (List<Map>)MapUtils.getObject(prod,"option");
-                if(option != null && option.size()>0) {
-                    for(Map item:option){
-                        item.put("stoId",stoId);
-                        item.put("accessIp", accessIp);
-                        item.put("usrId", usrId);
-                    }
-                    optionList.addAll(option);
-                }
                 //결과 리턴에 추가
                 stockList.add(prod);
                 index++;
@@ -223,10 +212,6 @@ public class StockService extends BaseService{
         if(stockList.size()==0) throw new Exception("추가된 재고가 없습니다.");
 
         abstractDAO.insert("stock.insertStock_multi",stockList);
-        //옵션 추가
-        if(optionList!=null && optionList.size()>0) {
-            optionService.insertOptionStock(optionList);
-        }
 
         response.setResultData(stockList);
         response.setResult(ResultCode.RC_OK);
@@ -247,8 +232,6 @@ public class StockService extends BaseService{
 
         //결과값 리턴을 위한
         List<Map> stockList = new ArrayList<>();
-        //옵션 추가를 위한 리스트
-        List<Map> optionList = new ArrayList();
         //수정할 재고 가져오기
         List<Map> prodList = (List<Map>) MapUtils.getObject(params,"prods");
         //stoId,prodColor,prodSize,prodManuDate,prodBarNum,stoMemo,delYn
@@ -259,16 +242,6 @@ public class StockService extends BaseService{
 
                 // 재고 수정
                 abstractDAO.update("stock.updateStock", prod);
-                //옵션
-                List<Map> option = (List<Map>)MapUtils.getObject(prod,"option");
-                if(option != null && option.size()>0) {
-                    for(Map item:option){
-                        item.put("stoId",stoId);
-                        item.put("accessIp", accessIp);
-                        item.put("usrId", usrId);
-                    }
-                    optionList.addAll(option);
-                }
                 //트랜잭션 때문에 이전에 동일 트랜잭션에서 바코드가 들어갔었을수도있음 그래서 트랜잭션 마지막에 개수체크
                 String prodBarNum = MapUtils.getString(prod, "prodBarNum");
                 if (countBarNum(prod) > 1) throw new Exception("(prodBarNum=" + prodBarNum + ") 중복된 바코드는 사용할 수 없습니다.");
@@ -280,10 +253,6 @@ public class StockService extends BaseService{
 
                 //결과 리턴에 추가
                 stockList.add(prod);
-            }
-            //옵션 수정
-            if(optionList!=null && optionList.size()>0) {
-                optionService.updateOptionStock(optionList);
             }
         }
 
