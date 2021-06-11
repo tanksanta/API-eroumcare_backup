@@ -1,5 +1,6 @@
 package kr.co.thkc.service;
 
+import jdk.nashorn.internal.runtime.regexp.joni.Regex;
 import kr.co.thkc.dispatch.BaseResponse;
 import kr.co.thkc.dispatch.ResultCode;
 import kr.co.thkc.mapper.AbstractDAO;
@@ -12,8 +13,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.sql.Array;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 @Slf4j
@@ -39,8 +43,23 @@ public class ProdService extends BaseService{
         BaseResponse response = new BaseResponse();
 
         List prodList = abstractDAO.selectList("prod.selectProdList",params);
+        List optionList = abstractDAO.selectList("prod.selectOptionProd",params);
 
         response.setResultData(prodList);
+        response.setResult(ResultCode.RC_OK);
+
+        return response;
+    }
+
+    public BaseResponse selectProdDetail(Map<String,Object> params) throws SQLException {
+        BaseResponse response = new BaseResponse();
+
+        Map prod = (Map)abstractDAO.selectOne("prod.selectProdList",params);
+        List optionList = abstractDAO.selectList("prod.selectOptionProd",params);
+
+        prod.put("prodOption",optionList);
+
+        response.setResultData(prod);
         response.setResult(ResultCode.RC_OK);
 
         return response;

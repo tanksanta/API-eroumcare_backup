@@ -93,6 +93,20 @@ public class RecipientController {
         // bussiness logic
         return recipientService.insertRecipient(request.bindRequest());
     }
+    /**
+     *  수급자 추가
+     * */
+    @PostMapping(value = "insertSpare")
+    public BaseResponse insertSpareRecipient(@RequestBody BaseRequest request) throws Exception {
+
+        // requiredField add
+        request.addRequiredField("usrId", request.TYPE_STRING);
+
+        request.validRequiredField();
+
+        // bussiness logic
+        return recipientService.insertSpareRecipient(request.bindRequest());
+    }
 
     /**
      *  수급자별 취급상품 추가
@@ -139,6 +153,22 @@ public class RecipientController {
 
         // bussiness logic
         return recipientService.updateRecipient(request.bindRequest());
+    }
+
+    /**
+     *  예비 수급자 수정
+     * */
+    @PostMapping(value = "updateSpare")
+    public BaseResponse updateSpareRecipient(@RequestBody BaseRequest request) throws Exception {
+
+        // requiredField add
+        request.addRequiredField("usrId", request.TYPE_STRING);
+        request.addRequiredField("penId", request.TYPE_STRING);
+
+        request.validRequiredField();
+
+        // bussiness logic
+        return recipientService.updateSpareRecipient(request.bindRequest());
     }
 
     /**

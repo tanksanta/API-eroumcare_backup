@@ -132,7 +132,7 @@ public class RecipientService extends BaseService{
         if(penProConNum!=null && !penProConNum.equals("")) params.put("penProConNum",sdb.encrypt(penProConNum));
         if(penProConPnum!=null && !penProConPnum.equals("")) params.put("penProConPnum",sdb.encrypt(penProConPnum));
 
-        //쇼핑몰의 admin은 시스템의 관리자 아이디 (wmdsadm) 으로 대
+        //쇼핑몰의 admin은 시스템의 관리자 아이디 (wmdsadm) 으로 대체
         if(MapUtils.getString(params,"usrId").equals("admin")) params.put("entUsrId","123456789");
         else params.put("entUsrId",MapUtils.getString(params,"usrId"));
 
@@ -142,6 +142,39 @@ public class RecipientService extends BaseService{
         abstractDAO.insert("recipient.insertRecipient",params);
         abstractDAO.insert("recipient.insertEntRecipient",params);
 
+
+        response.setData(new HashMap(){{put("penId",penId);}});
+        response.setResult(ResultCode.RC_OK);
+
+        return response;
+    }
+
+    /**
+     * 예비 수급자추가
+    **/
+    public BaseResponse insertSpareRecipient(Map<String,Object> params) throws SQLException {
+        BaseResponse response = new BaseResponse();
+        //전화번호 암호화
+        SDBCryptUtil sdb = new SDBCryptUtil();
+
+        String penConNum = MapUtils.getString(params,"penConNum");
+        String penConPnum = MapUtils.getString(params,"penConPnum");
+        String penProConNum = MapUtils.getString(params,"penProConNum");
+        String penProConPnum = MapUtils.getString(params,"penProConPnum");
+
+        if(penConNum!=null && !penConNum.equals("")) params.put("penConNum",sdb.encrypt(penConNum));
+        if(penConPnum!=null && !penConPnum.equals("")) params.put("penConPnum",sdb.encrypt(penConPnum));
+        if(penProConNum!=null && !penProConNum.equals("")) params.put("penProConNum",sdb.encrypt(penProConNum));
+        if(penProConPnum!=null && !penProConPnum.equals("")) params.put("penProConPnum",sdb.encrypt(penProConPnum));
+
+        //쇼핑몰의 admin은 시스템의 관리자 아이디 (wmdsadm) 으로 대체
+        if(MapUtils.getString(params,"usrId").equals("admin")) params.put("entUsrId","123456789");
+        else params.put("entUsrId",MapUtils.getString(params,"usrId"));
+
+        String penId = newPenId();
+        params.put("penId",penId);
+
+        abstractDAO.insert("recipient.insertSpareRecipient",params);
 
         response.setData(new HashMap(){{put("penId",penId);}});
         response.setResult(ResultCode.RC_OK);
@@ -196,6 +229,31 @@ public class RecipientService extends BaseService{
 
         return response;
     }
+    /**
+     * 수급자수정
+    **/
+    public BaseResponse updateSpareRecipient(Map<String,Object> params) throws SQLException {
+        BaseResponse response = new BaseResponse();
+
+        //전화번호 암호화
+        SDBCryptUtil sdb = new SDBCryptUtil();
+
+        String penConNum = MapUtils.getString(params,"penConNum");
+        String penConPnum = MapUtils.getString(params,"penConPnum");
+        String penProConNum = MapUtils.getString(params,"penProConNum");
+        String penProConPnum = MapUtils.getString(params,"penProConPnum");
+
+        if(penConNum!=null && !penConNum.equals("")) params.put("penConNum",sdb.encrypt(penConNum));
+        if(penConPnum!=null && !penConPnum.equals("")) params.put("penConPnum",sdb.encrypt(penConPnum));
+        if(penProConNum!=null && !penProConNum.equals("")) params.put("penProConNum",sdb.encrypt(penProConNum));
+        if(penProConPnum!=null && !penProConPnum.equals("")) params.put("penProConPnum",sdb.encrypt(penProConPnum));
+
+        abstractDAO.update("recipient.updateSpareRecipient",params);
+
+        response.setResult(ResultCode.RC_OK);
+
+        return response;
+    }
 
 
     /**
@@ -227,30 +285,33 @@ public class RecipientService extends BaseService{
         return response;
     }
 
+
+    /*수급자의 전화번호가 암호화 되지 않은 것들을 뽑아내기 위해 임시로 생성*/
+    @Deprecated
     public BaseResponse updateEncrypt(Map<String,Object> params) throws SQLException {
-            BaseResponse response = new BaseResponse();
+        BaseResponse response = new BaseResponse();
 
-            //전화번호 암호화 모듈
-            SDBCryptUtil sdb = new SDBCryptUtil();
+        //전화번호 암호화 모듈
+        SDBCryptUtil sdb = new SDBCryptUtil();
 
-            List<Map> mapList = (List<Map>) abstractDAO.selectList("recipient.selectConNum",null);
+        List<Map> mapList = (List<Map>) abstractDAO.selectList("recipient.selectConNum",null);
 
-            for(Map map:mapList){
-                String penConNum = MapUtils.getString(map,"penConNum");
-                String penConPnum = MapUtils.getString(map,"penConPnum");
-                String penProConNum = MapUtils.getString(map,"penProConNum");
-                String penProConPnum = MapUtils.getString(map,"penProConPnum");
+        for(Map map:mapList){
+            String penConNum = MapUtils.getString(map,"penConNum");
+            String penConPnum = MapUtils.getString(map,"penConPnum");
+            String penProConNum = MapUtils.getString(map,"penProConNum");
+            String penProConPnum = MapUtils.getString(map,"penProConPnum");
 
-                if(penConNum!=null && !penConNum.equals("")) map.put("penConNum",sdb.encrypt(penConNum));
-                if(penConPnum!=null && !penConPnum.equals("")) map.put("penConPnum",sdb.encrypt(penConPnum));
-                if(penProConNum!=null && !penProConNum.equals("")) map.put("penProConNum",sdb.encrypt(penProConNum));
-                if(penProConPnum!=null && !penProConPnum.equals("")) map.put("penProConPnum",sdb.encrypt(penProConPnum));
+            if(penConNum!=null && !penConNum.equals("")) map.put("penConNum",sdb.encrypt(penConNum));
+            if(penConPnum!=null && !penConPnum.equals("")) map.put("penConPnum",sdb.encrypt(penConPnum));
+            if(penProConNum!=null && !penProConNum.equals("")) map.put("penProConNum",sdb.encrypt(penProConNum));
+            if(penProConPnum!=null && !penProConPnum.equals("")) map.put("penProConPnum",sdb.encrypt(penProConPnum));
 
-                abstractDAO.update("recipient.updateRecipient",params);
-            }
-            response.setResult(ResultCode.RC_OK);
-
-            return response;
+            abstractDAO.update("recipient.updateRecipient",params);
         }
+        response.setResult(ResultCode.RC_OK);
+
+        return response;
+    }
 
 }

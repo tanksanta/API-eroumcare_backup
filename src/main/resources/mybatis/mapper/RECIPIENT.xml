@@ -30,6 +30,17 @@
     </select>
 
 
+    <!--수급자의 전화번호가 암호화 되지 않은 것들을 뽑아내기 위해 임시로 생성-->
+    <select id="selectConNum" parameterType="hashmap" resultType="camelMap" fetchSize="10000">
+        <![CDATA[
+        SELECT PEN_ID,MODIFY_USR_ID,MODIFY_USR_IP
+            ,PEN_PRO_CON_PNUM,PEN_PRO_CON_NUM,PEN_CON_PNUM,PEN_CON_NUM
+        FROM pen1000
+#         WHERE LENGTH(PEN_PRO_CON_PNUM)>13 OR LENGTH(PEN_PRO_CON_NUM)>13 OR LENGTH(PEN_CON_PNUM)>13 OR LENGTH(PEN_CON_NUM)>13
+        ]]>
+    </select>
+
+
     <!--예비수급자 조회-->
     <sql id="spareRecipientList">
         SELECT
@@ -65,13 +76,15 @@
                          WHEN A.PEN_APP_ED_DTM3 IS NOT NULL THEN A.PEN_APP_ED_DTM3
                          WHEN A.PEN_APP_ED_DTM3 IS NULL AND A.PEN_APP_ED_DTM2 IS NOT NULL THEN PEN_APP_ED_DTM2
                          ELSE A.PEN_APP_ED_DTM1
-                         END PEN_APP_ED_DTM ,
+                     END PEN_APP_ED_DTM ,
                      A.PEN_JUMIN,
                      A.PEN_ZIP,
                      A.PEN_ADDR ,
                      A.PEN_ADDR_DTL ,
                      A.PEN_CON_NUM SDB_PEN_CON_NUM,
                      A.PEN_CON_PNUM SDB_PEN_CON_PNUM ,
+                     A.PEN_PRO_TYPE_CD,
+                    (SELECT SUB_CD_NM FROM CMM1100 WHERE MST_CD = 'PEN00016' AND SUB_CD = A.PEN_PRO_TYPE_CD) AS PEN_PRO_TYPE_NM ,
                      A.PEN_PRO_NM,
                      A.PEN_PRO_ZIP ,
                      A.PEN_PRO_ADDR ,
@@ -154,6 +167,8 @@
                 A.PEN_ADDR_DTL ,
                 A.PEN_CON_NUM SDB_PEN_CON_NUM,
                 A.PEN_CON_PNUM SDB_PEN_CON_PNUM ,
+                A.PEN_PRO_TYPE_CD,
+               (SELECT SUB_CD_NM FROM CMM1100 WHERE MST_CD = 'PEN00016' AND SUB_CD = A.PEN_PRO_TYPE_CD) AS PEN_PRO_TYPE_NM ,
                 A.PEN_PRO_NM,
                 A.PEN_PRO_ZIP ,
                 A.PEN_PRO_ADDR ,
@@ -339,6 +354,9 @@
         </if>
     </select>
 
+
+
+    <!--수급자 추가-->
     <insert id="insertRecipient" parameterType="hashmap">
         INSERT INTO PEN1000
         (
@@ -365,7 +383,35 @@
         ,CURRENT_TIMESTAMP,	#{usrId}, #{accessIp} ,CURRENT_TIMESTAMP, #{usrId}, #{accessIp}
         )
     </insert>
+    <!--예비수급자 추가-->
+    <insert id="insertSpareRecipient" parameterType="hashmap">
+        INSERT INTO PEN1001
+        (
+        PEN_ID
+        ,PEN_NM ,PEN_LTM_NUM, PEN_REC_GRA_CD
+        ,PEN_GENDER, PEN_BIRTH, PEN_JUMIN, PEN_TYPE_CD, PEN_CON_NUM, PEN_CON_PNUM
+        ,PEN_EXPI_ST_DTM, PEN_EXPI_ED_DTM, PEN_APP_ST_DTM1, PEN_APP_ED_DTM1, PEN_APP_ST_DTM2, PEN_APP_ED_DTM2, PEN_APP_ST_DTM3, PEN_APP_ED_DTM3,PEN_REC_DTM, PEN_APP_DTM
+        ,PEN_ZIP, PEN_ADDR, PEN_ADDR_DTL
+        ,PEN_PRO_NM, PEN_PRO_BIRTH, PEN_PRO_REL, PEN_PRO_CON_NUM, PEN_PRO_CON_PNUM, PEN_PRO_EMAIL, PEN_PRO_REL_ETC, PEN_PRO_ZIP, PEN_PRO_ADDR, PEN_PRO_ADDR_DTL
+        ,PEN_CNM_TYPE_CD, PEN_REC_TYPE_CD, PEN_REC_TYPE_TXT, PEN_REMARK
+        ,ENT_ID, ENT_USR_ID, APP_CD, CA_CEN_YN, DEL_YN
+        ,REG_DTM, REG_USR_ID, REG_USR_IP, MODIFY_DTM, MODIFY_USR_ID, MODIFY_USR_IP
+        )
+        VALUES
+        (
+         #{penId}
+        , #{penNm} , #{penLtmNum}, #{penRecGraCd}
+        , #{penGender}, #{penBirth}, #{penJumin}, #{penTypeCd}, #{penConNum}, #{penConPnum}
+        , #{penExpiStDtm}, #{penExpiEdDtm}, #{penAppStDtm1}, #{penAppEdDtm1}, #{penAppStDtm2}, #{penAppEdDtm2}, #{penAppStDtm3}, #{penAppEdDtm3}, #{penRecDtm}, #{penAppDtm}
+        , #{penZip}, #{penAddr}, #{penAddrDtl}
+        , #{penProNm}, #{penProBirth}, #{penProRel}, #{penProConNum}, #{penProConPnum}, #{penProEmail}, #{penProRelEtc}, #{penProZip}, #{penProAddr}, #{penProAddrDtl}
+        , #{penCnmTypeCd}, #{penRecTypeCd}, #{penRecTypeTxt}, #{penRemark}
+        , #{entId}, #{entUsrId}, #{appCd}, #{caCenYn}, 'N'
+        ,CURRENT_TIMESTAMP,	#{usrId}, #{accessIp} ,CURRENT_TIMESTAMP, #{usrId}, #{accessIp}
+        )
+    </insert>
 
+    <!--사업소 수급자 추가-->
     <insert id="insertEntRecipient" parameterType="hashmap">
         INSERT INTO ENTPEN1000
         (
@@ -431,13 +477,9 @@
         ,#{usrId}, #{accessIp}, CURRENT_TIMESTAMP
         )
     </insert>
-<!--취급상품 삭제-->
-    <delete id="deleteRecipientItem" parameterType="hashmap">
-        DELETE FROM pen1100
-        WHERE PEN_ID = #{penId}
-        <if test="itemId != null and !itemId.equals('')">AND ITEM_ID = #{itemId}</if>
-    </delete>
 
+
+    <!--수급자 업데이트-->
     <update id="updateRecipient" parameterType="hashmap">
         UPDATE PEN1000 SET
             MODIFY_DTM		= CURRENT_TIMESTAMP
@@ -486,7 +528,56 @@
         <if test='delYn != null and !delYn.equals("")'>,DEL_YN = #{delYn}</if>
         WHERE PEN_ID = #{penId}
     </update>
-
+    <!--예비 수급자 업데이트-->
+    <update id="updateSpareRecipient" parameterType="hashmap">
+        UPDATE PEN1001 SET
+            MODIFY_DTM		= CURRENT_TIMESTAMP
+            ,MODIFY_USR_ID	= #{usrId}
+            ,MODIFY_USR_IP = #{accessIp}
+        <if test='penNm != null and !penNm.equals("")'>,PEN_NM= #{penNm}</if>
+        <if test='penLtmNum != null and !penLtmNum.equals("")'>,PEN_LTM_NUM= #{penLtmNum}</if>
+        <if test='penRecGraCd != null and !penRecGraCd.equals("")'>,PEN_REC_GRA_CD = #{penRecGraCd}</if>
+        <if test='penGender != null and !penGender.equals("")'>,PEN_GENDER = #{penGender}</if>
+        <if test='penBirth != null and !penBirth.equals("")'>,PEN_BIRTH = #{penBirth}</if>
+        <if test='penJumin != null and !penJumin.equals("")'>,PEN_JUMIN = #{penJumin}</if>
+        <if test='penConNum != null and !penConNum.equals("")'>,PEN_CON_NUM = #{penConNum}</if>
+        <if test='penConPnum != null and !penConPnum.equals("")'>,PEN_CON_PNUM = #{penConPnum}</if>
+        <if test='penExpiStDtm != null and !penExpiStDtm.equals("")'>,PEN_EXPI_ST_DTM = #{penExpiStDtm}</if>
+        <if test='penExpiEdDtm != null and !penExpiEdDtm.equals("")'>,PEN_EXPI_ED_DTM = #{penExpiEdDtm}</if>
+        <if test='penAppStDtm1 != null and !penAppStDtm1.equals("")'>,PEN_APP_ST_DTM1 = #{penAppStDtm1}</if>
+        <if test='penAppEdDtm1 != null and !penAppEdDtm1.equals("")'>,PEN_APP_ED_DTM1 = #{penAppEdDtm1}</if>
+        <if test='penAppStDtm2 != null and !penAppStDtm2.equals("")'>,PEN_APP_ST_DTM2 = #{penAppStDtm2}</if>
+        <if test='penAppEdDtm2 != null and !penAppEdDtm2.equals("")'>,PEN_APP_ED_DTM2 = #{penAppEdDtm2}</if>
+        <if test='penAppStDtm3 != null and !penAppStDtm3.equals("")'>,PEN_APP_ST_DTM3 = #{penAppStDtm3}</if>
+        <if test='penAppEdDtm3 != null and !penAppEdDtm3.equals("")'>,PEN_APP_ED_DTM3 = #{penAppEdDtm3}</if>
+        <if test='penRecDtm != null and !penRecDtm.equals("")'>,PEN_REC_DTM = #{penRecDtm}</if>
+        <if test='penAppDtm != null and !penAppDtm.equals("")'>,PEN_APP_DTM = #{penAppDtm}</if>
+        <if test='penZip != null and !penZip.equals("")'>,PEN_ZIP = #{penZip}</if>
+        <if test='penAddr != null and !penAddr.equals("")'>,PEN_ADDR = #{penAddr}</if>
+        <if test='penAddrDtl != null and !penAddrDtl.equals("")'>,PEN_ADDR_DTL = #{penAddrDtl}</if>
+        <if test='penProNm != null and !penProNm.equals("")'>,PEN_PRO_NM = #{penProNm}</if>
+        <if test='penProBirth != null and !penProBirth.equals("")'>,PEN_PRO_BIRTH = #{penProBirth}</if>
+        <if test='penProRel != null and !penProRel.equals("")'>,PEN_PRO_REL = #{penProRel}</if>
+        <if test='penProConNum != null and !penProConNum.equals("")'>,PEN_PRO_CON_NUM = #{penProConNum}</if>
+        <if test='penProConPnum != null and !penProConPnum.equals("")'>,PEN_PRO_CON_PNUM = #{penProConPnum}</if>
+        <if test='penProEmail != null and !penProEmail.equals("")'>,PEN_PRO_EMAIL = #{penProEmail}</if>
+        <if test='penProRelEtc != null and !penProRelEtc.equals("")'>,PEN_PRO_REL_ETC = #{penProRelEtc}</if>
+        <if test='penProZip != null and !penProZip.equals("")'>,PEN_PRO_ZIP = #{penProZip}</if>
+        <if test='penProAddr != null and !penProAddr.equals("")'>,PEN_PRO_ADDR = #{penProAddr}</if>
+        <if test='penProAddrDtl != null and !penProAddrDtl.equals("")'>,PEN_PRO_ADDR_DTL = #{penProAddrDtl}</if>
+        <if test='penCnmTypeCd != null and !penCnmTypeCd.equals("")'>,PEN_CNM_TYPE_CD = #{penCnmTypeCd}</if>
+        <if test='penTypeCd != null and !penTypeCd.equals("")'>,PEN_TYPE_CD = #{penTypeCd}</if>
+        <if test='penRecTypeCd != null and !penRecTypeCd.equals("")'>,PEN_REC_TYPE_CD = #{penRecTypeCd}</if>
+        <if test='penRecTypeTxt != null and !penRecTypeTxt.equals("")'>,PEN_REC_TYPE_TXT = #{penRecTypeTxt}</if>
+        <if test='penRemark != null and !penRemark.equals("")'>,PEN_REMARK = #{penRemark}</if>
+        <if test='entId != null and !entId.equals("")'>,ENT_ID = #{entId}</if>
+        <if test='entUsrId != null and !entUsrId.equals("")'>,ENT_USR_ID = #{usrId}</if>
+        <if test='appCd != null and !appCd.equals("")'>,APP_CD = #{appCd}</if>
+        <if test='caCenYn !=null and !caCenYn.equals("")'>,CA_CEN_YN = #{caCenYn}</if>
+        <if test='delYn != null and !delYn.equals("")'>,DEL_YN = #{delYn}</if>
+        WHERE PEN_ID = #{penId}
+    </update>
+    <!--욕구사정기록지 수정-->
     <update id="updateRecipientRec" parameterType="hashmap">
         UPDATE PEN1500 SET
             MODIFY_DTM		= CURRENT_TIMESTAMP
@@ -512,17 +603,17 @@
         WHERE REC_ID = #{recId}
     </update>
 
+    <!--취급상품 삭제-->
+    <delete id="deleteRecipientItem" parameterType="hashmap">
+        DELETE FROM pen1100
+        WHERE PEN_ID = #{penId}
+        <if test="itemId != null and !itemId.equals('')">AND ITEM_ID = #{itemId}</if>
+    </delete>
+
+    <!--욕구사정기록지 삭제-->
     <delete id="deleteRecipientRec" parameterType="hashmap">
         DELETE FROM PEN1500
         WHERE REC_ID = #{recId}
     </delete>
 
-    <select id="selectConNum" parameterType="hashmap" resultType="camelMap" fetchSize="10000">
-        <![CDATA[
-        SELECT PEN_ID,MODIFY_USR_ID,MODIFY_USR_IP
-            ,PEN_PRO_CON_PNUM,PEN_PRO_CON_NUM,PEN_CON_PNUM,PEN_CON_NUM
-        FROM pen1000
-#         WHERE LENGTH(PEN_PRO_CON_PNUM)>13 OR LENGTH(PEN_PRO_CON_NUM)>13 OR LENGTH(PEN_CON_PNUM)>13 OR LENGTH(PEN_CON_NUM)>13
-        ]]>
-    </select>
 </mapper>
