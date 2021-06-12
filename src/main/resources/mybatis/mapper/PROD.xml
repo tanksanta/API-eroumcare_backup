@@ -69,7 +69,6 @@
             A.MODIFY_USR_ID,
             A.MODIFY_USR_IP
         FROM PRO1100 A
-        LEFT JOIN OPTION_PROD B ON A.PROD_ID = B.PROD_ID
         WHERE PROD_ID = #{prodId}
     </select>
 
