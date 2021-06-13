@@ -365,7 +365,7 @@
         ,PEN_GENDER, PEN_BIRTH, PEN_JUMIN, PEN_TYPE_CD, PEN_CON_NUM, PEN_CON_PNUM
         ,PEN_EXPI_ST_DTM, PEN_EXPI_ED_DTM, PEN_APP_ST_DTM1, PEN_APP_ED_DTM1, PEN_APP_ST_DTM2, PEN_APP_ED_DTM2, PEN_APP_ST_DTM3, PEN_APP_ED_DTM3,PEN_REC_DTM, PEN_APP_DTM
         ,PEN_ZIP, PEN_ADDR, PEN_ADDR_DTL
-        ,PEN_PRO_NM, PEN_PRO_BIRTH, PEN_PRO_REL, PEN_PRO_CON_NUM, PEN_PRO_CON_PNUM, PEN_PRO_EMAIL, PEN_PRO_REL_ETC, PEN_PRO_ZIP, PEN_PRO_ADDR, PEN_PRO_ADDR_DTL
+        ,PEN_PRO_TYPE_CD,PEN_PRO_NM, PEN_PRO_BIRTH, PEN_PRO_REL, PEN_PRO_CON_NUM, PEN_PRO_CON_PNUM, PEN_PRO_EMAIL, PEN_PRO_REL_ETC, PEN_PRO_ZIP, PEN_PRO_ADDR, PEN_PRO_ADDR_DTL
         ,PEN_CNM_TYPE_CD, PEN_REC_TYPE_CD, PEN_REC_TYPE_TXT, PEN_REMARK
         ,ENT_ID, ENT_USR_ID, APP_CD, CA_CEN_YN, DEL_YN
         ,REG_DTM, REG_USR_ID, REG_USR_IP, MODIFY_DTM, MODIFY_USR_ID, MODIFY_USR_IP
@@ -377,7 +377,7 @@
         , #{penGender}, #{penBirth}, #{penJumin}, #{penTypeCd}, #{penConNum}, #{penConPnum}
         , #{penExpiStDtm}, #{penExpiEdDtm}, #{penAppStDtm1}, #{penAppEdDtm1}, #{penAppStDtm2}, #{penAppEdDtm2}, #{penAppStDtm3}, #{penAppEdDtm3}, #{penRecDtm}, #{penAppDtm}
         , #{penZip}, #{penAddr}, #{penAddrDtl}
-        , #{penProNm}, #{penProBirth}, #{penProRel}, #{penProConNum}, #{penProConPnum}, #{penProEmail}, #{penProRelEtc}, #{penProZip}, #{penProAddr}, #{penProAddrDtl}
+        , #{penProTypeCd},#{penProNm}, #{penProBirth}, #{penProRel}, #{penProConNum}, #{penProConPnum}, #{penProEmail}, #{penProRelEtc}, #{penProZip}, #{penProAddr}, #{penProAddrDtl}
         , #{penCnmTypeCd}, #{penRecTypeCd}, #{penRecTypeTxt}, #{penRemark}
         , #{entId}, #{entUsrId}, #{appCd}, #{caCenYn}, 'N'
         ,CURRENT_TIMESTAMP,	#{usrId}, #{accessIp} ,CURRENT_TIMESTAMP, #{usrId}, #{accessIp}
@@ -392,7 +392,7 @@
         ,PEN_GENDER, PEN_BIRTH, PEN_JUMIN, PEN_TYPE_CD, PEN_CON_NUM, PEN_CON_PNUM
         ,PEN_EXPI_ST_DTM, PEN_EXPI_ED_DTM, PEN_APP_ST_DTM1, PEN_APP_ED_DTM1, PEN_APP_ST_DTM2, PEN_APP_ED_DTM2, PEN_APP_ST_DTM3, PEN_APP_ED_DTM3,PEN_REC_DTM, PEN_APP_DTM
         ,PEN_ZIP, PEN_ADDR, PEN_ADDR_DTL
-        ,PEN_PRO_NM, PEN_PRO_BIRTH, PEN_PRO_REL, PEN_PRO_CON_NUM, PEN_PRO_CON_PNUM, PEN_PRO_EMAIL, PEN_PRO_REL_ETC, PEN_PRO_ZIP, PEN_PRO_ADDR, PEN_PRO_ADDR_DTL
+        ,PEN_PRO_TYPE_CD,PEN_PRO_NM, PEN_PRO_BIRTH, PEN_PRO_REL, PEN_PRO_CON_NUM, PEN_PRO_CON_PNUM, PEN_PRO_EMAIL, PEN_PRO_REL_ETC, PEN_PRO_ZIP, PEN_PRO_ADDR, PEN_PRO_ADDR_DTL
         ,PEN_CNM_TYPE_CD, PEN_REC_TYPE_CD, PEN_REC_TYPE_TXT, PEN_REMARK
         ,ENT_ID, ENT_USR_ID, APP_CD, CA_CEN_YN, DEL_YN
         ,REG_DTM, REG_USR_ID, REG_USR_IP, MODIFY_DTM, MODIFY_USR_ID, MODIFY_USR_IP
@@ -404,7 +404,7 @@
         , #{penGender}, #{penBirth}, #{penJumin}, #{penTypeCd}, #{penConNum}, #{penConPnum}
         , #{penExpiStDtm}, #{penExpiEdDtm}, #{penAppStDtm1}, #{penAppEdDtm1}, #{penAppStDtm2}, #{penAppEdDtm2}, #{penAppStDtm3}, #{penAppEdDtm3}, #{penRecDtm}, #{penAppDtm}
         , #{penZip}, #{penAddr}, #{penAddrDtl}
-        , #{penProNm}, #{penProBirth}, #{penProRel}, #{penProConNum}, #{penProConPnum}, #{penProEmail}, #{penProRelEtc}, #{penProZip}, #{penProAddr}, #{penProAddrDtl}
+        , #{penProTypeCd},#{penProNm}, #{penProBirth}, #{penProRel}, #{penProConNum}, #{penProConPnum}, #{penProEmail}, #{penProRelEtc}, #{penProZip}, #{penProAddr}, #{penProAddrDtl}
         , #{penCnmTypeCd}, #{penRecTypeCd}, #{penRecTypeTxt}, #{penRemark}
         , #{entId}, #{entUsrId}, #{appCd}, #{caCenYn}, 'N'
         ,CURRENT_TIMESTAMP,	#{usrId}, #{accessIp} ,CURRENT_TIMESTAMP, #{usrId}, #{accessIp}
@@ -506,6 +506,7 @@
         <if test='penZip != null and !penZip.equals("")'>,PEN_ZIP = #{penZip}</if>
         <if test='penAddr != null and !penAddr.equals("")'>,PEN_ADDR = #{penAddr}</if>
         <if test='penAddrDtl != null and !penAddrDtl.equals("")'>,PEN_ADDR_DTL = #{penAddrDtl}</if>
+        <if test='penProTypeCd != null and !penProTypeCd.equals("")'>,PEN_PRO_TYPE_CD = #{penProTypeCd}</if>
         <if test='penProNm != null and !penProNm.equals("")'>,PEN_PRO_NM = #{penProNm}</if>
         <if test='penProBirth != null and !penProBirth.equals("")'>,PEN_PRO_BIRTH = #{penProBirth}</if>
         <if test='penProRel != null and !penProRel.equals("")'>,PEN_PRO_REL = #{penProRel}</if>
@@ -555,6 +556,7 @@
         <if test='penZip != null and !penZip.equals("")'>,PEN_ZIP = #{penZip}</if>
         <if test='penAddr != null and !penAddr.equals("")'>,PEN_ADDR = #{penAddr}</if>
         <if test='penAddrDtl != null and !penAddrDtl.equals("")'>,PEN_ADDR_DTL = #{penAddrDtl}</if>
+        <if test='penProTypeCd != null and !penProTypeCd.equals("")'>,PEN_PRO_TYPE_CD = #{penProTypeCd}</if>
         <if test='penProNm != null and !penProNm.equals("")'>,PEN_PRO_NM = #{penProNm}</if>
         <if test='penProBirth != null and !penProBirth.equals("")'>,PEN_PRO_BIRTH = #{penProBirth}</if>
         <if test='penProRel != null and !penProRel.equals("")'>,PEN_PRO_REL = #{penProRel}</if>
