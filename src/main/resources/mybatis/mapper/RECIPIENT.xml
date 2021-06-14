@@ -357,7 +357,7 @@
          #{penId}
         , #{penNm} , #{penLtmNum}, #{penRecGraCd}
         , #{penGender}, #{penBirth}, #{penJumin}, #{penTypeCd}, #{penConNum}, #{penConPnum}
-        , #{penExpiStDtm}, #{penExpiEdDtm}, #{penAppStDtm1}, #{penAppEdDtm1}, #{penAppStDtm2}, #{penAppEdDtm2}, #{penAppStDtm3}, #{penAppEdDtm3}, #{penRecDtm}, #{penAppDtm}
+        , #{penExpiStDtm, jdbcType=DATE}, #{penExpiEdDtm, jdbcType=DATE}, #{penAppStDtm1}, #{penAppEdDtm1}, #{penAppStDtm2}, #{penAppEdDtm2}, #{penAppStDtm3}, #{penAppEdDtm3}, #{penRecDtm}, #{penAppDtm}
         , #{penZip}, #{penAddr}, #{penAddrDtl}
         , #{penProNm}, #{penProBirth}, #{penProRel}, #{penProConNum}, #{penProConPnum}, #{penProEmail}, #{penProRelEtc}, #{penProZip}, #{penProAddr}, #{penProAddrDtl}
         , #{penCnmTypeCd}, #{penRecTypeCd}, #{penRecTypeTxt}, #{penRemark}
@@ -451,8 +451,8 @@
         <if test='penJumin != null and !penJumin.equals("")'>,PEN_JUMIN = #{penJumin}</if>
         <if test='penConNum != null and !penConNum.equals("")'>,PEN_CON_NUM = #{penConNum}</if>
         <if test='penConPnum != null and !penConPnum.equals("")'>,PEN_CON_PNUM = #{penConPnum}</if>
-        <if test='penExpiStDtm != null and !penExpiStDtm.equals("")'>,PEN_EXPI_ST_DTM = #{penExpiStDtm}</if>
-        <if test='penExpiEdDtm != null and !penExpiEdDtm.equals("")'>,PEN_EXPI_ED_DTM = #{penExpiEdDtm}</if>
+        <if test='penExpiStDtm != null and !penExpiStDtm.equals("")'>,PEN_EXPI_ST_DTM = #{penExpiStDtm, jdbcType=DATE}</if>
+        <if test='penExpiEdDtm != null and !penExpiEdDtm.equals("")'>,PEN_EXPI_ED_DTM = #{penExpiEdDtm, jdbcType=DATE}</if>
         <if test='penAppStDtm1 != null and !penAppStDtm1.equals("")'>,PEN_APP_ST_DTM1 = #{penAppStDtm1}</if>
         <if test='penAppEdDtm1 != null and !penAppEdDtm1.equals("")'>,PEN_APP_ED_DTM1 = #{penAppEdDtm1}</if>
         <if test='penAppStDtm2 != null and !penAppStDtm2.equals("")'>,PEN_APP_ST_DTM2 = #{penAppStDtm2}</if>
