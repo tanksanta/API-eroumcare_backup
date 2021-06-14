@@ -27,6 +27,10 @@ public class StockService extends BaseService{
     @Autowired
     private AbstractDAO abstractDAO;
 
+    @Autowired
+    private ProdService prodService;
+
+
     /**
      * 바코드 중복 체크
      * */
@@ -161,6 +165,10 @@ public class StockService extends BaseService{
         //결과를 위한 파라미터 리스트
         List stockList = new ArrayList();
 
+        String accessIp = MapUtils.getString(params,"accessIp");
+        String usrId = MapUtils.getString(params,"usrId");
+        String entId = MapUtils.getString(params,"entId");
+
         //취급제품 체크용
         Object ppcId = "";
         //제품 리스트 가져오기
@@ -169,12 +177,10 @@ public class StockService extends BaseService{
         int index = 0;
         for(int i=0;  i<prodList.size(); i++){
             Map prod = new HashMap();
-            prod.put("entId",MapUtils.getString(params,"entId"));
-            prod.put("usrId",MapUtils.getString(params,"usrId"));
-            prod.put("accessIp",MapUtils.getString(params,"accessIp"));
+            prod.put("entId",entId);
+            prod.put("usrId",usrId);
+            prod.put("accessIp",accessIp);
             prod.put("prodId",MapUtils.getString(prodList.get(i),"prodId"));
-            prod.put("prodColor",MapUtils.getString(prodList.get(i),"prodColor"));
-            prod.put("prodSize",MapUtils.getString(prodList.get(i),"prodSize"));
             prod.put("prodManuDate",MapUtils.getString(prodList.get(i),"prodManuDate"));
             prod.put("prodBarNum",MapUtils.getString(prodList.get(i),"prodBarNum"));
             prod.put("stoMemo",MapUtils.getString(prodList.get(i),"stoMemo"));
@@ -220,16 +226,19 @@ public class StockService extends BaseService{
     public BaseResponse updateStock(Map<String,Object> params) throws Exception {
         BaseResponse response = new BaseResponse();
 
+        String usrId = MapUtils.getString(params,"usrId");
+        String accessIp = MapUtils.getString(params,"accessIp");
+        String stoId = MapUtils.getString(params,"stoId");
+
         //결과값 리턴을 위한
         List<Map> stockList = new ArrayList<>();
-
         //수정할 재고 가져오기
         List<Map> prodList = (List<Map>) MapUtils.getObject(params,"prods");
         //stoId,prodColor,prodSize,prodManuDate,prodBarNum,stoMemo,delYn
         if(prodList!=null) {
             for (Map prod : prodList) {
-                prod.put("usrId", MapUtils.getString(params, "usrId"));
-                prod.put("accessIp", MapUtils.getString(params, "accessIp"));
+                prod.put("usrId", usrId);
+                prod.put("accessIp", accessIp);
 
                 // 재고 수정
                 abstractDAO.update("stock.updateStock", prod);

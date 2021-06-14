@@ -6,6 +6,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class test {
     public static void main(String[] args) throws ParseException {
@@ -24,6 +28,17 @@ public class test {
 //        System.out.println("010-2551-8080 / " + sdbCryptUtil.encrypt("010-2551-8080"));
 //        System.out.println("010-6776-9303 / " + sdbCryptUtil.encrypt("010-6776-9303"));
 //        System.out.println("010-4051-4887 / " + sdbCryptUtil.encrypt("010-4051-4887"));
-        System.out.println("└ % & ");
+        List<Map> option = new ArrayList<>();
+        Map test = new HashMap(){{
+            put("test",1);
+        }};
+        option.add(test);
+        System.out.println("list : " + option);
+
+        for(Map item:option){
+            item.put("test",2);
+        }
+        System.out.println("list : " + option);
+
     }
 }

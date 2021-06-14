@@ -46,6 +46,21 @@ public class ProdController {
     }
 
     /**
+     *  상품 상세 조회
+     * */
+    @PostMapping(value = "select")
+    public BaseResponse selectProd(@RequestBody BaseRequest request) throws Exception {
+
+        // requiredField add
+        request.addRequiredField("prodId", request.TYPE_STRING);
+
+        request.validRequiredField();
+
+        // bussiness logic
+        return prodService.selectProdDetail(request.bindRequest());
+    }
+
+    /**
      *  품목 조회
      * */
     @PostMapping(value = "selectItemList")

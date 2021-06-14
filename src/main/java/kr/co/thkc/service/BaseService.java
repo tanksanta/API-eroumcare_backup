@@ -61,42 +61,42 @@ public abstract class BaseService {
 
 
     @SuppressWarnings("rawtypes")
-    	public Map excuteHttpLocalClient(String url, String apiKey) throws Exception{
+    public Map excuteHttpLocalClient(String url, String apiKey) throws Exception{
 
-    		String GET_URL = url;
+        String GET_URL = url;
 
-    	       //http client 생성
-            CloseableHttpClient httpClient = HttpClients.createDefault();
+           //http client 생성
+        CloseableHttpClient httpClient = HttpClients.createDefault();
 
-            //get 메서드와 URL 설정
-            HttpGet httpGet = new HttpGet(GET_URL);
+        //get 메서드와 URL 설정
+        HttpGet httpGet = new HttpGet(GET_URL);
 
-            //agent 정보 설정
-            httpGet.addHeader("Authorization", apiKey);
-            httpGet.addHeader("Content-type", "application/json");
+        //agent 정보 설정
+        httpGet.addHeader("Authorization", apiKey);
+        httpGet.addHeader("Content-type", "application/json");
 
-            //get 요청
-            CloseableHttpResponse httpResponse = httpClient.execute(httpGet);
+        //get 요청
+        CloseableHttpResponse httpResponse = httpClient.execute(httpGet);
 
-            System.out.println("GET Response Status");
-            System.out.println(httpResponse.getStatusLine().getStatusCode());
-            String json = EntityUtils.toString(httpResponse.getEntity(), "UTF-8");
+        System.out.println("GET Response Status");
+        System.out.println(httpResponse.getStatusLine().getStatusCode());
+        String json = EntityUtils.toString(httpResponse.getEntity(), "UTF-8");
 
-            JSONObject spaceListJSON = new JSONObject(json);
-
-
-            JSONArray jsonArray = spaceListJSON.getJSONArray("documents");
-
-            HashMap<String, Object> localMap = new HashMap<>();
-
-            JSONObject spaceJSON = jsonArray.getJSONObject(0);
-            localMap.put("longitude", spaceJSON.getString("x"));
-            localMap.put("latitude", spaceJSON.getString("y"));
+        JSONObject spaceListJSON = new JSONObject(json);
 
 
+        JSONArray jsonArray = spaceListJSON.getJSONArray("documents");
 
-       		httpClient.close();
+        HashMap<String, Object> localMap = new HashMap<>();
 
-    		return localMap;
-    	}
+        JSONObject spaceJSON = jsonArray.getJSONObject(0);
+        localMap.put("longitude", spaceJSON.getString("x"));
+        localMap.put("latitude", spaceJSON.getString("y"));
+
+
+
+        httpClient.close();
+
+        return localMap;
+    }
 }

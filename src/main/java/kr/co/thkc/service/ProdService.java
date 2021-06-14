@@ -1,5 +1,6 @@
 package kr.co.thkc.service;
 
+import jdk.nashorn.internal.runtime.regexp.joni.Regex;
 import kr.co.thkc.dispatch.BaseResponse;
 import kr.co.thkc.dispatch.ResultCode;
 import kr.co.thkc.mapper.AbstractDAO;
@@ -12,8 +13,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.sql.Array;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 @Slf4j
@@ -29,6 +33,7 @@ public class ProdService extends BaseService{
 
 
 
+
     /*
     * ------------------------------------------------------
     *                       상품
@@ -38,8 +43,23 @@ public class ProdService extends BaseService{
         BaseResponse response = new BaseResponse();
 
         List prodList = abstractDAO.selectList("prod.selectProdList",params);
+        List optionList = abstractDAO.selectList("prod.selectOptionProd",params);
 
         response.setResultData(prodList);
+        response.setResult(ResultCode.RC_OK);
+
+        return response;
+    }
+
+    public BaseResponse selectProdDetail(Map<String,Object> params) throws SQLException {
+        BaseResponse response = new BaseResponse();
+
+        Map prod = (Map)abstractDAO.selectOne("prod.selectProdList",params);
+        List optionList = abstractDAO.selectList("prod.selectOptionProd",params);
+
+        prod.put("prodOption",optionList);
+
+        response.setResultData(prod);
         response.setResult(ResultCode.RC_OK);
 
         return response;
@@ -59,6 +79,9 @@ public class ProdService extends BaseService{
 
     public BaseResponse insertProd(Map<String,Object> params, Map<String,MultipartFile> fileMap) throws Exception {
         BaseResponse response = new BaseResponse();
+
+        String usrId = MapUtils.getString(params,"usrId");
+        String accessIp = MapUtils.getString(params,"accessIp");
 
         String prodDetail = MapUtils.getString(params,"prodDetail");
         params.put("prodDetail",prodDetail);
@@ -89,6 +112,16 @@ public class ProdService extends BaseService{
         abstractDAO.insert("prod.insertProd",params);
         //제품수정정보추가
         abstractDAO.insert("prod.insertProdModify",params);
+        //옵션 추가
+        List<Map> optionList = (List) MapUtils.getObject(params,"option");
+        if(optionList!=null && optionList.size()>0) {
+            for(Map option:optionList){
+                option.put("prodId",prodId);
+                option.put("usrId",usrId);
+                option.put("accessIp",accessIp);
+            }
+            abstractDAO.insert("prod.insertOptionProd",optionList);
+        }
 
         response.setData(params);
         response.setResult(ResultCode.RC_OK);
@@ -99,6 +132,10 @@ public class ProdService extends BaseService{
 
     public BaseResponse updateProd(Map<String,Object> params, Map<String,MultipartFile> fileMap) throws Exception {
         BaseResponse response = new BaseResponse();
+
+        String usrId = MapUtils.getString(params,"usrId");
+        String accessIp = MapUtils.getString(params,"accessIp");
+        String prodId = MapUtils.getString(params,"prodId");
 
         String prodDetail = MapUtils.getString(params,"prodDetail");
         params.put("prodDetail",prodDetail);
@@ -136,6 +173,16 @@ public class ProdService extends BaseService{
         abstractDAO.update("prod.updateProd",params);
         //제품수정정보추가
         abstractDAO.update("prod.updateProdModify",params);
+        //옵션 수정
+        List<Map> optionList = (List) MapUtils.getObject(params,"option");
+        if(optionList!=null && optionList.size()>0) {
+            for(Map option:optionList){
+                option.put("prodId",prodId);
+                option.put("usrId",usrId);
+                option.put("accessIp",accessIp);
+            }
+            abstractDAO.update("prod.updateOptionProd",optionList);
+        }
 
         response.setResult(ResultCode.RC_OK);
 
@@ -184,14 +231,14 @@ public class ProdService extends BaseService{
     }
 
     public BaseResponse deletePpc(Map<String,Object> params) throws Exception {
-            BaseResponse response = new BaseResponse();
+        BaseResponse response = new BaseResponse();
 
-            //취급제품 삭제
-            abstractDAO.update("prod.deletePpc",params);
+        //취급제품 삭제
+        abstractDAO.update("prod.deletePpc",params);
 
-            response.setResult(ResultCode.RC_OK);
+        response.setResult(ResultCode.RC_OK);
 
-            return response;
-        }
+        return response;
+    }
 
 }

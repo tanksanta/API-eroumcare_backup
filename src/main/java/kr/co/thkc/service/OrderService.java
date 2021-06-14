@@ -33,6 +33,9 @@ public class OrderService extends BaseService {
     @Autowired
     private EformService eformService;
 
+    @Autowired
+    private ProdService prodService;
+
 
     /**
      * 주문 조회
@@ -41,7 +44,6 @@ public class OrderService extends BaseService {
         BaseResponse response = new BaseResponse();
 
         params.put("downloadUrl",env.getProperty("download.url"));
-
         List orderList = abstractDAO.selectList("order.selectOrderList",params);
 
         response.setResultData(orderList);
@@ -95,7 +97,7 @@ public class OrderService extends BaseService {
         params.put("returnUrl",returnUrl);
 
 
-        //추가해야할 재고가 있을때 사용할 신규재로 목록
+        //추가해야할 재고가 있을때 사용할 신규재고 목록
         List<Map> newStockList = new ArrayList();
         List<Map> orderList = new ArrayList();
 
@@ -185,7 +187,7 @@ public class OrderService extends BaseService {
                 String ordLendStrDtm = MapUtils.getString(order,"ordLendStrDtm");       //수정 하려는 대여일자
                 String ordLendEndDtm = MapUtils.getString(order,"ordLendEndDtm");       //수정 하려는 대여일자
                 price = MapUtils.getIntValue(order, "rentalPrice");
-//                대여일자 계산해서 결제금액 계산
+                //대여일자 계산해서 결제금액 계산
                 if(ordLendStrDtm!=null && ordLendEndDtm!=null) {
                     rentalCnt = DateUtil.getDateDiffOrder(ordLendStrDtm, ordLendEndDtm);
                 }
@@ -194,6 +196,8 @@ public class OrderService extends BaseService {
             }
             order.put("prodOflPrice", price);
             order.put("finPayment", finPayment);
+
+            //주문시퀀스 등록
             order.put("penStaSeq",penStaSeq++);
 
             resultStock.add(new HashMap(){{
