@@ -188,6 +188,21 @@ public class RecipientController {
     }
 
     /**
+     *  욕구사정기록지 삭제
+     * */
+    @PostMapping(value = "deleteRec")
+    public BaseResponse deleteRecipientRec(@RequestBody BaseRequest request) throws Exception {
+        request.addRequiredField("recId", request.TYPE_STRING);
+        request.addRequiredField("entId", request.TYPE_STRING);
+        request.addRequiredField("penId", request.TYPE_STRING);
+
+        request.validRequiredField();
+
+        // bussiness logic
+        return recipientService.deleteRecipientRec(request.bindRequest());
+    }
+
+    /**
      *  데이터 암호화
      * */
     @PostMapping(value = "encrpyt")

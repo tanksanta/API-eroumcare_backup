@@ -292,6 +292,23 @@ public class RecipientService extends BaseService{
         return response;
     }
 
+    /**
+     * 욕구사정기록지 삭제
+     **/
+    public BaseResponse deleteRecipientRec(Map<String,Object> params) throws SQLException {
+        BaseResponse response = new BaseResponse();
+
+        int result = abstractDAO.delete("recipient.deleteRecipientRec",params);
+
+        if (result > 0) {
+            response.setResult(ResultCode.RC_OK);
+        } else {
+            response.setResult(ResultCode.RC_FAIL);
+        }
+
+        return response;
+    }
+
 
     /*수급자의 전화번호가 암호화 되지 않은 것들을 뽑아내기 위해 임시로 생성*/
     @Deprecated

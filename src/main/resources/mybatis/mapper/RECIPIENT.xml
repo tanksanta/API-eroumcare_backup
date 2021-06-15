@@ -615,7 +615,7 @@
     <!--욕구사정기록지 삭제-->
     <delete id="deleteRecipientRec" parameterType="hashmap">
         DELETE FROM PEN1500
-        WHERE REC_ID = #{recId}
+        WHERE REC_ID = #{recId} AND ENT_ID = #{entId} AND PEN_ID = #{penId}
     </delete>
 
 </mapper>
