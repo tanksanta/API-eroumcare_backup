@@ -63,7 +63,7 @@
         <if test='prodOption != null and !prodOption.equals("")'>AND D.PROD_OPTION = #{prodOption}</if>
         <if test="usrId!=null and !usrId.equals('')">AND D.REG_USR_ID = #{usrId}</if>
         <if test="entId!=null and !entId.equals('')">AND C.ENT_ID = #{entId}</if>
-        ORDER BY D.REG_DTM
+        ORDER BY D.REG_DTM, PROD_BAR_NUM
     </select>
 
     <select id="selectStock" parameterType="hashmap" resultType="camelMap" fetchSize="10000">
@@ -101,7 +101,7 @@
         <if test="prodPayCode!=null and !prodPayCode.equals('')">AND A.PROD_PAY_CODE = #{prodPayCode}</if>
         <if test="gubun!=null and !gubun.equals('')">AND A.GUBUN = #{gubun}</if>
         GROUP BY PROD_NM,PROD_COLOR,PROD_SIZE,PROD_OPTION
-        ORDER BY D.REG_DTM
+        ORDER BY D.REG_DTM, PROD_BAR_NUM
     </select>
 
 
@@ -134,7 +134,7 @@
        <if test="entId!=null and !entId.equals('')">AND C.ENT_ID = #{entId}</if>
        <if test="stoId!=null and !stoId.equals('')">AND D.STO_ID = #{stoId}</if>
        <if test="prodId!=null and !prodId.equals('')">AND A.PROD_ID = #{prodId}</if>
-       ORDER BY D.REG_DTM
+       ORDER BY D.REG_DTM, PROD_BAR_NUM ASC
     </select>
 
     <select id="selectStockDetailList" parameterType="hashmap" resultType="camelMap" fetchSize="10000">
@@ -189,7 +189,7 @@
         <if test="entId!=null and !entId.equals('')">AND C.ENT_ID = #{entId}</if>
         <if test="stoId!=null and !stoId.equals('')">AND D.STO_ID = #{stoId}</if>
         <if test="prodId!=null and !prodId.equals('')">AND A.PROD_ID = #{prodId}</if>
-        ORDER BY D.REG_DTM
+        ORDER BY D.REG_DTM, PROD_BAR_NUM ASC
         <if test="pageSize > 0 and pageNum > 0">
             LIMIT #{pageSize}
             OFFSET #{offset}
@@ -242,7 +242,7 @@
         <if test="gubun!=null and !gubun.equals('')">AND A.GUBUN = #{gubun}</if>
         <if test="taxInfoCd!=null and !taxInfoCd.equals('')">AND A.TAX_INFO_CD = #{taxInfoCd}</if>
         GROUP BY A.PROD_ID
-        ORDER BY A.REG_DTM
+        ORDER BY A.REG_DTM, PROD_BAR_NUM ASC
         <if test="pageSize > 0 and pageNum > 0">
             LIMIT #{pageSize}
             OFFSET #{offset}
@@ -284,7 +284,7 @@
         <if test="stoId!=null and !stoId.equals('')">AND D.STO_ID = #{stoId}</if>
         <if test="prodId!=null and !prodId.equals('')">AND A.PROD_ID = #{prodId}</if>
         <if test="gubun!=null and !gubun.equals('')">AND A.GUBUN = #{gubun}</if>
-        ORDER BY D.REG_DTM
+        ORDER BY D.REG_DTM, PROD_BAR_NUM ASC
     </select>
 
     <insert id="insertStock" parameterType="hashmap">
