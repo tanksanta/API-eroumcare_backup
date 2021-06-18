@@ -163,7 +163,7 @@
             <when test='supId == null or supId.equals("")'>(SELECT SUP_ID FROM sup1000 WHERE USR_ID ='6178614330')</when>
             <otherwise>#{supId}</otherwise>
          </choose>
-        ,#{prodSym},		#{prodWeig},
+        ,#{prodSym},		#{prodWeig}
         ,#{prodColor},      #{prodSize},        #{prodSizeDetail}
         ,1,     	        #{prodDetail}
         ,#{prodImgAttr}
