@@ -46,6 +46,7 @@
         WHERE A.DEL_YN = 'N' AND A.STATE_CD != '02'
             AND PROD_BAR_NUM = #{prodBarNum}
             AND B.PROD_ID = #{prodId}
+            AND B.ENT_ID = #{entId}
     </select>
 
     <select id="selectBarNumList" parameterType="hashmap" resultType="camelMap" fetchSize="10000">

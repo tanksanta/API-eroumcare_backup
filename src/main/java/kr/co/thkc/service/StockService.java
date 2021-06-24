@@ -34,14 +34,15 @@ public class StockService extends BaseService{
     /**
      * 바코드 중복 체크
      * */
-    public int countBarNum(Map param) {
+    public int countBarNum(Map param) throws Exception {
 
         if ((MapUtils.getString(param, "prodBarNum") != null && !MapUtils.getString(param, "prodBarNum").equals(""))
-                && (MapUtils.getString(param, "stoId") != null && !MapUtils.getString(param, "stoId").equals(""))) {
+                && (MapUtils.getString(param, "prodId") != null && !MapUtils.getString(param, "prodId").equals(""))
+                && (MapUtils.getString(param, "entId") != null && !MapUtils.getString(param, "entId").equals(""))) {
             List barNumList = abstractDAO.selectList("stock.selectDuplicateBarNum", param);
             return barNumList.size();
         } else {
-            return 0;
+            throw new Exception("바코드 중복 조회 필수 값이 누락되었습니다. (필수 : 바코드, 제품 고유 아이디, 사업소 고유 아이디)");
         }
     }
 
