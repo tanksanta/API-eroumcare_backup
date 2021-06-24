@@ -288,6 +288,7 @@
         <if test="stoId!=null and !stoId.equals('')">AND D.STO_ID = #{stoId}</if>
         <if test="prodId!=null and !prodId.equals('')">AND A.PROD_ID = #{prodId}</if>
         <if test="gubun!=null and !gubun.equals('')">AND A.GUBUN = #{gubun}</if>
+        <if test="endId!=null and !endId.equals('')">AND C.ENT_ID = #{entId}</if>
         ORDER BY D.REG_DTM, PROD_BAR_NUM ASC
     </select>
 

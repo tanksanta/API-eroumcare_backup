@@ -108,7 +108,8 @@ public class OrderService extends BaseService {
             //상품정보 가져오기 gubun,prodNm,itemId,subItem,prodSupPrice,prodOflPrice,rentalPrice
             Map prodInfo = (Map) abstractDAO.selectOne("prod.selectProdNonOptionInfo",prod);
             prod.putAll(prodInfo);
-            prod.put("itemNm",MapUtils.getString(prodInfo,"itemNm"));
+            prod.put("itemNm", MapUtils.getString(prodInfo,"itemNm"));
+            prod.put("entId", entId);
             prod.remove("penStaSeq");
 
             //주문 등록 파람설정
