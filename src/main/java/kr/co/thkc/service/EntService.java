@@ -46,7 +46,7 @@ public class EntService extends BaseService{
         String usrId = MapUtils.getString(params,"usrId");
         String plainPw = MapUtils.getString(params,"pw");
         String pw = SHA256Util.encryptPassword(plainPw,usrId);
-        params.put("pw",pw);
+        params.put("pw", pw);
 
         Map result = (Map)abstractDAO.selectOne("ent.selectEntLogin",params);
 

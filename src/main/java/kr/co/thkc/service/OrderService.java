@@ -59,7 +59,7 @@ public class OrderService extends BaseService {
     public BaseResponse insertOrder(Map<String,Object> params) throws Exception {
         BaseResponse response = new BaseResponse();
 
-        //EntId 조회
+        //EntId 조회 (사업자 조회)
         Map account = (Map)abstractDAO.selectOne("ent.selectEntAccount",params);
         String entId = MapUtils.getString(account,"entId");
         String accessIp = MapUtils.getString(account,"accessIp");
@@ -256,6 +256,7 @@ public class OrderService extends BaseService {
                 prod.put("accessIp",accessIp);
                 prod.put("usrId",usrId);
                 prod.put("penOrdId", penOrdId);
+
                 //주문 수정
                 abstractDAO.update("order.updateOrder", prod);
 

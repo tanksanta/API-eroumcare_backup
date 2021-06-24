@@ -58,7 +58,7 @@ public class StockController {
     }
 
     /**
-     *  상세 재 목록 조회
+     *  상세 재고 목록 조회
      * */
     @PostMapping(value = "selectDetailList")
     public BaseResponse selectStockDetailList(@RequestBody BaseRequest request) throws Exception {
