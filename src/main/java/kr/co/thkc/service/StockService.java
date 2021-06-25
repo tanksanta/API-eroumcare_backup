@@ -247,7 +247,7 @@ public class StockService extends BaseService{
                 abstractDAO.update("stock.updateStock", prod);
                 //트랜잭션 때문에 이전에 동일 트랜잭션에서 바코드가 들어갔었을수도있음 그래서 트랜잭션 마지막에 개수체크
                 String prodBarNum = MapUtils.getString(prod, "prodBarNum");
-                if (countBarNum(prod) > 1) throw new Exception("(prodBarNum=" + prodBarNum + ") 중복된 바코드는 사용할 수 없습니다.");
+                //if (countBarNum(prod) > 1) throw new Exception("(prodBarNum=" + prodBarNum + ") 중복된 바코드는 사용할 수 없습니다.");
                 //주문의 재고 수정
                 abstractDAO.update("order.updateOrder", new HashMap(){{
                     put("stoId",MapUtils.getString(prod,"stoId"));
