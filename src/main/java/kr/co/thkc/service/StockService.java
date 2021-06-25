@@ -230,6 +230,7 @@ public class StockService extends BaseService{
         String usrId = MapUtils.getString(params,"usrId");
         String accessIp = MapUtils.getString(params,"accessIp");
         String stoId = MapUtils.getString(params,"stoId");
+        String entId = MapUtils.getString(params,"entId");
 
         //결과값 리턴을 위한
         List<Map> stockList = new ArrayList<>();
@@ -240,6 +241,7 @@ public class StockService extends BaseService{
             for (Map prod : prodList) {
                 prod.put("usrId", usrId);
                 prod.put("accessIp", accessIp);
+                prod.put("entId", entId);
 
                 // 재고 수정
                 abstractDAO.update("stock.updateStock", prod);
