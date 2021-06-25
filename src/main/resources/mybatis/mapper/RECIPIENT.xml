@@ -402,7 +402,7 @@
          #{penId}
         , #{penNm} , #{penLtmNum}, #{penRecGraCd}
         , #{penGender}, #{penBirth}, #{penJumin}, #{penTypeCd}, #{penConNum}, #{penConPnum}
-        , #{penExpiStDtm}, #{penExpiEdDtm}, #{penAppStDtm1}, #{penAppEdDtm1}, #{penAppStDtm2}, #{penAppEdDtm2}, #{penAppStDtm3}, #{penAppEdDtm3}, #{penRecDtm}, #{penAppDtm}
+        , #{penExpiStDtm, jdbcType=DATE}, #{penExpiEdDtm, jdbcType=DATE}, #{penAppStDtm1, jdbcType=DATE}, #{penAppEdDtm1, jdbcType=DATE}, #{penAppStDtm2, jdbcType=DATE}, #{penAppEdDtm2, jdbcType=DATE}, #{penAppStDtm3, jdbcType=DATE}, #{penAppEdDtm3, jdbcType=DATE}, #{penRecDtm, jdbcType=DATE}, #{penAppDtm, jdbcType=DATE}
         , #{penZip}, #{penAddr}, #{penAddrDtl}
         , #{penProTypeCd},#{penProNm}, #{penProBirth}, #{penProRel}, #{penProConNum}, #{penProConPnum}, #{penProEmail}, #{penProRelEtc}, #{penProZip}, #{penProAddr}, #{penProAddrDtl}
         , #{penCnmTypeCd}, #{penRecTypeCd}, #{penRecTypeTxt}, #{penRemark}

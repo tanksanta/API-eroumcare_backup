@@ -168,11 +168,34 @@ public class RecipientService extends BaseService{
         String penConPnum = MapUtils.getString(params,"penConPnum");
         String penProConNum = MapUtils.getString(params,"penProConNum");
         String penProConPnum = MapUtils.getString(params,"penProConPnum");
+        String penExpiStDtm = MapUtils.getString(params, "penExpiStDtm");
+        String penExpiEdDtm = MapUtils.getString(params, "penExpiEdDtm");
+        String penAppStDtm1 = MapUtils.getString(params, "penAppStDtm1");
+        String penAppEdDtm1 = MapUtils.getString(params, "penAppEdDtm1");
+        String penAppStDtm2 = MapUtils.getString(params, "penAppStDtm2");
+        String penAppEdDtm2 = MapUtils.getString(params, "penAppEdDtm2");
+        String penAppStDtm3 = MapUtils.getString(params, "penAppStDtm3");
+        String penAppEdDtm3 = MapUtils.getString(params, "penAppEdDtm3");
+        String penRecDtm = MapUtils.getString(params, "penRecDtm");
+        String penAppDtm = MapUtils.getString(params, "penAppDtm");
 
         if(penConNum!=null && !penConNum.equals("")) params.put("penConNum",sdb.encrypt(penConNum));
         if(penConPnum!=null && !penConPnum.equals("")) params.put("penConPnum",sdb.encrypt(penConPnum));
         if(penProConNum!=null && !penProConNum.equals("")) params.put("penProConNum",sdb.encrypt(penProConNum));
         if(penProConPnum!=null && !penProConPnum.equals("")) params.put("penProConPnum",sdb.encrypt(penProConPnum));
+
+        // date형식 데이터 빈 값 처리
+        if (penExpiStDtm != null && penExpiStDtm.equals("")) params.put("penExpiStDtm", null);
+        if (penExpiEdDtm != null && penExpiEdDtm.equals("")) params.put("penExpiEdDtm", null);
+        if (penAppStDtm1 != null && penAppStDtm1.equals("")) params.put("penAppStDtm1", null);
+        if (penAppEdDtm1 != null && penAppEdDtm1.equals("")) params.put("penAppEdDtm1", null);
+        if (penAppStDtm2 != null && penAppStDtm2.equals("")) params.put("penAppStDtm2", null);
+        if (penAppEdDtm2 != null && penAppEdDtm2.equals("")) params.put("penAppEdDtm2", null);
+        if (penAppStDtm3 != null && penAppStDtm3.equals("")) params.put("penAppStDtm3", null);
+        if (penAppEdDtm3 != null && penAppEdDtm3.equals("")) params.put("penAppEdDtm3", null);
+        if (penRecDtm != null && penRecDtm.equals("")) params.put("penRecDtm", null);
+        if (penAppDtm != null && penAppDtm.equals("")) params.put("penAppDtm", null);
+
 
         //쇼핑몰의 admin은 시스템의 관리자 아이디 (wmdsadm) 으로 대체
         if(MapUtils.getString(params,"usrId").equals("admin")) params.put("entUsrId","123456789");
