@@ -41,6 +41,8 @@ public class StockService extends BaseService{
                 && (MapUtils.getString(param, "entId") != null && !MapUtils.getString(param, "entId").equals(""))) {
             List barNumList = abstractDAO.selectList("stock.selectDuplicateBarNum", param);
             return barNumList.size();
+        } else if (MapUtils.getString(param, "prodBarNum") == null || MapUtils.getString(param, "prodBarNum").equals("")) {
+            return 0;
         } else {
             throw new Exception("바코드 중복 조회 필수 값이 누락되었습니다. (필수 : 바코드, 제품 고유 아이디, 사업소 고유 아이디)");
         }
