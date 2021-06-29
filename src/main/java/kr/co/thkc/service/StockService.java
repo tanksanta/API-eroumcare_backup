@@ -189,6 +189,11 @@ public class StockService extends BaseService{
             prod.put("stoMemo",MapUtils.getString(prodList.get(i),"stoMemo"));
             prod.put("ct_id",MapUtils.getString(prodList.get(i),"ct_id"));
 
+            // 옵션
+            prod.put("prodColor", MapUtils.getString(prodList.get(i), "prodColor"));
+            prod.put("prodSize", MapUtils.getString(prodList.get(i), "prodSize"));
+            prod.put("prodOption", MapUtils.getString(prodList.get(i), "prodOption"));
+
             //취급제품인지 체크
             ppcId = abstractDAO.selectOne("stock.selectPpc",prod);
             if(ppcId==null){    //취급제품 없으면 추가
@@ -229,10 +234,15 @@ public class StockService extends BaseService{
     public BaseResponse updateStock(Map<String,Object> params) throws Exception {
         BaseResponse response = new BaseResponse();
 
-        String usrId = MapUtils.getString(params,"usrId");
-        String accessIp = MapUtils.getString(params,"accessIp");
-        String stoId = MapUtils.getString(params,"stoId");
-        String entId = MapUtils.getString(params,"entId");
+        String usrId = MapUtils.getString(params, "usrId");
+        String accessIp = MapUtils.getString(params, "accessIp");
+        String stoId = MapUtils.getString(params, "stoId");
+        String entId = MapUtils.getString(params, "entId");
+
+        // 옵션
+        String prodSize = MapUtils.getString(params, "prodSize");
+        String prodColor = MapUtils.getString(params, "prodColor");
+        String prodOption = MapUtils.getString(params, "prodOption");
 
         //결과값 리턴을 위한
         List<Map> stockList = new ArrayList<>();
@@ -244,6 +254,11 @@ public class StockService extends BaseService{
                 prod.put("usrId", usrId);
                 prod.put("accessIp", accessIp);
                 prod.put("entId", entId);
+
+                // 옵션
+                prod.put("prodSize", prodSize);
+                prod.put("prodColor", prodColor);
+                prod.put("prodOption", prodOption);
 
                 // 재고 수정
                 abstractDAO.update("stock.updateStock", prod);
