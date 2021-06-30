@@ -3,61 +3,54 @@
 <mapper namespace="set">
 
     <select id="selectNewSchId" resultType="string">
-        SELECT	IFNULL(
-                          CONCAT(SUBSTR(B.NEW_ENT_ID, 1, 11), LPAD( (SUBSTR(B.NEW_ENT_ID, 12, 5)) + 1 , 5, '0'))
-                      ,	CONCAT('SCHL',  DATE_FORMAT(NOW(), '%Y%m%d'), '00001')
-                      ) AS NEW_ENT_ID
-        FROM	(
-                    SELECT	MAX(A.ENT_ID)  AS NEW_ENT_ID
-                    FROM	ENT1300 A
-                    WHERE	1=1
-                      AND	A.ENT_ID LIKE CONCAT('ENT',  DATE_FORMAT(NOW(), '%Y%m%d'), '%')
-                ) B
+        SELECT IFNULL(
+                       CONCAT(SUBSTR(B.NEW_ENT_ID, 1, 11), LPAD((SUBSTR(B.NEW_ENT_ID, 12, 5)) + 1, 5, '0'))
+                   , CONCAT('SCHL', DATE_FORMAT(NOW(), '%Y%m%d'), '00001')
+                   ) AS NEW_ENT_ID
+        FROM (
+                 SELECT MAX(A.ENT_ID) AS NEW_ENT_ID
+                 FROM ENT1300 A
+                 WHERE 1 = 1
+                   AND A.ENT_ID LIKE CONCAT('ENT', DATE_FORMAT(NOW(), '%Y%m%d'), '%')
+             ) B
     </select>
 
     <!-- set1000DAO.insertSet1004InfoAll - 사업소 직원 사용가능 메뉴 등록 ( 전체관리자 선택 ) -->
     <insert id="insertSetMenuAll" parameterType="hashmap">
-        INSERT INTO SYS1100 (
-            MENU_ID ,
-            TGT_ID ,
-            ENT_TYPE_CD ,
-            REG_DTM ,
-            REG_USR_ID ,
-            REG_USR_IP ,
-            MODIFY_DTM ,
-            MODIFY_USR_ID ,
-            MODIFY_USR_IP
-        )
-        SELECT 	MENU_ID,
-                  #{usrId} AS USR_ID ,
-                  MENU_TYPE_CD AS ENT_TYPE_CD ,
-                  CURRENT_TIMESTAMP,
-                  #{usrId},
-                  #{accessIp},
-                  CURRENT_TIMESTAMP,
-                  #{usrId},
-                  #{accessIp}
-        FROM	SYS1000
-        WHERE	MENU_TYPE_CD = '01'
-          AND	LVL != 0
-	</insert>
+        INSERT INTO SYS1100 (MENU_ID,
+                             TGT_ID,
+                             ENT_TYPE_CD,
+                             REG_DTM,
+                             REG_USR_ID,
+                             REG_USR_IP,
+                             MODIFY_DTM,
+                             MODIFY_USR_ID,
+                             MODIFY_USR_IP)
+        SELECT MENU_ID,
+               #{usrId}     AS USR_ID,
+               MENU_TYPE_CD AS ENT_TYPE_CD,
+               CURRENT_TIMESTAMP,
+               #{usrId},
+               #{accessIp},
+               CURRENT_TIMESTAMP,
+               #{usrId},
+               #{accessIp}
+        FROM SYS1000
+        WHERE MENU_TYPE_CD = '01'
+          AND LVL != 0
+    </insert>
 
 
-<!--  시스템 이용 신청  -->
-   <insert id="insertReq" parameterType="hashmap">
-       INSERT INTO REQ1000 (
-           TGT_TYPE,		TGT_ID,			REQ_PROD_ID
-           ,REQ_CD,		REQ_DTM
-           ,REG_DTM,		REG_USR_ID, 	REG_USR_IP
-           ,MODIFY_DTM,	MODIFY_USR_ID,	MODIFY_USR_IP
-       )
-       VALUES
-       (
-           #{type},				#{entId},			#{reqProdId}
-           ,'00',				CURRENT_TIMESTAMP
-           ,CURRENT_TIMESTAMP,	'wmdsadm',			#{accessIp}
-           ,CURRENT_TIMESTAMP,	'wmdsadm',		#{accessIp}
-       )
-   </insert>
+    <!--  시스템 이용 신청  -->
+    <insert id="insertReq" parameterType="hashmap">
+        INSERT INTO REQ1000 ( TGT_TYPE, TGT_ID, REQ_PROD_ID
+                            , REQ_CD, REQ_DTM
+                            , REG_DTM, REG_USR_ID, REG_USR_IP
+                            , MODIFY_DTM, MODIFY_USR_ID, MODIFY_USR_IP)
+        VALUES ( #{type}, #{entId}, #{reqProdId}
+               , '00', CURRENT_TIMESTAMP
+               , CURRENT_TIMESTAMP, 'wmdsadm', #{accessIp}
+               , CURRENT_TIMESTAMP, 'wmdsadm', #{accessIp})
+    </insert>
 
 </mapper>

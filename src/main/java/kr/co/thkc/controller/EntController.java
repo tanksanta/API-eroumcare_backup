@@ -17,17 +17,16 @@ import static kr.co.thkc.filter.ModifyRequestWrapper.EROUM_PARAMS_NAME;
 
 @Slf4j
 @RestController
-@RequestMapping(value = BaseController.baseUrl+"/ent", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
+@RequestMapping(value = BaseController.baseUrl + "/ent", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
 public class EntController {
 
     @Autowired
     EntService entService;
 
 
-
     /**
-     *  사업소 회원 조회
-     * */
+     * 사업소 회원 조회
+     */
     @PostMapping(value = "account")
     public BaseResponse entAccountInfo(@RequestBody BaseRequest request) throws Exception {
 
@@ -41,8 +40,8 @@ public class EntController {
     }
 
     /**
-     *  사업소 관리자 중복 조회
-     * */
+     * 사업소 관리자 중복 조회
+     */
     @PostMapping(value = "crnDupCheck")
     public BaseResponse entIdDuplicationCheck(@RequestBody BaseRequest request) throws Exception {
 
@@ -56,8 +55,8 @@ public class EntController {
     }
 
     /**
-     *  사업소 등록번호 중복 조회
-     * */
+     * 사업소 등록번호 중복 조회
+     */
     @PostMapping(value = "idDupCheck")
     public BaseResponse entCrnDuplicationCheck(@RequestBody BaseRequest request) throws Exception {
 
@@ -72,16 +71,16 @@ public class EntController {
 
 
     /**
-     *  사업소 회원가입
-     * */
+     * 사업소 회원가입
+     */
     @PostMapping(value = "insert")
-    public BaseResponse insertEnt(@RequestParam(EROUM_PARAMS_NAME) String params , MultipartHttpServletRequest multipartRequest) throws Exception {
+    public BaseResponse insertEnt(@RequestParam(EROUM_PARAMS_NAME) String params, MultipartHttpServletRequest multipartRequest) throws Exception {
         //파라미터를 가져올때 \\이 String에 포함된다. 이부분 제거해야함
-        params = params.replace("\\\"","\"");
+        params = params.replace("\\\"", "\"");
 
         //file세팅
         Map<String, MultipartFile> fileMap = multipartRequest.getFileMap();
-        log.debug("fileMap:"+fileMap);
+        log.debug("fileMap:" + fileMap);
 
         //파라미터 세팅
         BaseRequest request = new BaseRequest();
@@ -98,16 +97,16 @@ public class EntController {
     }
 
     /**
-     *  사업소 수정
-     * */
+     * 사업소 수정
+     */
     @PostMapping(value = "update")
-    public BaseResponse updateEnt(@RequestParam(EROUM_PARAMS_NAME) String params , MultipartHttpServletRequest multipartRequest) throws Exception {
+    public BaseResponse updateEnt(@RequestParam(EROUM_PARAMS_NAME) String params, MultipartHttpServletRequest multipartRequest) throws Exception {
         //파라미터를 가져올때 \\이 String에 포함된다. 이부분 제거해야함
-        params = params.replace("\\","");
+        params = params.replace("\\", "");
 
         //file세팅
-        Map<String,MultipartFile> fileMap = multipartRequest.getFileMap();
-        log.debug("fileMap:"+fileMap);
+        Map<String, MultipartFile> fileMap = multipartRequest.getFileMap();
+        log.debug("fileMap:" + fileMap);
 
         //파라미터 세팅
         BaseRequest request = new BaseRequest();
@@ -119,12 +118,12 @@ public class EntController {
         request.validRequiredField();
 
         // bussiness logic
-        return entService.updateEnt(request.bindRequest(),fileMap);
+        return entService.updateEnt(request.bindRequest(), fileMap);
     }
 
     /**
-     *  사업소 회원수정
-     * */
+     * 사업소 회원수정
+     */
     @PostMapping(value = "updateAccount")
     public BaseResponse updateEntAccount(@RequestBody BaseRequest request) throws Exception {
 

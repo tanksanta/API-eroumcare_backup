@@ -1,24 +1,21 @@
 package kr.co.thkc.vo;
 
 
-import java.io.Serializable;
-
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import java.io.Serializable;
+
 /**
+ * @author 공통 서비스 개발팀 이삼섭
  * @Class Name : FileVO.java
  * @Description : 파일정보 처리를 위한 VO 클래스
  * @Modification Information
- *
- *    수정일       수정자         수정내용
- *    -------        -------     -------------------
- *    2009. 3. 25.     이삼섭
- *
- * @author 공통 서비스 개발팀 이삼섭
- * @since 2009. 3. 25.
- * @version
+ * <p>
+ * 수정일       수정자         수정내용
+ * -------        -------     -------------------
+ * 2009. 3. 25.     이삼섭
  * @see
- *
+ * @since 2009. 3. 25.
  */
 @SuppressWarnings("serial")
 public class FileVO implements Serializable {
@@ -74,8 +71,7 @@ public class FileVO implements Serializable {
     /**
      * atchFileId attribute 값을 설정한다.
      *
-     * @param atchFileId
-     *            the atchFileId to set
+     * @param atchFileId the atchFileId to set
      */
     public void setAtchFileId(String atchFileId) {
         this.atchFileId = atchFileId;
@@ -93,8 +89,7 @@ public class FileVO implements Serializable {
     /**
      * creatDt attribute 값을 설정한다.
      *
-     * @param creatDt
-     *            the creatDt to set
+     * @param creatDt the creatDt to set
      */
     public void setCreatDt(String creatDt) {
         this.creatDt = creatDt;
@@ -112,8 +107,7 @@ public class FileVO implements Serializable {
     /**
      * fileCn attribute 값을 설정한다.
      *
-     * @param fileCn
-     *            the fileCn to set
+     * @param fileCn the fileCn to set
      */
     public void setFileCn(String fileCn) {
         this.fileCn = fileCn;
@@ -131,8 +125,7 @@ public class FileVO implements Serializable {
     /**
      * fileExtsn attribute 값을 설정한다.
      *
-     * @param fileExtsn
-     *            the fileExtsn to set
+     * @param fileExtsn the fileExtsn to set
      */
     public void setFileExtsn(String fileExtsn) {
         this.fileExtsn = fileExtsn;
@@ -150,8 +143,7 @@ public class FileVO implements Serializable {
     /**
      * fileMg attribute 값을 설정한다.
      *
-     * @param fileMg
-     *            the fileMg to set
+     * @param fileMg the fileMg to set
      */
     public void setFileMg(String fileMg) {
         this.fileMg = fileMg;
@@ -169,8 +161,7 @@ public class FileVO implements Serializable {
     /**
      * fileSn attribute 값을 설정한다.
      *
-     * @param fileSn
-     *            the fileSn to set
+     * @param fileSn the fileSn to set
      */
     public void setFileSn(String fileSn) {
         this.fileSn = fileSn;
@@ -188,8 +179,7 @@ public class FileVO implements Serializable {
     /**
      * fileStreCours attribute 값을 설정한다.
      *
-     * @param fileStreCours
-     *            the fileStreCours to set
+     * @param fileStreCours the fileStreCours to set
      */
     public void setFileStreCours(String fileStreCours) {
         this.fileStreCours = fileStreCours;
@@ -207,8 +197,7 @@ public class FileVO implements Serializable {
     /**
      * orignlFileNm attribute 값을 설정한다.
      *
-     * @param orignlFileNm
-     *            the orignlFileNm to set
+     * @param orignlFileNm the orignlFileNm to set
      */
     public void setOrignlFileNm(String orignlFileNm) {
         this.orignlFileNm = orignlFileNm;
@@ -226,8 +215,7 @@ public class FileVO implements Serializable {
     /**
      * streFileNm attribute 값을 설정한다.
      *
-     * @param streFileNm
-     *            the streFileNm to set
+     * @param streFileNm the streFileNm to set
      */
     public void setStreFileNm(String streFileNm) {
         this.streFileNm = streFileNm;
@@ -245,8 +233,7 @@ public class FileVO implements Serializable {
     /**
      * newSn attribute 값을 설정한다.
      *
-     * @param newSn
-     *            the newSn to set
+     * @param newSn the newSn to set
      */
     public void setNewSn(String newSn) {
         this.newSn = newSn;

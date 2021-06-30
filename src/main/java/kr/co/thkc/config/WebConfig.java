@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.support.StandardServletMultipartResolver;
@@ -20,7 +19,7 @@ import javax.servlet.Filter;
 
 @Configuration
 @EnableWebMvc
-public class WebConfig implements WebMvcConfigurer{
+public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
@@ -35,7 +34,7 @@ public class WebConfig implements WebMvcConfigurer{
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/**").addResourceLocations("classpath:/static/","classpath:/mybatis/");
+        registry.addResourceHandler("/**").addResourceLocations("classpath:/static/", "classpath:/mybatis/");
     }
 
 
@@ -49,7 +48,7 @@ public class WebConfig implements WebMvcConfigurer{
     }
 
     @Bean
-    public ViewResolver viewResolver(){
+    public ViewResolver viewResolver() {
         InternalResourceViewResolver resolver = new InternalResourceViewResolver();
         resolver.setPrefix("/");
         resolver.setSuffix(".html");
@@ -58,7 +57,7 @@ public class WebConfig implements WebMvcConfigurer{
     }
 
     @Bean
-    public MultipartResolver multipartResolver(){
+    public MultipartResolver multipartResolver() {
         StandardServletMultipartResolver multipartResolver = new StandardServletMultipartResolver();
         return multipartResolver;
     }

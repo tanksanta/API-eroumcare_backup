@@ -3,7 +3,6 @@ package kr.co.thkc.config;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
@@ -20,7 +19,7 @@ import javax.sql.DataSource;
 public class DBConfig {
 
     @Bean
-    public SqlSessionFactory sqlSessionFactory(@Qualifier("dataSource") DataSource dataSource) throws Exception{
+    public SqlSessionFactory sqlSessionFactory(@Qualifier("dataSource") DataSource dataSource) throws Exception {
         SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
         sqlSessionFactoryBean.setDataSource(dataSource);
         sqlSessionFactoryBean.setConfigLocation(new PathMatchingResourcePatternResolver().getResource("classpath:/mybatis/sql-map-maria-config.xml"));
@@ -29,18 +28,18 @@ public class DBConfig {
     }
 
     @Bean
-    public SqlSessionTemplate sqlSessionTemplate(SqlSessionFactory sqlSessionFactory){
+    public SqlSessionTemplate sqlSessionTemplate(SqlSessionFactory sqlSessionFactory) {
         return new SqlSessionTemplate(sqlSessionFactory);
     }
 
     @Bean
     @ConfigurationProperties(prefix = "spring.datasource.hikari")
-    public HikariConfig hikariConfig(){
+    public HikariConfig hikariConfig() {
         return new HikariConfig();
     }
 
     @Bean
-    public DataSource dataSource(){
+    public DataSource dataSource() {
         DataSource dataSource = new HikariDataSource(hikariConfig());
         return dataSource;
     }

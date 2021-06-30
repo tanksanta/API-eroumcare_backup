@@ -18,53 +18,15 @@ import java.util.Map;
 @Slf4j
 @Service
 @Transactional(rollbackFor = {Exception.class})
-public class RecipientService extends BaseService{
+public class RecipientService extends BaseService {
 
     @Autowired
     private AbstractDAO abstractDAO;
 
     /**
      * 수급자 조회
-     * */
-    public BaseResponse selectRecipient(Map<String,Object> params) throws SQLException {
-        BaseResponse response = new BaseResponse();
-
-        //페이징 처리
-        int pageNum = MapUtils.getIntValue(params,"pageNum");
-        int pageSize = MapUtils.getIntValue(params,"pageSize");
-
-        int offset = pageSize * (pageNum - 1);
-
-        params.put("pageSize",pageSize);
-        params.put("pageNum",pageNum);
-        params.put("offset",offset);
-
-        Integer total = (Integer)abstractDAO.selectOne("recipient.selectRecipientCnt",params);
-        List result = abstractDAO.selectList("recipient.selectRecipientList",params);
-
-        response.setTotal(total == null ? 0 :total);
-        response.setData(result);
-        response.setResult(ResultCode.RC_OK);
-
-        return response;
-    }
-    /**
-     * 수급자별 취급상품 조회
-     * */
-    public BaseResponse selectRecipientItemList(Map<String,Object> params) throws SQLException {
-        BaseResponse response = new BaseResponse();
-
-        List result = abstractDAO.selectList("recipient.selectRecipientItemList",params);
-
-        response.setData(result);
-        response.setResult(ResultCode.RC_OK);
-
-        return response;
-    }
-    /**
-     * 예비수급자 조회
-     * */
-    public BaseResponse selectSpareRecipient(Map<String,Object> params) throws SQLException {
+     */
+    public BaseResponse selectRecipient(Map<String, Object> params) throws SQLException {
         BaseResponse response = new BaseResponse();
 
         //페이징 처리
@@ -77,10 +39,50 @@ public class RecipientService extends BaseService{
         params.put("pageNum", pageNum);
         params.put("offset", offset);
 
-        Integer total = (Integer)abstractDAO.selectOne("recipient.selectSpareRecipientCnt", params);
+        Integer total = (Integer) abstractDAO.selectOne("recipient.selectRecipientCnt", params);
+        List result = abstractDAO.selectList("recipient.selectRecipientList", params);
+
+        response.setTotal(total == null ? 0 : total);
+        response.setData(result);
+        response.setResult(ResultCode.RC_OK);
+
+        return response;
+    }
+
+    /**
+     * 수급자별 취급상품 조회
+     */
+    public BaseResponse selectRecipientItemList(Map<String, Object> params) throws SQLException {
+        BaseResponse response = new BaseResponse();
+
+        List result = abstractDAO.selectList("recipient.selectRecipientItemList", params);
+
+        response.setData(result);
+        response.setResult(ResultCode.RC_OK);
+
+        return response;
+    }
+
+    /**
+     * 예비수급자 조회
+     */
+    public BaseResponse selectSpareRecipient(Map<String, Object> params) throws SQLException {
+        BaseResponse response = new BaseResponse();
+
+        //페이징 처리
+        int pageNum = MapUtils.getIntValue(params, "pageNum");
+        int pageSize = MapUtils.getIntValue(params, "pageSize");
+
+        int offset = pageSize * (pageNum - 1);
+
+        params.put("pageSize", pageSize);
+        params.put("pageNum", pageNum);
+        params.put("offset", offset);
+
+        Integer total = (Integer) abstractDAO.selectOne("recipient.selectSpareRecipientCnt", params);
         List result = abstractDAO.selectList("recipient.selectSpareRecipientList", params);
 
-        response.setTotal(total == null ? 0 :total);
+        response.setTotal(total == null ? 0 : total);
         response.setData(result);
         response.setResult(ResultCode.RC_OK);
 
@@ -89,24 +91,24 @@ public class RecipientService extends BaseService{
 
     /**
      * 욕구사정기록지 조회
-     * */
-    public BaseResponse selectRecipientRec(Map<String,Object> params) throws SQLException {
+     */
+    public BaseResponse selectRecipientRec(Map<String, Object> params) throws SQLException {
         BaseResponse response = new BaseResponse();
 
         //페이징 처리
-        int pageNum = MapUtils.getIntValue(params,"pageNum");
-        int pageSize = MapUtils.getIntValue(params,"pageSize");
+        int pageNum = MapUtils.getIntValue(params, "pageNum");
+        int pageSize = MapUtils.getIntValue(params, "pageSize");
 
         int offset = pageSize * (pageNum - 1);
 
-        params.put("pageSize",pageSize);
-        params.put("pageNum",pageNum);
-        params.put("offset",offset);
+        params.put("pageSize", pageSize);
+        params.put("pageNum", pageNum);
+        params.put("offset", offset);
 
-        Integer total = (Integer)abstractDAO.selectOne("recipient.selectRecipientRecCnt",params);
-        List result = abstractDAO.selectList("recipient.selectRecipientRecList",params);
+        Integer total = (Integer) abstractDAO.selectOne("recipient.selectRecipientRecCnt", params);
+        List result = abstractDAO.selectList("recipient.selectRecipientRecList", params);
 
-        response.setTotal(total == null ? 0 :total);
+        response.setTotal(total == null ? 0 : total);
         response.setData(result);
         response.setResult(ResultCode.RC_OK);
 
@@ -116,7 +118,7 @@ public class RecipientService extends BaseService{
 
     /**
      * 수급자추가
-    **/
+     **/
     public BaseResponse insertRecipient(Map<String, Object> params) throws SQLException {
         BaseResponse response = new BaseResponse();
         //전화번호 암호화
@@ -158,16 +160,16 @@ public class RecipientService extends BaseService{
 
     /**
      * 예비 수급자추가
-    **/
-    public BaseResponse insertSpareRecipient(Map<String,Object> params) throws SQLException {
+     **/
+    public BaseResponse insertSpareRecipient(Map<String, Object> params) throws SQLException {
         BaseResponse response = new BaseResponse();
         //전화번호 암호화
         SDBCryptUtil sdb = new SDBCryptUtil();
 
-        String penConNum = MapUtils.getString(params,"penConNum");
-        String penConPnum = MapUtils.getString(params,"penConPnum");
-        String penProConNum = MapUtils.getString(params,"penProConNum");
-        String penProConPnum = MapUtils.getString(params,"penProConPnum");
+        String penConNum = MapUtils.getString(params, "penConNum");
+        String penConPnum = MapUtils.getString(params, "penConPnum");
+        String penProConNum = MapUtils.getString(params, "penProConNum");
+        String penProConPnum = MapUtils.getString(params, "penProConPnum");
         String penExpiStDtm = MapUtils.getString(params, "penExpiStDtm");
         String penExpiEdDtm = MapUtils.getString(params, "penExpiEdDtm");
         String penAppStDtm1 = MapUtils.getString(params, "penAppStDtm1");
@@ -179,10 +181,10 @@ public class RecipientService extends BaseService{
         String penRecDtm = MapUtils.getString(params, "penRecDtm");
         String penAppDtm = MapUtils.getString(params, "penAppDtm");
 
-        if(penConNum!=null && !penConNum.equals("")) params.put("penConNum",sdb.encrypt(penConNum));
-        if(penConPnum!=null && !penConPnum.equals("")) params.put("penConPnum",sdb.encrypt(penConPnum));
-        if(penProConNum!=null && !penProConNum.equals("")) params.put("penProConNum",sdb.encrypt(penProConNum));
-        if(penProConPnum!=null && !penProConPnum.equals("")) params.put("penProConPnum",sdb.encrypt(penProConPnum));
+        if (penConNum != null && !penConNum.equals("")) params.put("penConNum", sdb.encrypt(penConNum));
+        if (penConPnum != null && !penConPnum.equals("")) params.put("penConPnum", sdb.encrypt(penConPnum));
+        if (penProConNum != null && !penProConNum.equals("")) params.put("penProConNum", sdb.encrypt(penProConNum));
+        if (penProConPnum != null && !penProConPnum.equals("")) params.put("penProConPnum", sdb.encrypt(penProConPnum));
 
         // date형식 데이터 빈 값 처리
         if (penExpiStDtm != null && penExpiStDtm.equals("")) params.put("penExpiStDtm", null);
@@ -198,15 +200,17 @@ public class RecipientService extends BaseService{
 
 
         //쇼핑몰의 admin은 시스템의 관리자 아이디 (wmdsadm) 으로 대체
-        if(MapUtils.getString(params,"usrId").equals("admin")) params.put("entUsrId","123456789");
-        else params.put("entUsrId",MapUtils.getString(params,"usrId"));
+        if (MapUtils.getString(params, "usrId").equals("admin")) params.put("entUsrId", "123456789");
+        else params.put("entUsrId", MapUtils.getString(params, "usrId"));
 
         String penId = newPenId();
-        params.put("penId",penId);
+        params.put("penId", penId);
 
-        abstractDAO.insert("recipient.insertSpareRecipient",params);
+        abstractDAO.insert("recipient.insertSpareRecipient", params);
 
-        response.setData(new HashMap(){{put("penId",penId);}});
+        response.setData(new HashMap() {{
+            put("penId", penId);
+        }});
         response.setResult(ResultCode.RC_OK);
 
         return response;
@@ -215,17 +219,17 @@ public class RecipientService extends BaseService{
 
     /**
      * 수급자별 품목 추가
-    **/
-    public BaseResponse setRecipientItem(Map<String,Object> params) throws SQLException {
+     **/
+    public BaseResponse setRecipientItem(Map<String, Object> params) throws SQLException {
         BaseResponse response = new BaseResponse();
 
-        abstractDAO.delete("recipient.deleteRecipientItem",params);
+        abstractDAO.delete("recipient.deleteRecipientItem", params);
 
-        List<String> itemList = MapUtils.getObject(params,"itemList")!=null?(List<String>)MapUtils.getObject(params,"itemList"):null;
+        List<String> itemList = MapUtils.getObject(params, "itemList") != null ? (List<String>) MapUtils.getObject(params, "itemList") : null;
 
-        for(String itemId:itemList){
-            params.put("itemId",itemId);
-            abstractDAO.insert("recipient.insertRecipientItem",params);
+        for (String itemId : itemList) {
+            params.put("itemId", itemId);
+            abstractDAO.insert("recipient.insertRecipientItem", params);
         }
 
 
@@ -236,49 +240,50 @@ public class RecipientService extends BaseService{
 
     /**
      * 수급자수정
-    **/
-    public BaseResponse updateRecipient(Map<String,Object> params) throws SQLException {
+     **/
+    public BaseResponse updateRecipient(Map<String, Object> params) throws SQLException {
         BaseResponse response = new BaseResponse();
 
         //전화번호 암호화
         SDBCryptUtil sdb = new SDBCryptUtil();
 
-        String penConNum = MapUtils.getString(params,"penConNum");
-        String penConPnum = MapUtils.getString(params,"penConPnum");
-        String penProConNum = MapUtils.getString(params,"penProConNum");
-        String penProConPnum = MapUtils.getString(params,"penProConPnum");
+        String penConNum = MapUtils.getString(params, "penConNum");
+        String penConPnum = MapUtils.getString(params, "penConPnum");
+        String penProConNum = MapUtils.getString(params, "penProConNum");
+        String penProConPnum = MapUtils.getString(params, "penProConPnum");
 
-        if(penConNum!=null && !penConNum.equals("")) params.put("penConNum",sdb.encrypt(penConNum));
-        if(penConPnum!=null && !penConPnum.equals("")) params.put("penConPnum",sdb.encrypt(penConPnum));
-        if(penProConNum!=null && !penProConNum.equals("")) params.put("penProConNum",sdb.encrypt(penProConNum));
-        if(penProConPnum!=null && !penProConPnum.equals("")) params.put("penProConPnum",sdb.encrypt(penProConPnum));
+        if (penConNum != null && !penConNum.equals("")) params.put("penConNum", sdb.encrypt(penConNum));
+        if (penConPnum != null && !penConPnum.equals("")) params.put("penConPnum", sdb.encrypt(penConPnum));
+        if (penProConNum != null && !penProConNum.equals("")) params.put("penProConNum", sdb.encrypt(penProConNum));
+        if (penProConPnum != null && !penProConPnum.equals("")) params.put("penProConPnum", sdb.encrypt(penProConPnum));
 
-        abstractDAO.update("recipient.updateRecipient",params);
+        abstractDAO.update("recipient.updateRecipient", params);
 
         response.setResult(ResultCode.RC_OK);
 
         return response;
     }
+
     /**
      * 수급자수정
-    **/
-    public BaseResponse updateSpareRecipient(Map<String,Object> params) throws SQLException {
+     **/
+    public BaseResponse updateSpareRecipient(Map<String, Object> params) throws SQLException {
         BaseResponse response = new BaseResponse();
 
         //전화번호 암호화
         SDBCryptUtil sdb = new SDBCryptUtil();
 
-        String penConNum = MapUtils.getString(params,"penConNum");
-        String penConPnum = MapUtils.getString(params,"penConPnum");
-        String penProConNum = MapUtils.getString(params,"penProConNum");
-        String penProConPnum = MapUtils.getString(params,"penProConPnum");
+        String penConNum = MapUtils.getString(params, "penConNum");
+        String penConPnum = MapUtils.getString(params, "penConPnum");
+        String penProConNum = MapUtils.getString(params, "penProConNum");
+        String penProConPnum = MapUtils.getString(params, "penProConPnum");
 
-        if(penConNum!=null && !penConNum.equals("")) params.put("penConNum",sdb.encrypt(penConNum));
-        if(penConPnum!=null && !penConPnum.equals("")) params.put("penConPnum",sdb.encrypt(penConPnum));
-        if(penProConNum!=null && !penProConNum.equals("")) params.put("penProConNum",sdb.encrypt(penProConNum));
-        if(penProConPnum!=null && !penProConPnum.equals("")) params.put("penProConPnum",sdb.encrypt(penProConPnum));
+        if (penConNum != null && !penConNum.equals("")) params.put("penConNum", sdb.encrypt(penConNum));
+        if (penConPnum != null && !penConPnum.equals("")) params.put("penConPnum", sdb.encrypt(penConPnum));
+        if (penProConNum != null && !penProConNum.equals("")) params.put("penProConNum", sdb.encrypt(penProConNum));
+        if (penProConPnum != null && !penProConPnum.equals("")) params.put("penProConPnum", sdb.encrypt(penProConPnum));
 
-        abstractDAO.update("recipient.updateSpareRecipient",params);
+        abstractDAO.update("recipient.updateSpareRecipient", params);
 
         response.setResult(ResultCode.RC_OK);
 
@@ -288,14 +293,14 @@ public class RecipientService extends BaseService{
 
     /**
      * 욕구사정기록지 추가
-    **/
-    public BaseResponse insertRecipientRec(Map<String,Object> params) throws SQLException {
+     **/
+    public BaseResponse insertRecipientRec(Map<String, Object> params) throws SQLException {
         BaseResponse response = new BaseResponse();
 
         String recId = newRecId();
-        params.put("recId",recId);
+        params.put("recId", recId);
 
-        abstractDAO.insert("recipient.insertRecipientRec",params);
+        abstractDAO.insert("recipient.insertRecipientRec", params);
 
         response.setResult(ResultCode.RC_OK);
 
@@ -304,11 +309,11 @@ public class RecipientService extends BaseService{
 
     /**
      * 욕구사정기록지 수정
-    **/
-    public BaseResponse updateRecipientRec(Map<String,Object> params) throws SQLException {
+     **/
+    public BaseResponse updateRecipientRec(Map<String, Object> params) throws SQLException {
         BaseResponse response = new BaseResponse();
 
-        abstractDAO.update("recipient.updateRecipientRec",params);
+        abstractDAO.update("recipient.updateRecipientRec", params);
 
         response.setResult(ResultCode.RC_OK);
 
@@ -318,10 +323,10 @@ public class RecipientService extends BaseService{
     /**
      * 욕구사정기록지 삭제
      **/
-    public BaseResponse deleteRecipientRec(Map<String,Object> params) throws SQLException {
+    public BaseResponse deleteRecipientRec(Map<String, Object> params) throws SQLException {
         BaseResponse response = new BaseResponse();
 
-        int result = abstractDAO.delete("recipient.deleteRecipientRec",params);
+        int result = abstractDAO.delete("recipient.deleteRecipientRec", params);
 
         if (result > 0) {
             response.setResult(ResultCode.RC_OK);
@@ -335,26 +340,27 @@ public class RecipientService extends BaseService{
 
     /*수급자의 전화번호가 암호화 되지 않은 것들을 뽑아내기 위해 임시로 생성*/
     @Deprecated
-    public BaseResponse updateEncrypt(Map<String,Object> params) throws SQLException {
+    public BaseResponse updateEncrypt(Map<String, Object> params) throws SQLException {
         BaseResponse response = new BaseResponse();
 
         //전화번호 암호화 모듈
         SDBCryptUtil sdb = new SDBCryptUtil();
 
-        List<Map> mapList = (List<Map>) abstractDAO.selectList("recipient.selectConNum",null);
+        List<Map> mapList = (List<Map>) abstractDAO.selectList("recipient.selectConNum", null);
 
-        for(Map map:mapList){
-            String penConNum = MapUtils.getString(map,"penConNum");
-            String penConPnum = MapUtils.getString(map,"penConPnum");
-            String penProConNum = MapUtils.getString(map,"penProConNum");
-            String penProConPnum = MapUtils.getString(map,"penProConPnum");
+        for (Map map : mapList) {
+            String penConNum = MapUtils.getString(map, "penConNum");
+            String penConPnum = MapUtils.getString(map, "penConPnum");
+            String penProConNum = MapUtils.getString(map, "penProConNum");
+            String penProConPnum = MapUtils.getString(map, "penProConPnum");
 
-            if(penConNum!=null && !penConNum.equals("")) map.put("penConNum",sdb.encrypt(penConNum));
-            if(penConPnum!=null && !penConPnum.equals("")) map.put("penConPnum",sdb.encrypt(penConPnum));
-            if(penProConNum!=null && !penProConNum.equals("")) map.put("penProConNum",sdb.encrypt(penProConNum));
-            if(penProConPnum!=null && !penProConPnum.equals("")) map.put("penProConPnum",sdb.encrypt(penProConPnum));
+            if (penConNum != null && !penConNum.equals("")) map.put("penConNum", sdb.encrypt(penConNum));
+            if (penConPnum != null && !penConPnum.equals("")) map.put("penConPnum", sdb.encrypt(penConPnum));
+            if (penProConNum != null && !penProConNum.equals("")) map.put("penProConNum", sdb.encrypt(penProConNum));
+            if (penProConPnum != null && !penProConPnum.equals(""))
+                map.put("penProConPnum", sdb.encrypt(penProConPnum));
 
-            abstractDAO.update("recipient.updateRecipient",params);
+            abstractDAO.update("recipient.updateRecipient", params);
         }
         response.setResult(ResultCode.RC_OK);
 

@@ -22,50 +22,49 @@ public abstract class BaseService {
     @Autowired
     private AbstractDAO abstractDAO;
 
-    public String newAtchFileId(){
-        return abstractDAO.selectOne("file.selectNewAtchFileId",null).toString();
+    public String newAtchFileId() {
+        return abstractDAO.selectOne("file.selectNewAtchFileId", null).toString();
     }
 
-    public String newProdId(){
-        return abstractDAO.selectOne("prod.selectNewProdId",null).toString();
+    public String newProdId() {
+        return abstractDAO.selectOne("prod.selectNewProdId", null).toString();
     }
 
-    public String newPenId(){
-        return abstractDAO.selectOne("recipient.selectNewPenId",null).toString();
+    public String newPenId() {
+        return abstractDAO.selectOne("recipient.selectNewPenId", null).toString();
     }
 
-    public String newRecId(){
-        return abstractDAO.selectOne("recipient.selectNewRecId",null).toString();
+    public String newRecId() {
+        return abstractDAO.selectOne("recipient.selectNewRecId", null).toString();
     }
 
-    public String newPenOrdId(){
-        return abstractDAO.selectOne("order.selectNewPenOrdId",null).toString();
+    public String newPenOrdId() {
+        return abstractDAO.selectOne("order.selectNewPenOrdId", null).toString();
     }
 
-    public String newPpcId(){
-        return abstractDAO.selectOne("stock.selectNewPpcId",null).toString();
+    public String newPpcId() {
+        return abstractDAO.selectOne("stock.selectNewPpcId", null).toString();
     }
 
-    public String newEntId(){
-        return abstractDAO.selectOne("ent.selectNewEntId",null).toString();
+    public String newEntId() {
+        return abstractDAO.selectOne("ent.selectNewEntId", null).toString();
     }
 
-    public String newStoId(){
-        return abstractDAO.selectOne("stock.selectNewStoId",null).toString();
+    public String newStoId() {
+        return abstractDAO.selectOne("stock.selectNewStoId", null).toString();
     }
 
-    public String newSchId(){
-        return abstractDAO.selectOne("set.selectNewSchId",null).toString();
+    public String newSchId() {
+        return abstractDAO.selectOne("set.selectNewSchId", null).toString();
     }
-
 
 
     @SuppressWarnings("rawtypes")
-    public Map excuteHttpLocalClient(String url, String apiKey) throws Exception{
+    public Map excuteHttpLocalClient(String url, String apiKey) throws Exception {
 
         String GET_URL = url;
 
-           //http client 생성
+        //http client 생성
         CloseableHttpClient httpClient = HttpClients.createDefault();
 
         //get 메서드와 URL 설정
@@ -92,7 +91,6 @@ public abstract class BaseService {
         JSONObject spaceJSON = jsonArray.getJSONObject(0);
         localMap.put("longitude", spaceJSON.getString("x"));
         localMap.put("latitude", spaceJSON.getString("y"));
-
 
 
         httpClient.close();

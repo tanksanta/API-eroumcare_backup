@@ -4,12 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.thkc.dispatch.BaseRequest;
 import kr.co.thkc.dispatch.BaseResponse;
 import kr.co.thkc.service.StockService;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +19,7 @@ import java.util.Map;
 
 @Slf4j
 @RestController
-@RequestMapping(value = BaseController.baseUrl+"/stock", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
+@RequestMapping(value = BaseController.baseUrl + "/stock", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
 public class StockController {
 
     @Autowired
@@ -26,8 +27,8 @@ public class StockController {
 
 
     /**
-     *  재고 목록 조회
-     * */
+     * 재고 목록 조회
+     */
     @PostMapping(value = "selectList")
     public BaseResponse selectStockList(@RequestBody BaseRequest request) throws Exception {
 
@@ -43,8 +44,8 @@ public class StockController {
 
 
     /**
-     *  사업소별 재고 목록 조회
-     * */
+     * 사업소별 재고 목록 조회
+     */
     @PostMapping(value = "selectListForEnt")
     public BaseResponse selectStockListForEnt(@RequestBody BaseRequest request) throws Exception {
 
@@ -58,8 +59,8 @@ public class StockController {
     }
 
     /**
-     *  상세 재고 목록 조회
-     * */
+     * 상세 재고 목록 조회
+     */
     @PostMapping(value = "selectDetailList")
     public BaseResponse selectStockDetailList(@RequestBody BaseRequest request) throws Exception {
 
@@ -75,8 +76,8 @@ public class StockController {
 
 
     /**
-     *  재고 바코드 조회
-     * */
+     * 재고 바코드 조회
+     */
     @PostMapping(value = "selectBarNumList")
     public BaseResponse selectBarNumList(@RequestBody BaseRequest request) throws Exception {
 
@@ -92,8 +93,8 @@ public class StockController {
 
 
     /**
-     *  재고 추가
-     * */
+     * 재고 추가
+     */
     @PostMapping(value = "insert")
     public BaseResponse insertStock(@RequestBody BaseRequest request) throws Exception {
 
@@ -104,10 +105,10 @@ public class StockController {
 
         List<Map> prods = new ArrayList<>();
 
-        if(request.getParams().containsKey("prods")) {
+        if (request.getParams().containsKey("prods")) {
             prods = new ObjectMapper().convertValue(request.getParams().get("prods"), List.class);
             if (prods == null) throw new Exception("Request is null");
-            for(Map prod:prods){
+            for (Map prod : prods) {
                 BaseRequest prodRequest = new BaseRequest(prod);
 
                 prodRequest.addRequiredField("prodId", BaseRequest.TYPE_STRING);
@@ -125,8 +126,8 @@ public class StockController {
 
 
     /**
-     *  재고 수정
-     * */
+     * 재고 수정
+     */
     @PostMapping(value = "update")
     public BaseResponse updateStock(@RequestBody BaseRequest request) throws Exception {
 
@@ -136,10 +137,10 @@ public class StockController {
 
         List<Map> prods = new ArrayList<>();
 
-        if(request.getParams().containsKey("prods")) {
+        if (request.getParams().containsKey("prods")) {
             prods = new ObjectMapper().convertValue(request.getParams().get("prods"), List.class);
             if (prods == null) throw new Exception("[prods] Request is null");
-            for(Map prod:prods){
+            for (Map prod : prods) {
                 BaseRequest prodRequest = new BaseRequest(prod);
 
                 prodRequest.addRequiredField("stoId", BaseRequest.TYPE_STRING);
@@ -154,8 +155,8 @@ public class StockController {
 
 
     /**
-     *  재고 삭제
-     * */
+     * 재고 삭제
+     */
     @PostMapping(value = "deleteMulti")
     public BaseResponse deleteStockMulti(@RequestBody BaseRequest request) throws Exception {
 

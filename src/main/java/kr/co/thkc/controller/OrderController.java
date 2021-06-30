@@ -5,7 +5,6 @@ import kr.co.thkc.dispatch.BaseRequest;
 import kr.co.thkc.dispatch.BaseResponse;
 import kr.co.thkc.service.OrderService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,14 +17,15 @@ import java.util.Map;
 
 @Slf4j
 @RestController
-@RequestMapping(value = BaseController.baseUrl+"/order", consumes = "application/json", produces = "application/json")
-public class OrderController extends BaseController{
+@RequestMapping(value = BaseController.baseUrl + "/order", consumes = "application/json", produces = "application/json")
+public class OrderController extends BaseController {
 
     @Autowired
     OrderService orderService;
 
     /**
-     * */
+     *
+     */
     @PostMapping(value = "selectList")
     public BaseResponse selectOrderList(@RequestBody BaseRequest request) throws Exception {
 
@@ -39,10 +39,9 @@ public class OrderController extends BaseController{
     }
 
 
-
     /**
-     *  주문 추가
-     * */
+     * 주문 추가
+     */
     @PostMapping(value = "insert")
     public BaseResponse insertOrder(@RequestBody BaseRequest request) throws Exception {
 
@@ -60,10 +59,10 @@ public class OrderController extends BaseController{
 
         List<Map> prods = new ArrayList<>();
 
-        if(request.getParams().containsKey("prods")) {
+        if (request.getParams().containsKey("prods")) {
             prods = new ObjectMapper().convertValue(request.getParams().get("prods"), List.class);
             if (prods == null) throw new Exception("Request is null");
-            for(Map prod:prods){
+            for (Map prod : prods) {
                 BaseRequest prodRequest = new BaseRequest(prod);
 
                 prodRequest.addRequiredField("prodId", BaseRequest.TYPE_STRING);
@@ -81,8 +80,8 @@ public class OrderController extends BaseController{
 
 
     /**
-     *  주문 수정
-     * */
+     * 주문 수정
+     */
     @PostMapping(value = "update")
     public BaseResponse updateOrder(@RequestBody BaseRequest request) throws Exception {
 
@@ -96,8 +95,8 @@ public class OrderController extends BaseController{
 
 
     /**
-     *  주문 삭제
-     * */
+     * 주문 삭제
+     */
     @PostMapping(value = "delete")
     public BaseResponse deleteOrder(@RequestBody BaseRequest request) throws Exception {
 

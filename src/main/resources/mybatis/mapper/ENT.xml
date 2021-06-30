@@ -4,101 +4,101 @@
 
     <!--사업소 아이디-->
     <select id="selectNewEntId" resultType="string">
-        SELECT	IFNULL(
-                          CONCAT(SUBSTR(B.NEW_ENT_ID, 1, 11), LPAD( (SUBSTR(B.NEW_ENT_ID, 12, 5)) + 1 , 5, '0'))
-                      ,	CONCAT('ENT',  DATE_FORMAT(NOW(), '%Y%m%d'), '00001')
-                      ) AS NEW_ENT_ID
-        FROM	(
-                    SELECT	MAX(A.ENT_ID)  AS NEW_ENT_ID
-                    FROM	ENT1000 A
-                    WHERE	1=1
-                      AND	A.ENT_ID LIKE CONCAT('ENT',  DATE_FORMAT(NOW(), '%Y%m%d'), '%')
-                ) B
+        SELECT IFNULL(
+                       CONCAT(SUBSTR(B.NEW_ENT_ID, 1, 11), LPAD((SUBSTR(B.NEW_ENT_ID, 12, 5)) + 1, 5, '0'))
+                   , CONCAT('ENT', DATE_FORMAT(NOW(), '%Y%m%d'), '00001')
+                   ) AS NEW_ENT_ID
+        FROM (
+                 SELECT MAX(A.ENT_ID) AS NEW_ENT_ID
+                 FROM ENT1000 A
+                 WHERE 1 = 1
+                   AND A.ENT_ID LIKE CONCAT('ENT', DATE_FORMAT(NOW(), '%Y%m%d'), '%')
+             ) B
     </select>
     <!--사업자등록번호 중복확인-->
     <select id="selectDuplicatedEntCrnCnt" parameterType="hashmap" resultType="int">
         SELECT COUNT(*) AS CHECK_CNT
         FROM ENT1000
-        WHERE	 1=1
-        AND ENT_CRN = #{entCrn}
-        AND	DEL_YN = 'N'
+        WHERE 1 = 1
+          AND ENT_CRN = #{entCrn}
+          AND DEL_YN = 'N'
     </select>
     <!--관리자아이디 중복확인-->
     <select id="selectDuplicatedEntIdCnt" parameterType="hashmap" resultType="int">
         SELECT COUNT(*) AS CHECK_CNT
         FROM ENT1100
-        WHERE	 1=1
-        AND  USR_ID = #{usrId}
-        AND	DEL_YN = 'N'
+        WHERE 1 = 1
+          AND USR_ID = #{usrId}
+          AND DEL_YN = 'N'
     </select>
     <!--사업소 로그인-->
     <select id="selectEntLogin" parameterType="hashMap" resultType="camelMap">
         SELECT
-            ID
-            ,PW
-            ,NM
-            ,ENT_ID
-            ,ENT_NM
-            ,AUTH_CD
+        ID
+        ,PW
+        ,NM
+        ,ENT_ID
+        ,ENT_NM
+        ,AUTH_CD
         FROM login_view A
-        WHERE	 1=1
-        AND  ID = #{usrId}
+        WHERE 1=1
+        AND ID = #{usrId}
         <if test="pw!=null and !pw.equals('')">AND PW = #{pw}</if>
         AND DEL_YN = 'N'
-          AND TYPE = '01'
+        AND TYPE = '01'
     </select>
     <!--사업소 계정 조회-->
     <select id="selectEntAccount" parameterType="hashMap" resultType="camelMap">
         <![CDATA[
-        SELECT
-            USR_ID,
-            ENT_ID,
-            ENT_NM,
-            B.*,
-            CONCAT('https://system.eroumcare.com/cmm/fms/getImage.do?fileSn=0&atchFileId=',ENT_CRN_ATTR) AS ENT_CRN_IMG,
-            CONCAT('https://system.eroumcare.com/cmm/fms/getImage.do?fileSn=0&atchFileId=',ENT_SEAL_ATTR) AS ENT_SEAL_IMG
+        SELECT USR_ID,
+               ENT_ID,
+               ENT_NM,
+               B.*,
+               CONCAT('https://system.eroumcare.com/cmm/fms/getImage.do?fileSn=0&atchFileId=',
+                      ENT_CRN_ATTR)                                                                           AS ENT_CRN_IMG,
+               CONCAT('https://system.eroumcare.com/cmm/fms/getImage.do?fileSn=0&atchFileId=',
+                      ENT_SEAL_ATTR)                                                                          AS ENT_SEAL_IMG
         FROM login_view A
-        LEFT JOIN (
-            SELECT
-                USR_ID,
-                ENT_ZIP,
-                ENT_ADDR,
-                ENT_ADDR_DETAIL,
-                ENT_PNUM,
-                ENT_FAX,
-                ENT_CRN,
-                ENT_CRN_ATTR,
-                ENT_SEAL_ATTR,
-                ENT_MAIL,
-                ENT_CONFIRM_CD,
-                ENT_BUSI_CONDITION,
-                ENT_BUSI_TYPE,
-                ENT_BUSI_NUM,
-                ENT_BUSI_SIGN,
-                ENT_TAX_CHARGER,
-                ENT_CEO_NM,
-                USR_NM,
-                USR_BIRTH,
-                USR_MAIL,
-                USR_GENDER,
-                USR_PNUM AS SDB_USR_PNUM,
-                USR_POSITION,
-                USR_ZIP,
-                USR_ADDR,
-                USR_ADDR_DETAIL,
-                t1.REG_DTM
-            FROM ENT1000 t1 JOIN ENT1100 t2 on t2.ENT_ID = t1.ENT_ID
+                 LEFT JOIN (
+            SELECT USR_ID,
+                   ENT_ZIP,
+                   ENT_ADDR,
+                   ENT_ADDR_DETAIL,
+                   ENT_PNUM,
+                   ENT_FAX,
+                   ENT_CRN,
+                   ENT_CRN_ATTR,
+                   ENT_SEAL_ATTR,
+                   ENT_MAIL,
+                   ENT_CONFIRM_CD,
+                   ENT_BUSI_CONDITION,
+                   ENT_BUSI_TYPE,
+                   ENT_BUSI_NUM,
+                   ENT_BUSI_SIGN,
+                   ENT_TAX_CHARGER,
+                   ENT_CEO_NM,
+                   USR_NM,
+                   USR_BIRTH,
+                   USR_MAIL,
+                   USR_GENDER,
+                   USR_PNUM AS SDB_USR_PNUM,
+                   USR_POSITION,
+                   USR_ZIP,
+                   USR_ADDR,
+                   USR_ADDR_DETAIL,
+                   t1.REG_DTM
+            FROM ENT1000 t1
+                     JOIN ENT1100 t2 on t2.ENT_ID = t1.ENT_ID
         ) B ON A.ID = B.USR_ID
         ]]>
-        WHERE	 1=1
-        AND  ID = #{usrId}
-        AND DEL_YN = 'N'
+        WHERE 1 = 1
+          AND ID = #{usrId}
+          AND DEL_YN = 'N'
           AND TYPE = '01'
     </select>
 
     <select id="selectEntInfo" parameterType="hashMap" resultType="camelMap">
-        SELECT
-               *
+        SELECT *
         FROM ent1000
         WHERE ENT_ID = #{entId}
     </select>
@@ -106,8 +106,7 @@
     <!-- 사업소 추가 -->
     <insert id="insertEnt" parameterType="hashmap">
         INSERT INTO ENT1000
-        (
-        ENT_ID
+        ( ENT_ID
         , ENT_NM, ENT_CEO_NM, ENT_CRN, ENT_CRN_ATTR
         , ENT_BUSI_SIGN, ENT_MAIL, ENT_PNUM, ENT_FAX, ENT_ZIP, ENT_ADDR, ENT_ADDR_DETAIL
         , ENT_CONFIRM_CD, EDIT_CD, ENT_LATITUDE, ENT_LONGITUDE
@@ -115,56 +114,44 @@
         , ENT_SEAL_ATTR, ENT_CON_ACCO1, ENT_CON_ACCO2, DIS_ID
         , ENT_BUSI_NUM, ENT_BUSI_TYPE, ENT_BUSI_CONDITION, ENT_TAX_CHARGER
         , DEL_YN
-        ,REG_DTM, REG_USR_ID, REG_USR_IP, MODIFY_DTM, MODIFY_USR_ID, MODIFY_USR_IP
-        )
-        VALUES
-        (
-         #{entId}
-        , #{entNm}, #{entCeoNm}, #{entCrn}, #{entCrnAttr}
-        , #{entBusiSign}, #{entMail}, #{entPnum}, #{entFax}, #{entZip}, #{entAddr}, #{entAddrDetail}
-        , #{entConfirmCd}, '02', #{entLatitude}, #{entLongitude}
-        , #{bankTypeCd}, #{bankAccNum}, #{bankDepo}
-        , #{entSealAttr}, #{entConAcco1}, #{entConAcco2}, #{disId}
-        , #{entBusiNum}, #{entBusiType}, #{entBusiCondition}, #{entTaxCharger}
-        , 'N'
-        ,CURRENT_TIMESTAMP,	#{usrId}, #{accessIp} ,CURRENT_TIMESTAMP, #{usrId}, #{accessIp}
-        )
+        , REG_DTM, REG_USR_ID, REG_USR_IP, MODIFY_DTM, MODIFY_USR_ID, MODIFY_USR_IP)
+        VALUES ( #{entId}
+               , #{entNm}, #{entCeoNm}, #{entCrn}, #{entCrnAttr}
+               , #{entBusiSign}, #{entMail}, #{entPnum}, #{entFax}, #{entZip}, #{entAddr}, #{entAddrDetail}
+               , #{entConfirmCd}, '02', #{entLatitude}, #{entLongitude}
+               , #{bankTypeCd}, #{bankAccNum}, #{bankDepo}
+               , #{entSealAttr}, #{entConAcco1}, #{entConAcco2}, #{disId}
+               , #{entBusiNum}, #{entBusiType}, #{entBusiCondition}, #{entTaxCharger}
+               , 'N'
+               , CURRENT_TIMESTAMP, #{usrId}, #{accessIp}, CURRENT_TIMESTAMP, #{usrId}, #{accessIp})
     </insert>
     <!--사업소 회원 추가-->
     <insert id="insertEntAccount" parameterType="hashmap">
         INSERT INTO ENT1100
-        (
-        USR_ID,USR_PW,ENT_ID
-        ,USR_NM,USR_BIRTH,USR_MAIL,USR_GENDER
-        ,USR_PNUM,USR_POSITION,USR_ZIP,USR_ADDR,USR_ADDR_DETAIL
-        ,USE_YN,AUTH_CD,DEL_YN
-        ,REG_DTM,REG_USR_ID,REG_USR_IP,MODIFY_DTM,MODIFY_USR_ID,MODIFY_USR_IP
-        ) VALUES (
-        #{usrId},#{usrPw},#{entId}
-        ,#{usrNm},#{usrBirth},#{usrMail},#{usrGender}
-        ,#{usrPnum},'01',#{usrZip},#{usrAddr},#{usrAddrDetail},
-        'Y',#{authCd},'N',
-        CURRENT_TIMESTAMP,#{usrId},#{accessIp},CURRENT_TIMESTAMP,#{usrId},#{accessIp}
-        )
+        ( USR_ID, USR_PW, ENT_ID
+        , USR_NM, USR_BIRTH, USR_MAIL, USR_GENDER
+        , USR_PNUM, USR_POSITION, USR_ZIP, USR_ADDR, USR_ADDR_DETAIL
+        , USE_YN, AUTH_CD, DEL_YN
+        , REG_DTM, REG_USR_ID, REG_USR_IP, MODIFY_DTM, MODIFY_USR_ID, MODIFY_USR_IP)
+        VALUES (#{usrId}, #{usrPw}, #{entId}
+                   , #{usrNm}, #{usrBirth}, #{usrMail}, #{usrGender}
+                   , #{usrPnum}, '01', #{usrZip}, #{usrAddr}, #{usrAddrDetail},
+                'Y', #{authCd}, 'N',
+                CURRENT_TIMESTAMP, #{usrId}, #{accessIp}, CURRENT_TIMESTAMP, #{usrId}, #{accessIp})
     </insert>
     <!--사업소 알림 설정 데이터 추가-->
     <insert id="insertSetAlm" parameterType="hashmap">
         INSERT INTO ENT1300
-        (
-            SCHL_ID,			ENT_ID,
-            LEND_END_ALM,		LEND_END_ALM_SMS,		LEND_END_EXTN_ALM,
-            LEND_DIS_ALM,		PEN_EXPI_ED_ALM,		PEN_EXPI_ED_ALM_SMS,	MONTH_ALM,
-            REG_DTM,			REG_USR_ID,				REG_USR_IP,
-            MODIFY_DTM,			MODIFY_USR_ID,			MODIFY_USR_IP
-        )
-        VALUES
-        (
-            #{entId},			#{entId},
-            60,		'N',		60,
-            60,		60,			'N',		1,
-            CURRENT_TIMESTAMP,	#{usrId},				#{accessIp},
-            CURRENT_TIMESTAMP,	#{usrId},				#{accessIp}
-        )
+        (SCHL_ID, ENT_ID,
+         LEND_END_ALM, LEND_END_ALM_SMS, LEND_END_EXTN_ALM,
+         LEND_DIS_ALM, PEN_EXPI_ED_ALM, PEN_EXPI_ED_ALM_SMS, MONTH_ALM,
+         REG_DTM, REG_USR_ID, REG_USR_IP,
+         MODIFY_DTM, MODIFY_USR_ID, MODIFY_USR_IP)
+        VALUES (#{entId}, #{entId},
+                60, 'N', 60,
+                60, 60, 'N', 1,
+                CURRENT_TIMESTAMP, #{usrId}, #{accessIp},
+                CURRENT_TIMESTAMP, #{usrId}, #{accessIp})
     </insert>
 
 
@@ -197,7 +184,8 @@
         <if test='entConAcc02 != null and !entConAcc02.equals("")'>,ENT_CON_ACCO2 = #{entConAcc02}</if>
         <if test='entBusiNum != null and !entBusiNum.equals("")'>,ENT_BUSI_NUM = #{entBusiNum}</if>
         <if test='entBusiType != null and !entBusiType.equals("")'>,ENT_BUSI_TYPE = #{entBusiType}</if>
-        <if test='entBusiCondition != null and !entBusiCondition.equals("")'>,ENT_BUSI_CONDITION = #{entBusiCondition}</if>
+        <if test='entBusiCondition != null and !entBusiCondition.equals("")'>,ENT_BUSI_CONDITION = #{entBusiCondition}
+        </if>
         <if test='entTaxCharger != null and !entTaxCharger.equals("")'>,ENT_TAX_CHARGER = #{entTaxCharger}</if>
         WHERE ENT_ID = #{entId}
     </update>

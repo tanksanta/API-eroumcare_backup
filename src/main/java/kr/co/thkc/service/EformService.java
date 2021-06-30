@@ -12,16 +12,16 @@ import java.util.Map;
 
 @Slf4j
 @Service
-public class EformService extends BaseService{
+public class EformService extends BaseService {
 
     @Autowired
     private AbstractDAO abstractDAO;
 
 
-    public BaseResponse selectEform001(Map<String,Object> params) throws Exception {
+    public BaseResponse selectEform001(Map<String, Object> params) throws Exception {
         BaseResponse response = new BaseResponse();
 
-        List result = abstractDAO.selectList("eform.selectEform001",params);
+        List result = abstractDAO.selectList("eform.selectEform001", params);
 
         response.setResultData(result);
         response.setResult(ResultCode.RC_OK);
@@ -30,10 +30,10 @@ public class EformService extends BaseService{
     }
 
 
-    public BaseResponse insertEform(Map<String,Object> params) throws Exception {
+    public BaseResponse insertEform(Map<String, Object> params) throws Exception {
         BaseResponse response = new BaseResponse();
 
-        abstractDAO.insert("eform.insertEformMaster",params);
+        abstractDAO.insert("eform.insertEformMaster", params);
 
         response.setResult(ResultCode.RC_OK);
 

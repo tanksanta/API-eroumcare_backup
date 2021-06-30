@@ -24,16 +24,16 @@ public class LogAspect {
     public BaseResponse serviceLog(ProceedingJoinPoint pjp) throws Throwable {
         BaseResponse result = new BaseResponse();
 
-        Map<String,Object> params = (Map<String,Object>)pjp.getArgs()[0]; // params 값 가져오기
+        Map<String, Object> params = (Map<String, Object>) pjp.getArgs()[0]; // params 값 가져오기
         log.info("REQUEST: {} => {}", pjp.getSignature().getName(),
                 StringUtil.convertMapToJSONstring(params));
 
-        result = (BaseResponse)pjp.proceed(); // reponse 값 가져오기
+        result = (BaseResponse) pjp.proceed(); // reponse 값 가져오기
         String resultData = result.getData() != null ? result.getData().toString() : "null";
         int resLen = resultData.length();
         log.info("RESPONSE: {} => errorYN:{} | message:{}", pjp.getSignature().getName(),
                 result.getErrorYN(), result.getMessage());
-        log.trace("RESPONSE: resultData={}", resultData.substring(1,resLen>2000?2000:resLen)+"...");
+        log.trace("RESPONSE: resultData={}", resultData.substring(1, resLen > 2000 ? 2000 : resLen) + "...");
 
         return result;
     }

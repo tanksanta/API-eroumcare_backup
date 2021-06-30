@@ -13,11 +13,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class ExceptionAdvice {
 
     @ExceptionHandler({Exception.class})
-    public ResponseEntity<Object> except(Exception ex){
+    public ResponseEntity<Object> except(Exception ex) {
         BaseResponse response = new BaseResponse();
 
-        if(ex.getMessage() == null){
-            if(ex instanceof NullPointerException){
+        if (ex.getMessage() == null) {
+            if (ex instanceof NullPointerException) {
                 String str = "";
                 for (StackTraceElement element : ex.getStackTrace()) {
                     str += element + "\n";
@@ -28,9 +28,9 @@ public class ExceptionAdvice {
                 response.setResult(ResultCode.RC_OK, ex.getCause().getMessage());
                 log.error("EXCEPTION: {}", ex.getCause().getMessage());
             }
-        }else {
+        } else {
             response.setResult(ResultCode.RC_FAIL, ex.getMessage());
-            log.error("EXCEPTION: {}",ex.getMessage());
+            log.error("EXCEPTION: {}", ex.getMessage());
         }
 
 

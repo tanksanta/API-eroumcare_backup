@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-@RequestMapping(value = BaseController.baseUrl+"/account", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
+@RequestMapping(value = BaseController.baseUrl + "/account", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
 public class AccountController {
 
     @Autowired
@@ -22,8 +22,8 @@ public class AccountController {
 
 
     /**
-     *  사업소 로그인
-     * */
+     * 사업소 로그인
+     */
     @PostMapping(value = "entLogin")
     public BaseResponse entLogin(@RequestBody BaseRequest request) throws Exception {
 

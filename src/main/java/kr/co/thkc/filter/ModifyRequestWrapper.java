@@ -1,11 +1,9 @@
 package kr.co.thkc.filter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.thkc.utils.CommonUtils;
 import kr.co.thkc.utils.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.utils.IOUtils;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.support.StandardServletMultipartResolver;
 
@@ -16,11 +14,13 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 2020-07-03 HoonyB : 최초 요청의 requestBody를 변조하기 위하여 생성
- * - RequestBody 에 accessIp(접속IP) 를 추가 
+ * - RequestBody 에 accessIp(접속IP) 를 추가
  */
 @Slf4j
 public class ModifyRequestWrapper extends HttpServletRequestWrapper {
@@ -37,22 +37,22 @@ public class ModifyRequestWrapper extends HttpServletRequestWrapper {
         String requestStringBody = "";
         try {
             //Body의 값을 가져온다
-            if(request.getContentType()!=null && request.getContentType().contains("multipart/form-data")) {
+            if (request.getContentType() != null && request.getContentType().contains("multipart/form-data")) {
                 //multipart일 경우
                 StandardServletMultipartResolver multipartResolver = new StandardServletMultipartResolver();
                 MultipartHttpServletRequest multipartRequest = multipartResolver.resolveMultipart(request);
 
                 //파라미터들을 묶어서 새로운 파라미터바디 생성
                 Enumeration<String> enumeration = multipartRequest.getParameterNames();
-                Map<String,Object> paramMap = new HashMap<>();
-                while(enumeration.hasMoreElements()) {
+                Map<String, Object> paramMap = new HashMap<>();
+                while (enumeration.hasMoreElements()) {
                     String key = enumeration.nextElement();
-                    paramMap.put(key,multipartRequest.getParameter(key));
+                    paramMap.put(key, multipartRequest.getParameter(key));
                 }
                 requestStringBody = StringUtil.convertMapToJSONstring(paramMap);
                 //파일을 묶어서 새로운 파일 리스트 생성
 
-            }else{
+            } else {
                 //그 외 json body
                 InputStream is = super.getInputStream();
                 body = IOUtils.toByteArray(is);
@@ -65,19 +65,18 @@ public class ModifyRequestWrapper extends HttpServletRequestWrapper {
             // ==> Body(JsonString) 을 map 으로 변환 후, accessIp를 put 후에 다시 JsonString 으로 변환하여 body를 대체한다.
             Map<String, Object> reqBody = new HashMap<>();
             Map<String, Object> params = new HashMap<String, Object>();
-            if(requestStringBody.length() == 0) {
+            if (requestStringBody.length() == 0) {
                 params = new HashMap<>();
-            }
-            else {
+            } else {
                 params = StringUtil.convertJSONstringToMap(requestStringBody);
             }
             params.put("accessIp", CommonUtils.getClientIpAddr(request));
-            reqBody.put(EROUM_PARAMS_NAME,params);
+            reqBody.put(EROUM_PARAMS_NAME, params);
             requestStringBody = StringUtil.convertMapToJSONstring(reqBody);
 
             body = new String(requestStringBody).getBytes("UTF-8");
-            
-        } catch ( Exception e) {
+
+        } catch (Exception e) {
             log.warn("requestStringBody : ", requestStringBody);
             log.warn("RequestBody Change Fail : ", e.getMessage());
         }

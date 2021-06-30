@@ -2,41 +2,48 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="recipient">
 
-
     <select id="selectNewPenId" resultType="string">
         SELECT IFNULL(
-                       CONCAT(SUBSTR(B.NEW_PEN_ID, 1, 14), LPAD( (SUBSTR(B.NEW_PEN_ID, 15, 6)) + 1 , 6, '0'))
-                   ,CONCAT('PENID_', DATE_FORMAT(NOW(), '%Y%m%d'), '000001')
+                       CONCAT(SUBSTR(B.NEW_PEN_ID, 1, 14), LPAD((SUBSTR(B.NEW_PEN_ID, 15, 6)) + 1, 6, '0'))
+                   , CONCAT('PENID_', DATE_FORMAT(NOW(), '%Y%m%d'), '000001')
                    ) AS NEW_PEN_ID
-        FROM	(
-                    SELECT	MAX(A.PEN_ID)  AS NEW_PEN_ID
-                    FROM	PEN1000 A
-                    WHERE	1=1
-                      AND	A.PEN_ID LIKE CONCAT('PENID_',  DATE_FORMAT(NOW(), '%Y%m%d'), '%')
-                ) B
+        FROM (
+                 SELECT MAX(A.PEN_ID) AS NEW_PEN_ID
+                 FROM PEN1000 A
+                 WHERE 1 = 1
+                   AND A.PEN_ID LIKE CONCAT('PENID_', DATE_FORMAT(NOW(), '%Y%m%d'), '%')
+             ) B
     </select>
 
     <select id="selectNewRecId" resultType="string">
-        SELECT	IFNULL(
-                    CONCAT(SUBSTR(B.NEW_REC_ID, 1, 11), LPAD( (SUBSTR(B.NEW_REC_ID, 12, 5)) + 1 , 5, '0'))
-                ,	CONCAT('REC',  DATE_FORMAT(NOW(), '%Y%m%d'), '00001')
-            ) AS NEW_REC_ID
-        FROM	(
-                SELECT	MAX(A.REC_ID)  AS NEW_REC_ID
-                FROM	PEN1500 A
-                WHERE	1=1
-                AND	A.REC_ID LIKE CONCAT('REC',  DATE_FORMAT(NOW(), '%Y%m%d'), '%')
-            ) B
+        SELECT IFNULL(
+                       CONCAT(SUBSTR(B.NEW_REC_ID, 1, 11), LPAD((SUBSTR(B.NEW_REC_ID, 12, 5)) + 1, 5, '0'))
+                   , CONCAT('REC', DATE_FORMAT(NOW(), '%Y%m%d'), '00001')
+                   ) AS NEW_REC_ID
+        FROM (
+                 SELECT MAX(A.REC_ID) AS NEW_REC_ID
+                 FROM PEN1500 A
+                 WHERE 1 = 1
+                   AND A.REC_ID LIKE CONCAT('REC', DATE_FORMAT(NOW(), '%Y%m%d'), '%')
+             ) B
     </select>
 
 
     <!--수급자의 전화번호가 암호화 되지 않은 것들을 뽑아내기 위해 임시로 생성-->
     <select id="selectConNum" parameterType="hashmap" resultType="camelMap" fetchSize="10000">
         <![CDATA[
-        SELECT PEN_ID,MODIFY_USR_ID,MODIFY_USR_IP
-            ,PEN_PRO_CON_PNUM,PEN_PRO_CON_NUM,PEN_CON_PNUM,PEN_CON_NUM
-        FROM pen1000
-#         WHERE LENGTH(PEN_PRO_CON_PNUM)>13 OR LENGTH(PEN_PRO_CON_NUM)>13 OR LENGTH(PEN_CON_PNUM)>13 OR LENGTH(PEN_CON_NUM)>13
+        SELECT PEN_ID
+             , MODIFY_USR_ID
+             , MODIFY_USR_IP
+             , PEN_PRO_CON_PNUM
+             , PEN_PRO_CON_NUM
+             , PEN_CON_PNUM
+             , PEN_CON_NUM
+        FROM pen1000 #
+        WHERE LENGTH(PEN_PRO_CON_PNUM) > 13
+           OR LENGTH(PEN_PRO_CON_NUM) > 13
+           OR LENGTH(PEN_CON_PNUM) > 13
+           OR LENGTH(PEN_CON_NUM) > 13
         ]]>
     </select>
 
@@ -44,66 +51,67 @@
     <!--예비수급자 조회-->
     <sql id="spareRecipientList">
         SELECT
-            T1.* ,
-            (SELECT USR_NM FROM ENT1100 WHERE USR_ID = T1.USR_ID ) AS USR_NM ,
-            DATEDIFF(T1.PEN_APP_ED_DTM , DATE_FORMAT(NOW(),'%Y%m%d')) AS PEN_APP_REM_DAY
+        T1.* ,
+        (SELECT USR_NM FROM ENT1100 WHERE USR_ID = T1.USR_ID ) AS USR_NM ,
+        DATEDIFF(T1.PEN_APP_ED_DTM , DATE_FORMAT(NOW(),'%Y%m%d')) AS PEN_APP_REM_DAY
         FROM (
-                 SELECT
-                     A.PEN_ID ,
-                     A.PEN_NM ,
-                     A.ENT_ID,
-                     A.ENT_USR_ID AS USR_ID,
-                     A.PEN_LTM_NUM ,
-                     A.PEN_REC_GRA_CD,
-                     (SELECT SUB_CD_NM FROM CMM1100 WHERE MST_CD = 'PEN00001' AND SUB_CD = A.PEN_REC_GRA_CD) AS PEN_REC_GRA_NM ,
-                     A.PEN_TYPE_CD ,
-                     (SELECT SUB_CD_NM FROM CMM1100 WHERE MST_CD = 'PEN00002' AND SUB_CD = A.PEN_TYPE_CD ) AS PEN_TYPE_NM ,
-                     A.PEN_CNM_TYPE_CD ,
-                     (SELECT PEN_CNM_TYPE_CD FROM CMM1100 WHERE MST_CD = 'PEN00004' AND SUB_CD = A.PEN_CNM_TYPE_CD ) AS PEN_CNM_TYPE_NM ,
-                     A.PEN_REC_TYPE_CD,
-                     A.PEN_REC_TYPE_TXT,
-                     A.PEN_REMARK,
-                     A.PEN_EXPI_ST_DTM ,
-                     A.PEN_EXPI_ED_DTM ,
-                     CONCAT(DATE_FORMAT(A.PEN_EXPI_ST_DTM, '%Y-%m-%d') , ' ~ ' , DATE_FORMAT(A.PEN_EXPI_ED_DTM, '%Y-%m-%d')) AS
-                         PEN_EXPI_DTM ,
-                     DATEDIFF(DATE_FORMAT(NOW(),'%Y%m%d') ,A.PEN_EXPI_ST_DTM) AS PEN_EXPI_REM_DAY,
-                     A.PEN_GENDER ,
-                     (SELECT SUB_CD_NM FROM CMM1100 WHERE MST_CD = 'CMM00002' AND SUB_CD = A.PEN_GENDER) AS PEN_GENDER_NM ,
-                     A.PEN_BIRTH ,
-                     TRUNCATE((TO_DAYS(NOW()) - TO_DAYS(DATE_FORMAT(A.PEN_BIRTH, '%Y-%m-%d'))) / 365, 0) AS PEN_AGE ,
-                     CASE
-                         WHEN A.PEN_APP_ED_DTM3 IS NOT NULL THEN A.PEN_APP_ED_DTM3
-                         WHEN A.PEN_APP_ED_DTM3 IS NULL AND A.PEN_APP_ED_DTM2 IS NOT NULL THEN PEN_APP_ED_DTM2
-                         ELSE A.PEN_APP_ED_DTM1
-                     END PEN_APP_ED_DTM ,
-                     A.PEN_JUMIN,
-                     A.PEN_ZIP,
-                     A.PEN_ADDR ,
-                     A.PEN_ADDR_DTL ,
-                     A.PEN_CON_NUM SDB_PEN_CON_NUM,
-                     A.PEN_CON_PNUM SDB_PEN_CON_PNUM ,
-                     A.PEN_PRO_TYPE_CD,
-                    (SELECT SUB_CD_NM FROM CMM1100 WHERE MST_CD = 'PEN00016' AND SUB_CD = A.PEN_PRO_TYPE_CD) AS PEN_PRO_TYPE_NM ,
-                     A.PEN_PRO_NM,
-                     A.PEN_PRO_ZIP ,
-                     A.PEN_PRO_ADDR ,
-                     A.PEN_PRO_ADDR_DTL ,
-                     A.PEN_PRO_CON_NUM SDB_PEN_PRO_CON_NUM,
-                     A.PEN_PRO_CON_PNUM SDB_PEN_PRO_CON_PNUM,
-                     A.PEN_PRO_BIRTH,
-                     A.PEN_PRO_REL,
-                     A.PEN_PRO_REL_ETC,
-                     A.PEN_PRO_EMAIL SDB_PEN_PRO_EMAIL,
-                     A.APP_CD ,
-                     (SELECT SUB_CD_NM FROM CMM1100 WHERE MST_CD = 'PEN00007' AND SUB_CD = A.APP_CD) AS APP_CD_NM ,
-                     A.CA_CEN_YN ,
-                     A.REG_DTM ,
-                     DATE_FORMAT(A.REG_DTM, '%Y.%m.%d') AS REG_DT
-                 FROM  PEN1001 A
-                 WHERE 1=1
-                   AND A.DEL_YN = 'N'
-             ) T1
+        SELECT
+        A.PEN_ID ,
+        A.PEN_NM ,
+        A.ENT_ID,
+        A.ENT_USR_ID AS USR_ID,
+        A.PEN_LTM_NUM ,
+        A.PEN_REC_GRA_CD,
+        (SELECT SUB_CD_NM FROM CMM1100 WHERE MST_CD = 'PEN00001' AND SUB_CD = A.PEN_REC_GRA_CD) AS PEN_REC_GRA_NM ,
+        A.PEN_TYPE_CD ,
+        (SELECT SUB_CD_NM FROM CMM1100 WHERE MST_CD = 'PEN00002' AND SUB_CD = A.PEN_TYPE_CD ) AS PEN_TYPE_NM ,
+        A.PEN_CNM_TYPE_CD ,
+        (SELECT PEN_CNM_TYPE_CD FROM CMM1100 WHERE MST_CD = 'PEN00004' AND SUB_CD = A.PEN_CNM_TYPE_CD ) AS
+        PEN_CNM_TYPE_NM ,
+        A.PEN_REC_TYPE_CD,
+        A.PEN_REC_TYPE_TXT,
+        A.PEN_REMARK,
+        A.PEN_EXPI_ST_DTM ,
+        A.PEN_EXPI_ED_DTM ,
+        CONCAT(DATE_FORMAT(A.PEN_EXPI_ST_DTM, '%Y-%m-%d') , ' ~ ' , DATE_FORMAT(A.PEN_EXPI_ED_DTM, '%Y-%m-%d')) AS
+        PEN_EXPI_DTM ,
+        DATEDIFF(DATE_FORMAT(NOW(),'%Y%m%d') ,A.PEN_EXPI_ST_DTM) AS PEN_EXPI_REM_DAY,
+        A.PEN_GENDER ,
+        (SELECT SUB_CD_NM FROM CMM1100 WHERE MST_CD = 'CMM00002' AND SUB_CD = A.PEN_GENDER) AS PEN_GENDER_NM ,
+        A.PEN_BIRTH ,
+        TRUNCATE((TO_DAYS(NOW()) - TO_DAYS(DATE_FORMAT(A.PEN_BIRTH, '%Y-%m-%d'))) / 365, 0) AS PEN_AGE ,
+        CASE
+        WHEN A.PEN_APP_ED_DTM3 IS NOT NULL THEN A.PEN_APP_ED_DTM3
+        WHEN A.PEN_APP_ED_DTM3 IS NULL AND A.PEN_APP_ED_DTM2 IS NOT NULL THEN PEN_APP_ED_DTM2
+        ELSE A.PEN_APP_ED_DTM1
+        END PEN_APP_ED_DTM ,
+        A.PEN_JUMIN,
+        A.PEN_ZIP,
+        A.PEN_ADDR ,
+        A.PEN_ADDR_DTL ,
+        A.PEN_CON_NUM SDB_PEN_CON_NUM,
+        A.PEN_CON_PNUM SDB_PEN_CON_PNUM ,
+        A.PEN_PRO_TYPE_CD,
+        (SELECT SUB_CD_NM FROM CMM1100 WHERE MST_CD = 'PEN00016' AND SUB_CD = A.PEN_PRO_TYPE_CD) AS PEN_PRO_TYPE_NM ,
+        A.PEN_PRO_NM,
+        A.PEN_PRO_ZIP ,
+        A.PEN_PRO_ADDR ,
+        A.PEN_PRO_ADDR_DTL ,
+        A.PEN_PRO_CON_NUM SDB_PEN_PRO_CON_NUM,
+        A.PEN_PRO_CON_PNUM SDB_PEN_PRO_CON_PNUM,
+        A.PEN_PRO_BIRTH,
+        A.PEN_PRO_REL,
+        A.PEN_PRO_REL_ETC,
+        A.PEN_PRO_EMAIL SDB_PEN_PRO_EMAIL,
+        A.APP_CD ,
+        (SELECT SUB_CD_NM FROM CMM1100 WHERE MST_CD = 'PEN00007' AND SUB_CD = A.APP_CD) AS APP_CD_NM ,
+        A.CA_CEN_YN ,
+        A.REG_DTM ,
+        DATE_FORMAT(A.REG_DTM, '%Y.%m.%d') AS REG_DT
+        FROM PEN1001 A
+        WHERE 1=1
+        AND A.DEL_YN = 'N'
+        ) T1
         WHERE 1=1
         <if test="appCd!=null and !appCd.equals('')">
             AND T1.APP_CD = #{appCd}
@@ -129,86 +137,87 @@
     <!--수급자조회-->
     <sql id="recipientList">
         SELECT
-            T1.* ,
-            (SELECT USR_NM FROM ENT1100 WHERE USR_ID = T1.USR_ID ) AS USR_NM ,
-            DATEDIFF(T1.PEN_APP_ED_DTM , DATE_FORMAT(NOW(),'%Y%m%d')) AS PEN_APP_REM_DAY
+        T1.* ,
+        (SELECT USR_NM FROM ENT1100 WHERE USR_ID = T1.USR_ID ) AS USR_NM ,
+        DATEDIFF(T1.PEN_APP_ED_DTM , DATE_FORMAT(NOW(),'%Y%m%d')) AS PEN_APP_REM_DAY
         FROM (
-            SELECT
-                A.PEN_ID ,
-                C.ENT_ID ,
-                A.PEN_NM ,
-                A.PEN_LTM_NUM ,
-                A.PEN_REC_GRA_CD,
-                (SELECT SUB_CD_NM FROM CMM1100 WHERE MST_CD = 'PEN00001' AND SUB_CD = A.PEN_REC_GRA_CD) AS PEN_REC_GRA_NM ,
-                A.PEN_TYPE_CD ,
-                (SELECT SUB_CD_NM FROM CMM1100 WHERE MST_CD = 'PEN00002' AND SUB_CD = A.PEN_TYPE_CD ) AS PEN_TYPE_NM ,
-                A.PEN_CNM_TYPE_CD ,
-                (SELECT PEN_CNM_TYPE_CD FROM CMM1100 WHERE MST_CD = 'PEN00004' AND SUB_CD = A.PEN_CNM_TYPE_CD ) AS PEN_CNM_TYPE_NM ,
-                A.PEN_REC_TYPE_CD,
-                A.PEN_REC_TYPE_TXT,
-                A.PEN_REMARK,
-                A.PEN_EXPI_ST_DTM ,
-                A.PEN_EXPI_ED_DTM ,
-                CONCAT(DATE_FORMAT(A.PEN_EXPI_ST_DTM, '%Y-%m-%d') , ' ~ ' , DATE_FORMAT(A.PEN_EXPI_ED_DTM, '%Y-%m-%d')) AS
-                PEN_EXPI_DTM ,
-                DATEDIFF(DATE_FORMAT(NOW(),'%Y%m%d') ,A.PEN_EXPI_ST_DTM) AS PEN_EXPI_REM_DAY,
-                A.PEN_GENDER ,
-                (SELECT SUB_CD_NM FROM CMM1100 WHERE MST_CD = 'CMM00002' AND SUB_CD = A.PEN_GENDER) AS PEN_GENDER_NM ,
-                A.PEN_BIRTH ,
-                TRUNCATE((TO_DAYS(NOW()) - TO_DAYS(DATE_FORMAT(A.PEN_BIRTH, '%Y-%m-%d'))) / 365, 0) AS PEN_AGE ,
-                CASE
-                WHEN A.PEN_APP_ED_DTM3 IS NOT NULL THEN A.PEN_APP_ED_DTM3
-                WHEN A.PEN_APP_ED_DTM3 IS NULL AND A.PEN_APP_ED_DTM2 IS NOT NULL THEN PEN_APP_ED_DTM2
-                ELSE A.PEN_APP_ED_DTM1
-                END PEN_APP_ED_DTM ,
-                A.PEN_JUMIN,
-                A.PEN_ZIP,
-                A.PEN_ADDR ,
-                A.PEN_ADDR_DTL ,
-                A.PEN_CON_NUM SDB_PEN_CON_NUM,
-                A.PEN_CON_PNUM SDB_PEN_CON_PNUM ,
-                A.PEN_PRO_TYPE_CD,
-               (SELECT SUB_CD_NM FROM CMM1100 WHERE MST_CD = 'PEN00016' AND SUB_CD = A.PEN_PRO_TYPE_CD) AS PEN_PRO_TYPE_NM ,
-                A.PEN_PRO_NM,
-                A.PEN_PRO_ZIP ,
-                A.PEN_PRO_ADDR ,
-                A.PEN_PRO_ADDR_DTL ,
-                A.PEN_PRO_CON_NUM SDB_PEN_PRO_CON_NUM,
-                A.PEN_PRO_CON_PNUM SDB_PEN_PRO_CON_PNUM,
-                A.PEN_PRO_BIRTH,
-                A.PEN_PRO_REL,
-                A.PEN_PRO_REL_ETC,
-                A.PEN_PRO_EMAIL SDB_PEN_PRO_EMAIL,
-                C.ENT_USR_ID AS USR_ID,
-                A.APP_CD ,
-                (SELECT SUB_CD_NM FROM CMM1100 WHERE MST_CD = 'PEN00007' AND SUB_CD = A.APP_CD) AS APP_CD_NM ,
-                A.CA_CEN_YN ,
-                A.REG_DTM ,
-                DATE_FORMAT(A.REG_DTM, '%Y.%m.%d') AS REG_DT ,
-                B.ORD_LEND_END_DTM ,
-                DATEDIFF(B.ORD_LEND_END_DTM, DATE_FORMAT(NOW(),'%Y%m%d')) AS ORD_LEND_REM_DAY,
-                CASE WHEN REC_ID IS NULL THEN 'N' ELSE 'Y' END AS REC_YN
-            FROM (
-                SELECT *
-                    FROM ENTPEN1000
-                WHERE ENT_ID = #{entId}
-                AND DEL_YN = 'N') C
-            LEFT JOIN PEN1000 A ON C.PEN_ID = A.PEN_ID
-            LEFT JOIN pen1500 P15 ON P15.PEN_ID = A.PEN_ID
-            LEFT OUTER JOIN (
-                SELECT B.PEN_ID, B.ORD_LEND_END_DTM
-                FROM (
-                    SELECT PEN_ID,
-                        ORD_LEND_END_DTM ,
-                        ROW_NUMBER() OVER ( PARTITION BY PEN_ID ORDER BY ORD_LEND_END_DTM DESC ) RN
-                    FROM PEN5000
-                    WHERE ORD_STATUS = '01'
-                    AND STA_ORD_CD = '03'
-                ) B
-                WHERE B.RN = '1'
-            ) B ON B.PEN_ID = A.PEN_ID
-            WHERE 1=1
-            AND A.DEL_YN = 'N'
+        SELECT
+        A.PEN_ID ,
+        C.ENT_ID ,
+        A.PEN_NM ,
+        A.PEN_LTM_NUM ,
+        A.PEN_REC_GRA_CD,
+        (SELECT SUB_CD_NM FROM CMM1100 WHERE MST_CD = 'PEN00001' AND SUB_CD = A.PEN_REC_GRA_CD) AS PEN_REC_GRA_NM ,
+        A.PEN_TYPE_CD ,
+        (SELECT SUB_CD_NM FROM CMM1100 WHERE MST_CD = 'PEN00002' AND SUB_CD = A.PEN_TYPE_CD ) AS PEN_TYPE_NM ,
+        A.PEN_CNM_TYPE_CD ,
+        (SELECT PEN_CNM_TYPE_CD FROM CMM1100 WHERE MST_CD = 'PEN00004' AND SUB_CD = A.PEN_CNM_TYPE_CD ) AS
+        PEN_CNM_TYPE_NM ,
+        A.PEN_REC_TYPE_CD,
+        A.PEN_REC_TYPE_TXT,
+        A.PEN_REMARK,
+        A.PEN_EXPI_ST_DTM ,
+        A.PEN_EXPI_ED_DTM ,
+        CONCAT(DATE_FORMAT(A.PEN_EXPI_ST_DTM, '%Y-%m-%d') , ' ~ ' , DATE_FORMAT(A.PEN_EXPI_ED_DTM, '%Y-%m-%d')) AS
+        PEN_EXPI_DTM ,
+        DATEDIFF(DATE_FORMAT(NOW(),'%Y%m%d') ,A.PEN_EXPI_ST_DTM) AS PEN_EXPI_REM_DAY,
+        A.PEN_GENDER ,
+        (SELECT SUB_CD_NM FROM CMM1100 WHERE MST_CD = 'CMM00002' AND SUB_CD = A.PEN_GENDER) AS PEN_GENDER_NM ,
+        A.PEN_BIRTH ,
+        TRUNCATE((TO_DAYS(NOW()) - TO_DAYS(DATE_FORMAT(A.PEN_BIRTH, '%Y-%m-%d'))) / 365, 0) AS PEN_AGE ,
+        CASE
+        WHEN A.PEN_APP_ED_DTM3 IS NOT NULL THEN A.PEN_APP_ED_DTM3
+        WHEN A.PEN_APP_ED_DTM3 IS NULL AND A.PEN_APP_ED_DTM2 IS NOT NULL THEN PEN_APP_ED_DTM2
+        ELSE A.PEN_APP_ED_DTM1
+        END PEN_APP_ED_DTM ,
+        A.PEN_JUMIN,
+        A.PEN_ZIP,
+        A.PEN_ADDR ,
+        A.PEN_ADDR_DTL ,
+        A.PEN_CON_NUM SDB_PEN_CON_NUM,
+        A.PEN_CON_PNUM SDB_PEN_CON_PNUM ,
+        A.PEN_PRO_TYPE_CD,
+        (SELECT SUB_CD_NM FROM CMM1100 WHERE MST_CD = 'PEN00016' AND SUB_CD = A.PEN_PRO_TYPE_CD) AS PEN_PRO_TYPE_NM ,
+        A.PEN_PRO_NM,
+        A.PEN_PRO_ZIP ,
+        A.PEN_PRO_ADDR ,
+        A.PEN_PRO_ADDR_DTL ,
+        A.PEN_PRO_CON_NUM SDB_PEN_PRO_CON_NUM,
+        A.PEN_PRO_CON_PNUM SDB_PEN_PRO_CON_PNUM,
+        A.PEN_PRO_BIRTH,
+        A.PEN_PRO_REL,
+        A.PEN_PRO_REL_ETC,
+        A.PEN_PRO_EMAIL SDB_PEN_PRO_EMAIL,
+        C.ENT_USR_ID AS USR_ID,
+        A.APP_CD ,
+        (SELECT SUB_CD_NM FROM CMM1100 WHERE MST_CD = 'PEN00007' AND SUB_CD = A.APP_CD) AS APP_CD_NM ,
+        A.CA_CEN_YN ,
+        A.REG_DTM ,
+        DATE_FORMAT(A.REG_DTM, '%Y.%m.%d') AS REG_DT ,
+        B.ORD_LEND_END_DTM ,
+        DATEDIFF(B.ORD_LEND_END_DTM, DATE_FORMAT(NOW(),'%Y%m%d')) AS ORD_LEND_REM_DAY,
+        CASE WHEN REC_ID IS NULL THEN 'N' ELSE 'Y' END AS REC_YN
+        FROM (
+        SELECT *
+        FROM ENTPEN1000
+        WHERE ENT_ID = #{entId}
+        AND DEL_YN = 'N') C
+        LEFT JOIN PEN1000 A ON C.PEN_ID = A.PEN_ID
+        LEFT JOIN pen1500 P15 ON P15.PEN_ID = A.PEN_ID
+        LEFT OUTER JOIN (
+        SELECT B.PEN_ID, B.ORD_LEND_END_DTM
+        FROM (
+        SELECT PEN_ID,
+        ORD_LEND_END_DTM ,
+        ROW_NUMBER() OVER ( PARTITION BY PEN_ID ORDER BY ORD_LEND_END_DTM DESC ) RN
+        FROM PEN5000
+        WHERE ORD_STATUS = '01'
+        AND STA_ORD_CD = '03'
+        ) B
+        WHERE B.RN = '1'
+        ) B ON B.PEN_ID = A.PEN_ID
+        WHERE 1=1
+        AND A.DEL_YN = 'N'
         ) T1
         WHERE 1=1
         <if test="appCd!=null and !appCd.equals('')">
@@ -241,21 +250,21 @@
     <!--욕구사정기록지-->
     <sql id="recipientRecList">
         SELECT
-            A.*,
-            CASE WHEN A.HELPER_TYPE IS NULL THEN HELPER_TYPE_ETC ELSE
-            (SELECT SUB_CD_NM FROM cmm1100 WHERE MST_CD = 'REC00002' AND SUB_CD = A.HELPER_TYPE) END AS HELPER_TYPE_NM,
-            (SELECT SUB_CD_NM FROM cmm1100 WHERE MST_CD = 'REC00001' AND SUB_CD = A.PSCL_STATE1) AS PSCL_STATE1_NM,
-            (SELECT SUB_CD_NM FROM cmm1100 WHERE MST_CD = 'REC00001' AND SUB_CD = A.PSCL_STATE2) AS PSCL_STATE2_NM,
-            (SELECT SUB_CD_NM FROM cmm1100 WHERE MST_CD = 'REC00001' AND SUB_CD = A.PSCL_STATE3) AS PSCL_STATE3_NM,
-            (SELECT SUB_CD_NM FROM cmm1100 WHERE MST_CD = 'REC00001' AND SUB_CD = A.PSCL_STATE4) AS PSCL_STATE4_NM,
-            (SELECT SUB_CD_NM FROM cmm1100 WHERE MST_CD = 'REC00001' AND SUB_CD = A.PSCL_STATE5) AS PSCL_STATE5_NM,
-            (SELECT SUB_CD_NM FROM cmm1100 WHERE MST_CD = 'REC00001' AND SUB_CD = A.PSCL_STATE6) AS PSCL_STATE6_NM,
-            (SELECT SUB_CD_NM FROM cmm1100 WHERE MST_CD = 'REC00003' AND SUB_CD = A.HOME_ENV) AS HOME_ENV_NM,
-            (SELECT SUB_CD_NM FROM cmm1100 WHERE MST_CD = 'REC00004' AND SUB_CD = A.HOME_TYPE) AS HOME_TYPE_NM,
-            (SELECT SUB_CD_NM FROM cmm1100 WHERE MST_CD = 'REC00005' AND SUB_CD = A.INMATE) AS INMATE_NM,
-            (SELECT ENT_NM FROM ENT1000 WHERE ENT_ID = A.ENT_ID) AS ENT_NM,
-            (SELECT USR_NM FROM ENT1100 WHERE USR_ID = A.USR_ID) AS USR_NM,
-            (SELECT PEN_NM FROM PEN1000 WHERE PEN_ID = A.PEN_ID) AS PEN_NM
+        A.*,
+        CASE WHEN A.HELPER_TYPE IS NULL THEN HELPER_TYPE_ETC ELSE
+        (SELECT SUB_CD_NM FROM cmm1100 WHERE MST_CD = 'REC00002' AND SUB_CD = A.HELPER_TYPE) END AS HELPER_TYPE_NM,
+        (SELECT SUB_CD_NM FROM cmm1100 WHERE MST_CD = 'REC00001' AND SUB_CD = A.PSCL_STATE1) AS PSCL_STATE1_NM,
+        (SELECT SUB_CD_NM FROM cmm1100 WHERE MST_CD = 'REC00001' AND SUB_CD = A.PSCL_STATE2) AS PSCL_STATE2_NM,
+        (SELECT SUB_CD_NM FROM cmm1100 WHERE MST_CD = 'REC00001' AND SUB_CD = A.PSCL_STATE3) AS PSCL_STATE3_NM,
+        (SELECT SUB_CD_NM FROM cmm1100 WHERE MST_CD = 'REC00001' AND SUB_CD = A.PSCL_STATE4) AS PSCL_STATE4_NM,
+        (SELECT SUB_CD_NM FROM cmm1100 WHERE MST_CD = 'REC00001' AND SUB_CD = A.PSCL_STATE5) AS PSCL_STATE5_NM,
+        (SELECT SUB_CD_NM FROM cmm1100 WHERE MST_CD = 'REC00001' AND SUB_CD = A.PSCL_STATE6) AS PSCL_STATE6_NM,
+        (SELECT SUB_CD_NM FROM cmm1100 WHERE MST_CD = 'REC00003' AND SUB_CD = A.HOME_ENV) AS HOME_ENV_NM,
+        (SELECT SUB_CD_NM FROM cmm1100 WHERE MST_CD = 'REC00004' AND SUB_CD = A.HOME_TYPE) AS HOME_TYPE_NM,
+        (SELECT SUB_CD_NM FROM cmm1100 WHERE MST_CD = 'REC00005' AND SUB_CD = A.INMATE) AS INMATE_NM,
+        (SELECT ENT_NM FROM ENT1000 WHERE ENT_ID = A.ENT_ID) AS ENT_NM,
+        (SELECT USR_NM FROM ENT1100 WHERE USR_ID = A.USR_ID) AS USR_NM,
+        (SELECT PEN_NM FROM PEN1000 WHERE PEN_ID = A.PEN_ID) AS PEN_NM
         FROM pen1500 A
         JOIN pen1000 p on p.PEN_ID = A.PEN_ID AND P.DEL_YN = 'N'
         WHERE 1=1
@@ -283,10 +292,10 @@
         ORDER BY A.REG_DTM DESC
     </sql>
 
-<!--수급자조회-->
+    <!--수급자조회-->
     <select id="selectRecipientCnt" parameterType="hashmap" resultType="int">
         SELECT
-            COUNT(*)
+        COUNT(*)
         FROM(
         <include refid="recipientList"></include>
         ) T1
@@ -299,12 +308,12 @@
         </if>
     </select>
 
-<!--예비 수급자조회-->
-    <select id="selectSpareRecipientCnt" parameterType="hashmap" resultType="int" >
+    <!--예비 수급자조회-->
+    <select id="selectSpareRecipientCnt" parameterType="hashmap" resultType="int">
         SELECT
-            COUNT(*)
+        COUNT(*)
         FROM(
-            <include refid="spareRecipientList"></include>
+        <include refid="spareRecipientList"></include>
         ) T1
     </select>
     <select id="selectSpareRecipientList" parameterType="hashmap" resultType="camelMap" fetchSize="10000">
@@ -315,35 +324,35 @@
         </if>
     </select>
 
-<!--수급자별 취급품목-->
+    <!--수급자별 취급품목-->
     <select id="selectRecipientItemList" parameterType="hashmap" resultType="camelMap" fetchSize="10000">
-        SELECT	A.ITEM_ID ,
-                (
-                CASE
-                    WHEN A.SUB_ITEM IS NULL
-                        THEN A.ITEM_NM
-                    WHEN A.SUB_ITEM = ''
-                        THEN A.ITEM_NM
-                    ELSE CONCAT(A.ITEM_NM, '(', A.SUB_ITEM,')')
-                END
-                ) as ITEM_NM,
-                ITEM_TYPE_CD AS GUBUN
-        FROM   	PRO1000 A
-                LEFT OUTER JOIN PEN1100 B ON B.ITEM_ID = A.ITEM_ID
-        WHERE 	1=1
-          AND B.PEN_ID = #{penId}
-        AND     B.ITEM_ID IS NOT NULL
-        AND 	USE_CD = '01'
+        SELECT A.ITEM_ID ,
+        (
+        CASE
+        WHEN A.SUB_ITEM IS NULL
+        THEN A.ITEM_NM
+        WHEN A.SUB_ITEM = ''
+        THEN A.ITEM_NM
+        ELSE CONCAT(A.ITEM_NM, '(', A.SUB_ITEM,')')
+        END
+        ) as ITEM_NM,
+        ITEM_TYPE_CD AS GUBUN
+        FROM PRO1000 A
+        LEFT OUTER JOIN PEN1100 B ON B.ITEM_ID = A.ITEM_ID
+        WHERE 1=1
+        AND B.PEN_ID = #{penId}
+        AND B.ITEM_ID IS NOT NULL
+        AND USE_CD = '01'
         <if test='gubun != null and !gubun.equals("")'>AND ITEM_TYPE_CD = #{gubun}</if>
         ORDER BY ITEM_ID
     </select>
 
-<!--욕구사정기록지-->
-    <select id="selectRecipientRecCnt" parameterType="hashmap" resultType="int" >
+    <!--욕구사정기록지-->
+    <select id="selectRecipientRecCnt" parameterType="hashmap" resultType="int">
         SELECT
-            COUNT(*)
+        COUNT(*)
         FROM (
-            <include refid="recipientRecList"></include>
+        <include refid="recipientRecList"></include>
         ) T1
     </select>
     <select id="selectRecipientRecList" parameterType="hashmap" resultType="camelMap" fetchSize="10000">
@@ -355,136 +364,115 @@
     </select>
 
 
-
     <!--수급자 추가-->
     <insert id="insertRecipient" parameterType="hashmap">
         INSERT INTO PEN1000
-        (
-        PEN_ID
-        ,PEN_NM ,PEN_LTM_NUM, PEN_REC_GRA_CD
-        ,PEN_GENDER, PEN_BIRTH, PEN_JUMIN, PEN_TYPE_CD, PEN_CON_NUM, PEN_CON_PNUM
-        ,PEN_EXPI_ST_DTM, PEN_EXPI_ED_DTM, PEN_APP_ST_DTM1, PEN_APP_ED_DTM1, PEN_APP_ST_DTM2, PEN_APP_ED_DTM2, PEN_APP_ST_DTM3, PEN_APP_ED_DTM3,PEN_REC_DTM, PEN_APP_DTM
-        ,PEN_ZIP, PEN_ADDR, PEN_ADDR_DTL
-        ,PEN_PRO_TYPE_CD,PEN_PRO_NM, PEN_PRO_BIRTH, PEN_PRO_REL, PEN_PRO_CON_NUM, PEN_PRO_CON_PNUM, PEN_PRO_EMAIL, PEN_PRO_REL_ETC, PEN_PRO_ZIP, PEN_PRO_ADDR, PEN_PRO_ADDR_DTL
-        ,PEN_CNM_TYPE_CD, PEN_REC_TYPE_CD, PEN_REC_TYPE_TXT, PEN_REMARK
-        ,ENT_ID, ENT_USR_ID, APP_CD, CA_CEN_YN, DEL_YN
-        ,REG_DTM, REG_USR_ID, REG_USR_IP, MODIFY_DTM, MODIFY_USR_ID, MODIFY_USR_IP
-        )
-        VALUES
-        (
-         #{penId}
-        , #{penNm} , #{penLtmNum}, #{penRecGraCd}
-        , #{penGender}, #{penBirth}, #{penJumin}, #{penTypeCd}, #{penConNum}, #{penConPnum}
-        , #{penExpiStDtm, jdbcType=DATE}, #{penExpiEdDtm, jdbcType=DATE}, #{penAppStDtm1}, #{penAppEdDtm1}, #{penAppStDtm2}, #{penAppEdDtm2}, #{penAppStDtm3}, #{penAppEdDtm3}, #{penRecDtm}, #{penAppDtm}
-        , #{penZip}, #{penAddr}, #{penAddrDtl}
-        , #{penProTypeCd},#{penProNm}, #{penProBirth}, #{penProRel}, #{penProConNum}, #{penProConPnum}, #{penProEmail}, #{penProRelEtc}, #{penProZip}, #{penProAddr}, #{penProAddrDtl}
-        , #{penCnmTypeCd}, #{penRecTypeCd}, #{penRecTypeTxt}, #{penRemark}
-        , #{entId}, #{entUsrId}, #{appCd}, #{caCenYn}, 'N'
-        ,CURRENT_TIMESTAMP,	#{usrId}, #{accessIp} ,CURRENT_TIMESTAMP, #{usrId}, #{accessIp}
-        )
+        ( PEN_ID
+        , PEN_NM, PEN_LTM_NUM, PEN_REC_GRA_CD
+        , PEN_GENDER, PEN_BIRTH, PEN_JUMIN, PEN_TYPE_CD, PEN_CON_NUM, PEN_CON_PNUM
+        , PEN_EXPI_ST_DTM, PEN_EXPI_ED_DTM, PEN_APP_ST_DTM1, PEN_APP_ED_DTM1, PEN_APP_ST_DTM2, PEN_APP_ED_DTM2
+        , PEN_APP_ST_DTM3, PEN_APP_ED_DTM3, PEN_REC_DTM, PEN_APP_DTM
+        , PEN_ZIP, PEN_ADDR, PEN_ADDR_DTL
+        , PEN_PRO_TYPE_CD, PEN_PRO_NM, PEN_PRO_BIRTH, PEN_PRO_REL, PEN_PRO_CON_NUM, PEN_PRO_CON_PNUM, PEN_PRO_EMAIL
+        , PEN_PRO_REL_ETC, PEN_PRO_ZIP, PEN_PRO_ADDR, PEN_PRO_ADDR_DTL
+        , PEN_CNM_TYPE_CD, PEN_REC_TYPE_CD, PEN_REC_TYPE_TXT, PEN_REMARK
+        , ENT_ID, ENT_USR_ID, APP_CD, CA_CEN_YN, DEL_YN
+        , REG_DTM, REG_USR_ID, REG_USR_IP, MODIFY_DTM, MODIFY_USR_ID, MODIFY_USR_IP)
+        VALUES ( #{penId}
+               , #{penNm}, #{penLtmNum}, #{penRecGraCd}
+               , #{penGender}, #{penBirth}, #{penJumin}, #{penTypeCd}, #{penConNum}, #{penConPnum}
+               , #{penExpiStDtm, jdbcType=DATE}, #{penExpiEdDtm, jdbcType=DATE}, #{penAppStDtm1}, #{penAppEdDtm1}
+               , #{penAppStDtm2}, #{penAppEdDtm2}, #{penAppStDtm3}, #{penAppEdDtm3}, #{penRecDtm}, #{penAppDtm}
+               , #{penZip}, #{penAddr}, #{penAddrDtl}
+               , #{penProTypeCd}, #{penProNm}, #{penProBirth}, #{penProRel}, #{penProConNum}, #{penProConPnum}
+               , #{penProEmail}, #{penProRelEtc}, #{penProZip}, #{penProAddr}, #{penProAddrDtl}
+               , #{penCnmTypeCd}, #{penRecTypeCd}, #{penRecTypeTxt}, #{penRemark}
+               , #{entId}, #{entUsrId}, #{appCd}, #{caCenYn}, 'N'
+               , CURRENT_TIMESTAMP, #{usrId}, #{accessIp}, CURRENT_TIMESTAMP, #{usrId}, #{accessIp})
     </insert>
     <!--예비수급자 추가-->
     <insert id="insertSpareRecipient" parameterType="hashmap">
         INSERT INTO PEN1001
-        (
-        PEN_ID
-        ,PEN_NM ,PEN_LTM_NUM, PEN_REC_GRA_CD
-        ,PEN_GENDER, PEN_BIRTH, PEN_JUMIN, PEN_TYPE_CD, PEN_CON_NUM, PEN_CON_PNUM
-        ,PEN_EXPI_ST_DTM, PEN_EXPI_ED_DTM, PEN_APP_ST_DTM1, PEN_APP_ED_DTM1, PEN_APP_ST_DTM2, PEN_APP_ED_DTM2, PEN_APP_ST_DTM3, PEN_APP_ED_DTM3,PEN_REC_DTM, PEN_APP_DTM
-        ,PEN_ZIP, PEN_ADDR, PEN_ADDR_DTL
-        ,PEN_PRO_TYPE_CD,PEN_PRO_NM, PEN_PRO_BIRTH, PEN_PRO_REL, PEN_PRO_CON_NUM, PEN_PRO_CON_PNUM, PEN_PRO_EMAIL, PEN_PRO_REL_ETC, PEN_PRO_ZIP, PEN_PRO_ADDR, PEN_PRO_ADDR_DTL
-        ,PEN_CNM_TYPE_CD, PEN_REC_TYPE_CD, PEN_REC_TYPE_TXT, PEN_REMARK
-        ,ENT_ID, ENT_USR_ID, APP_CD, CA_CEN_YN, DEL_YN
-        ,REG_DTM, REG_USR_ID, REG_USR_IP, MODIFY_DTM, MODIFY_USR_ID, MODIFY_USR_IP
-        )
-        VALUES
-        (
-         #{penId}
-        , #{penNm} , #{penLtmNum}, #{penRecGraCd}
-        , #{penGender}, #{penBirth}, #{penJumin}, #{penTypeCd}, #{penConNum}, #{penConPnum}
-        , #{penExpiStDtm, jdbcType=DATE}, #{penExpiEdDtm, jdbcType=DATE}, #{penAppStDtm1, jdbcType=DATE}, #{penAppEdDtm1, jdbcType=DATE}, #{penAppStDtm2, jdbcType=DATE}, #{penAppEdDtm2, jdbcType=DATE}, #{penAppStDtm3, jdbcType=DATE}, #{penAppEdDtm3, jdbcType=DATE}, #{penRecDtm, jdbcType=DATE}, #{penAppDtm, jdbcType=DATE}
-        , #{penZip}, #{penAddr}, #{penAddrDtl}
-        , #{penProTypeCd},#{penProNm}, #{penProBirth}, #{penProRel}, #{penProConNum}, #{penProConPnum}, #{penProEmail}, #{penProRelEtc}, #{penProZip}, #{penProAddr}, #{penProAddrDtl}
-        , #{penCnmTypeCd}, #{penRecTypeCd}, #{penRecTypeTxt}, #{penRemark}
-        , #{entId}, #{entUsrId}, #{appCd}, #{caCenYn}, 'N'
-        ,CURRENT_TIMESTAMP,	#{usrId}, #{accessIp} ,CURRENT_TIMESTAMP, #{usrId}, #{accessIp}
-        )
+        ( PEN_ID
+        , PEN_NM, PEN_LTM_NUM, PEN_REC_GRA_CD
+        , PEN_GENDER, PEN_BIRTH, PEN_JUMIN, PEN_TYPE_CD, PEN_CON_NUM, PEN_CON_PNUM
+        , PEN_EXPI_ST_DTM, PEN_EXPI_ED_DTM, PEN_APP_ST_DTM1, PEN_APP_ED_DTM1, PEN_APP_ST_DTM2, PEN_APP_ED_DTM2
+        , PEN_APP_ST_DTM3, PEN_APP_ED_DTM3, PEN_REC_DTM, PEN_APP_DTM
+        , PEN_ZIP, PEN_ADDR, PEN_ADDR_DTL
+        , PEN_PRO_TYPE_CD, PEN_PRO_NM, PEN_PRO_BIRTH, PEN_PRO_REL, PEN_PRO_CON_NUM, PEN_PRO_CON_PNUM, PEN_PRO_EMAIL
+        , PEN_PRO_REL_ETC, PEN_PRO_ZIP, PEN_PRO_ADDR, PEN_PRO_ADDR_DTL
+        , PEN_CNM_TYPE_CD, PEN_REC_TYPE_CD, PEN_REC_TYPE_TXT, PEN_REMARK
+        , ENT_ID, ENT_USR_ID, APP_CD, CA_CEN_YN, DEL_YN
+        , REG_DTM, REG_USR_ID, REG_USR_IP, MODIFY_DTM, MODIFY_USR_ID, MODIFY_USR_IP)
+        VALUES ( #{penId}
+               , #{penNm}, #{penLtmNum}, #{penRecGraCd}
+               , #{penGender}, #{penBirth}, #{penJumin}, #{penTypeCd}, #{penConNum}, #{penConPnum}
+               , #{penExpiStDtm, jdbcType=DATE}, #{penExpiEdDtm, jdbcType=DATE}, #{penAppStDtm1, jdbcType=DATE}
+               , #{penAppEdDtm1, jdbcType=DATE}, #{penAppStDtm2, jdbcType=DATE}, #{penAppEdDtm2, jdbcType=DATE}
+               , #{penAppStDtm3, jdbcType=DATE}, #{penAppEdDtm3, jdbcType=DATE}, #{penRecDtm, jdbcType=DATE}
+               , #{penAppDtm, jdbcType=DATE}
+               , #{penZip}, #{penAddr}, #{penAddrDtl}
+               , #{penProTypeCd}, #{penProNm}, #{penProBirth}, #{penProRel}, #{penProConNum}, #{penProConPnum}
+               , #{penProEmail}, #{penProRelEtc}, #{penProZip}, #{penProAddr}, #{penProAddrDtl}
+               , #{penCnmTypeCd}, #{penRecTypeCd}, #{penRecTypeTxt}, #{penRemark}
+               , #{entId}, #{entUsrId}, #{appCd}, #{caCenYn}, 'N'
+               , CURRENT_TIMESTAMP, #{usrId}, #{accessIp}, CURRENT_TIMESTAMP, #{usrId}, #{accessIp})
     </insert>
 
     <!--사업소 수급자 추가-->
     <insert id="insertEntRecipient" parameterType="hashmap">
         INSERT INTO ENTPEN1000
-        (
-        PEN_ID
-        ,ENT_ID, ENT_USR_ID, DEL_YN
-        ,REG_DTM, MODIFY_DTM, MODIFY_USR_ID
-        )
-        VALUES
-        (
-        #{penId}
-        , #{entId}, #{entUsrId}, 'N'
-        ,CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, #{usrId}
-        )
+        ( PEN_ID
+        , ENT_ID, ENT_USR_ID, DEL_YN
+        , REG_DTM, MODIFY_DTM, MODIFY_USR_ID)
+        VALUES ( #{penId}
+               , #{entId}, #{entUsrId}, 'N'
+               , CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, #{usrId})
     </insert>
 
     <insert id="insertRecipientReq" parameterType="hashmap">
         INSERT INTO PEN6000
-        (
-        PEN_ID
-        ,APP_SEQ,   PEN_ORD_ID, APP_GUBN,   PEN_GUBN
-        ,REG_DTM, REG_USR_ID, REG_USR_IP, MODIFY_DTM, MODIFY_USR_ID, MODIFY_USR_IP
-        )
-        VALUES
-        (
-         #{penId}
-        , (SELECT IFNULL(MAX(T1.APP_SEQ),0)+1 FROM pen6000 T1), #{penOrdId}, '00', '00'
-        ,CURRENT_TIMESTAMP,	#{usrId}, #{accessIp} ,CURRENT_TIMESTAMP, #{usrId}, #{accessIp}
-        )
+        ( PEN_ID
+        , APP_SEQ, PEN_ORD_ID, APP_GUBN, PEN_GUBN
+        , REG_DTM, REG_USR_ID, REG_USR_IP, MODIFY_DTM, MODIFY_USR_ID, MODIFY_USR_IP)
+        VALUES ( #{penId}
+               , (SELECT IFNULL(MAX(T1.APP_SEQ), 0) + 1 FROM pen6000 T1), #{penOrdId}, '00', '00'
+               , CURRENT_TIMESTAMP, #{usrId}, #{accessIp}, CURRENT_TIMESTAMP, #{usrId}, #{accessIp})
     </insert>
 
     <!--욕구사정기록지 추가-->
     <insert id="insertRecipientRec" parameterType="hashmap">
         INSERT INTO pen1500
-        (
-            REC_ID, PEN_ID, ENT_ID, USR_ID,
-            PSCL_STATE1, PSCL_STATE2, PSCL_STATE3, PSCL_STATE4,
-            PSCL_STATE5, PSCL_STATE6, PSCL_REASON, RECOG_REASON, HELPER_YN, CHILD, HELPER_TYPE,
-            HELPER_TYPE_ETC, HOME_ENV, HOME_TYPE, INMATE, TOTAL_REVIEW,
-            REG_DTM, REG_USR_ID, REG_USR_IP,MODIFY_DTM, MODIFY_USR_ID, MODIFY_USR_IP
-        )
-        VALUES
-        (
-            #{recId}, #{penId}, #{entId}, #{usrId},
-            #{psclState1}, #{psclState2}, #{psclState3}, #{psclState4},
-            #{psclState5}, #{psclState6}, #{psclReason}, #{recogReason}, #{helperYn}, #{child}, #{helperType},
-            #{helperTypeEtc}, #{homeEnv}, #{homeType}, #{inmate}, #{totalReview},
-            CURRENT_TIMESTAMP,	#{usrId}, #{accessIp} ,CURRENT_TIMESTAMP, #{usrId}, #{accessIp}
-        )
+        (REC_ID, PEN_ID, ENT_ID, USR_ID,
+         PSCL_STATE1, PSCL_STATE2, PSCL_STATE3, PSCL_STATE4,
+         PSCL_STATE5, PSCL_STATE6, PSCL_REASON, RECOG_REASON, HELPER_YN, CHILD, HELPER_TYPE,
+         HELPER_TYPE_ETC, HOME_ENV, HOME_TYPE, INMATE, TOTAL_REVIEW,
+         REG_DTM, REG_USR_ID, REG_USR_IP, MODIFY_DTM, MODIFY_USR_ID, MODIFY_USR_IP)
+        VALUES (#{recId}, #{penId}, #{entId}, #{usrId},
+                #{psclState1}, #{psclState2}, #{psclState3}, #{psclState4},
+                #{psclState5}, #{psclState6}, #{psclReason}, #{recogReason}, #{helperYn}, #{child}, #{helperType},
+                #{helperTypeEtc}, #{homeEnv}, #{homeType}, #{inmate}, #{totalReview},
+                CURRENT_TIMESTAMP, #{usrId}, #{accessIp}, CURRENT_TIMESTAMP, #{usrId}, #{accessIp})
     </insert>
 
     <!--취급품목 추가-->
     <insert id="insertRecipientItem" parameterType="hashmap">
         INSERT INTO pen1100
-        (
-        PEN_ID, ITEM_ID
-        ,REG_USR_ID, REG_USR_IP,REG_DTM
-        ,MODIFY_USR_ID,MODIFY_USR_IP,MODIFY_DTM
-        )
-        VALUES
-        (
-        #{penId}, #{itemId}
-        ,#{usrId}, #{accessIp}, CURRENT_TIMESTAMP
-        ,#{usrId}, #{accessIp}, CURRENT_TIMESTAMP
-        )
+        ( PEN_ID, ITEM_ID
+        , REG_USR_ID, REG_USR_IP, REG_DTM
+        , MODIFY_USR_ID, MODIFY_USR_IP, MODIFY_DTM)
+        VALUES ( #{penId}, #{itemId}
+               , #{usrId}, #{accessIp}, CURRENT_TIMESTAMP
+               , #{usrId}, #{accessIp}, CURRENT_TIMESTAMP)
     </insert>
 
 
     <!--수급자 업데이트-->
     <update id="updateRecipient" parameterType="hashmap">
         UPDATE PEN1000 SET
-            MODIFY_DTM		= CURRENT_TIMESTAMP
-            ,MODIFY_USR_ID	= #{usrId}
-            ,MODIFY_USR_IP = #{accessIp}
+        MODIFY_DTM = CURRENT_TIMESTAMP
+        ,MODIFY_USR_ID = #{usrId}
+        ,MODIFY_USR_IP = #{accessIp}
         <if test='penNm != null and !penNm.equals("")'>,PEN_NM= #{penNm}</if>
         <if test='penLtmNum != null and !penLtmNum.equals("")'>,PEN_LTM_NUM= #{penLtmNum}</if>
         <if test='penRecGraCd != null and !penRecGraCd.equals("")'>,PEN_REC_GRA_CD = #{penRecGraCd}</if>
@@ -493,8 +481,10 @@
         <if test='penJumin != null and !penJumin.equals("")'>,PEN_JUMIN = #{penJumin}</if>
         <if test='penConNum != null and !penConNum.equals("")'>,PEN_CON_NUM = #{penConNum}</if>
         <if test='penConPnum != null and !penConPnum.equals("")'>,PEN_CON_PNUM = #{penConPnum}</if>
-        <if test='penExpiStDtm != null and !penExpiStDtm.equals("")'>,PEN_EXPI_ST_DTM = #{penExpiStDtm, jdbcType=DATE}</if>
-        <if test='penExpiEdDtm != null and !penExpiEdDtm.equals("")'>,PEN_EXPI_ED_DTM = #{penExpiEdDtm, jdbcType=DATE}</if>
+        <if test='penExpiStDtm != null and !penExpiStDtm.equals("")'>,PEN_EXPI_ST_DTM = #{penExpiStDtm, jdbcType=DATE}
+        </if>
+        <if test='penExpiEdDtm != null and !penExpiEdDtm.equals("")'>,PEN_EXPI_ED_DTM = #{penExpiEdDtm, jdbcType=DATE}
+        </if>
         <if test='penAppStDtm1 != null and !penAppStDtm1.equals("")'>,PEN_APP_ST_DTM1 = #{penAppStDtm1}</if>
         <if test='penAppEdDtm1 != null and !penAppEdDtm1.equals("")'>,PEN_APP_ED_DTM1 = #{penAppEdDtm1}</if>
         <if test='penAppStDtm2 != null and !penAppStDtm2.equals("")'>,PEN_APP_ST_DTM2 = #{penAppStDtm2}</if>
@@ -532,9 +522,9 @@
     <!--예비 수급자 업데이트-->
     <update id="updateSpareRecipient" parameterType="hashmap">
         UPDATE PEN1001 SET
-            MODIFY_DTM		= CURRENT_TIMESTAMP
-            ,MODIFY_USR_ID	= #{usrId}
-            ,MODIFY_USR_IP = #{accessIp}
+        MODIFY_DTM = CURRENT_TIMESTAMP
+        ,MODIFY_USR_ID = #{usrId}
+        ,MODIFY_USR_IP = #{accessIp}
         <if test='penNm != null and !penNm.equals("")'>,PEN_NM= #{penNm}</if>
         <if test='penLtmNum != null and !penLtmNum.equals("")'>,PEN_LTM_NUM= #{penLtmNum}</if>
         <if test='penRecGraCd != null and !penRecGraCd.equals("")'>,PEN_REC_GRA_CD = #{penRecGraCd}</if>
@@ -582,9 +572,9 @@
     <!--욕구사정기록지 수정-->
     <update id="updateRecipientRec" parameterType="hashmap">
         UPDATE PEN1500 SET
-            MODIFY_DTM		= CURRENT_TIMESTAMP
-            ,MODIFY_USR_ID	= #{usrId}
-            ,MODIFY_USR_IP = #{accessIp}
+        MODIFY_DTM = CURRENT_TIMESTAMP
+        ,MODIFY_USR_ID = #{usrId}
+        ,MODIFY_USR_IP = #{accessIp}
         <if test='usrId != null and !usrId.equals("")'>,USR_ID = #{usrId}</if>
         <if test='psclState1 != null and !psclState1.equals("")'>,PSCL_STATE1 = #{psclState1}</if>
         <if test='psclState2 != null and !psclState2.equals("")'>,PSCL_STATE2 = #{psclState2}</if>
@@ -614,8 +604,11 @@
 
     <!--욕구사정기록지 삭제-->
     <delete id="deleteRecipientRec" parameterType="hashmap">
-        DELETE FROM PEN1500
-        WHERE REC_ID = #{recId} AND ENT_ID = #{entId} AND PEN_ID = #{penId}
+        DELETE
+        FROM PEN1500
+        WHERE REC_ID = #{recId}
+          AND ENT_ID = #{entId}
+          AND PEN_ID = #{penId}
     </delete>
 
 </mapper>

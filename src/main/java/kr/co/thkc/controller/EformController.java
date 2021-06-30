@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-@RequestMapping(value = BaseController.baseUrl+"/eform", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
+@RequestMapping(value = BaseController.baseUrl + "/eform", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
 public class EformController {
 
     @Autowired
@@ -21,8 +21,8 @@ public class EformController {
 
 
     /**
-     *  전자계약서 데이터 호출
-     * */
+     * 전자계약서 데이터 호출
+     */
     @PostMapping(value = "selectEform001")
     public BaseResponse entAccountInfo(@RequestBody BaseRequest request) throws Exception {
 

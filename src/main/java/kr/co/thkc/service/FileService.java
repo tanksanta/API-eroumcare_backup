@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -61,13 +60,13 @@ public class FileService extends BaseService {
         }
 
         //storePath 폴더 분류
-        if(!"".equals(entId) && entId != null){
+        if (!"".equals(entId) && entId != null) {
 
             String y = entId.substring(3, 7);
             String m = entId.substring(7, 9);
             String d = entId.substring(9, 11);
 
-            storePathString += y + "/" + m + "/" + d +"/";
+            storePathString += y + "/" + m + "/" + d + "/";
         }
 
         File saveFolder = new File(WebUtil.filePathBlackList(storePathString));
@@ -107,7 +106,7 @@ public class FileService extends BaseService {
             String fileExt = orginFileName.substring(index + 1);
 
             //확장자가 없는 경우
-            if(index == -1){
+            if (index == -1) {
                 continue;
             }
 
@@ -135,7 +134,7 @@ public class FileService extends BaseService {
                     targetFile.setReadable(false, false);
                     targetFile.setWritable(false, false);
                     targetFile.setExecutable(false, false);
-                    if(targetFile.exists()) {
+                    if (targetFile.exists()) {
                         Path path = Paths.get(filePath);
                         Set<PosixFilePermission> posixPermissions = PosixFilePermissions.fromString("rwxrwxrwx");
                         Files.setPosixFilePermissions(path, posixPermissions);
@@ -150,12 +149,12 @@ public class FileService extends BaseService {
                         targetFile.setReadable(false, false);
                         targetFile.setWritable(false, false);
                         targetFile.setExecutable(false, false);
-                        if(targetFile.exists()) {
+                        if (targetFile.exists()) {
                             Path path = Paths.get(authPath);
                             Set<PosixFilePermission> posixPermissions = PosixFilePermissions.fromString("rwxrwxrwx");
                             Files.setPosixFilePermissions(path, posixPermissions);
                         }
-                    }while (!env.getProperty("path.seal").equals(authPath + "/"));
+                    } while (!env.getProperty("path.seal").equals(authPath + "/"));
                 }
             }
 
@@ -170,7 +169,7 @@ public class FileService extends BaseService {
 
             result.add(fvo);
 
-            log.debug("======================"+result);
+            log.debug("======================" + result);
 
             fileKey++;
         }
@@ -266,8 +265,8 @@ public class FileService extends BaseService {
             storePathString = env.getProperty(storePath);
         }
         //storePath 폴더 분류
-        if(!"".equals(addStrPath) && addStrPath != null){
-            storePathString += addStrPath+"/";
+        if (!"".equals(addStrPath) && addStrPath != null) {
+            storePathString += addStrPath + "/";
         }
 
         if ("".equals(atchFileId) || atchFileId == null) {
@@ -308,7 +307,7 @@ public class FileService extends BaseService {
             String fileExt = orginFileName.substring(index + 1);
 
             //확장자가 없는 경우
-            if(index == -1){
+            if (index == -1) {
                 continue;
             }
 
@@ -316,14 +315,14 @@ public class FileService extends BaseService {
              * 이미지 확장자 체크
              * 저장 폴더 명(addStrPath)을 UsrImg로 지정 할 경우 확장자 체크 처리
              */
-            if("UsrImg".equals(addStrPath)){
+            if ("UsrImg".equals(addStrPath)) {
                 //확장자 이미지인지 체크
                 String imgPattern = "(jpg|jpeg|png|gif)$";
                 Pattern p = Pattern.compile(imgPattern);
                 Matcher m = p.matcher(fileExt);
 
                 //확장자 체크, 이미지 확장자가 아닐 경우
-                if(m.find() == false){
+                if (m.find() == false) {
                     continue;
                 }
             }
@@ -348,7 +347,7 @@ public class FileService extends BaseService {
 
             result.add(fvo);
 
-            log.debug("======================"+result);
+            log.debug("======================" + result);
 
             fileKey++;
         }

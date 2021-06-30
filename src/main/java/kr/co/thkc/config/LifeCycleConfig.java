@@ -24,16 +24,16 @@ public class LifeCycleConfig implements InitializingBean, DisposableBean {
 
     File file = new File("./eroumapi/", "startup.log");
     File version = new File("./eroumapi/", "version");
-    
+
     //어플리케이션 시작 프로퍼티 세팅 후 작업
     @Override
     public void afterPropertiesSet() throws Exception {
 
         String strLog = "";
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String now = format.format( new Date());
-        
-        
+        String now = format.format(new Date());
+
+
         strLog = strLog + "\n";
         strLog = strLog + "********************************************************************************* \n";
         strLog = strLog + "                              eroum Configuration Info                            \n";
@@ -59,7 +59,7 @@ public class LifeCycleConfig implements InitializingBean, DisposableBean {
         // 출력
         log.info(strLog);
 
-      
+
         // 시작이력 로그 
         BufferedWriter bw = null;
         try {
@@ -69,8 +69,11 @@ public class LifeCycleConfig implements InitializingBean, DisposableBean {
             bw.flush();
         } catch (IOException e) {
             e.printStackTrace();
-        }finally {
-            if(bw != null) try {bw.close(); } catch (IOException e) {}
+        } finally {
+            if (bw != null) try {
+                bw.close();
+            } catch (IOException e) {
+            }
         }
 
         // 버전정보
@@ -84,13 +87,14 @@ public class LifeCycleConfig implements InitializingBean, DisposableBean {
             bw.flush();
         } catch (IOException e) {
             e.printStackTrace();
-        }finally {
-            if(bw != null) try {bw.close(); } catch (IOException e) {}
+        } finally {
+            if (bw != null) try {
+                bw.close();
+            } catch (IOException e) {
+            }
         }
 
 
-
-        
     }
 
     //Bean 소멸시
@@ -98,7 +102,7 @@ public class LifeCycleConfig implements InitializingBean, DisposableBean {
     public void destroy() throws Exception {
         String strLog = "";
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String now = format.format( new Date());
+        String now = format.format(new Date());
 
 
         strLog = strLog + "********************************************************************************* \n";
@@ -110,7 +114,6 @@ public class LifeCycleConfig implements InitializingBean, DisposableBean {
         strLog = strLog + "********************************************************************************* \n";
 
 
-        
         BufferedWriter bw = null;
         try {
             bw = new BufferedWriter(new FileWriter(file, true));
@@ -119,8 +122,11 @@ public class LifeCycleConfig implements InitializingBean, DisposableBean {
             bw.flush();
         } catch (IOException e) {
             e.printStackTrace();
-        }finally {
-            if(bw != null) try {bw.close(); } catch (IOException e) {}
+        } finally {
+            if (bw != null) try {
+                bw.close();
+            } catch (IOException e) {
+            }
         }
     }
 }
