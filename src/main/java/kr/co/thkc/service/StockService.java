@@ -302,5 +302,10 @@ public class StockService extends BaseService {
         return response;
     }
 
-
+    /**
+     * 재고 최초 계약일 현재날짜로 업데이트
+     */
+    public void updateStockInitialContractDateNow(String stoId) {
+        abstractDAO.update("stock.updateStockInitialContractDateNow", stoId);
+    }
 }

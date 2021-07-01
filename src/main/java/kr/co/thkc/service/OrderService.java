@@ -146,6 +146,10 @@ public class OrderService extends BaseService {
                 List<Map> selectStockList = abstractDAO.selectList("stock.selectStockInfoList", prod);
                 if (selectStockList.size() == 1) {
                     stock = selectStockList.get(0);
+                    if (stock.get("initialContractDate") == null) { // 최초 계약일 없으면 현재날짜로 업데이트
+                        String stoId = (String) stock.get("stoId");
+                        stockService.updateStockInitialContractDateNow(stoId);
+                    }
                     newOrderMap.putAll(stock);
                 } else {
                     //바코드로 조회되는 재고가 없을때 재고추가

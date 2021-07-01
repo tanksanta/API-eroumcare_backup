@@ -364,4 +364,9 @@
         <foreach item="item" index="index" collection="stoId" open=" (" separator="," close=")">#{item}</foreach>
     </delete>
 
+    <update id="updateStockInitialContractDateNow" parameterType="String">
+        UPDATE PRO1103 SET
+        INITIAL_CONTRACT_DATE = NOW()
+        WHERE STO_ID = #{stoId}
+    </update>
 </mapper>
