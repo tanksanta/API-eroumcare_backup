@@ -38,14 +38,14 @@
                    WHEN A.ORD_STATUS = '00' THEN
                        A.PROD_OFL_PRICE
                    ELSE
-                       FN_MONTH_RENTAL_PRICE((SELECT RENTAL_PRICE FROM pro1100 WHERE PROD_ID = A.PROD_ID))
+                       FN_MONTH_RENTAL_PRICE((SELECT RENTAL_PRICE FROM pro1100 WHERE PROD_ID = A.PROD_ID), A.ORD_LEND_STR_DTM)
                    END         AS PROD_PRICE,
                CASE
                    WHEN A.ORD_STATUS = '00' THEN
                        GET_PEN_PRICE(A.PEN_ID, A.PROD_OFL_PRICE)
                    ELSE
                        GET_PEN_PRICE(A.PEN_ID, FN_MONTH_RENTAL_PRICE(
-                                   (SELECT RENTAL_PRICE FROM pro1100 WHERE PROD_ID = A.PROD_ID)))
+                                   (SELECT RENTAL_PRICE FROM pro1100 WHERE PROD_ID = A.PROD_ID), A.ORD_LEND_STR_DTM))
                    END         AS PEN_PRICE
         FROM pen5000 A
         WHERE PEN_ORD_ID = #{penOrdId}
