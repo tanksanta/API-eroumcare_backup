@@ -86,6 +86,7 @@
         D.PROD_SIZE,
         D.PROD_OPTION,
         D.INITIAL_CONTRACT_DATE,
+        D.CUSTOM_RENTAL_PRICE,
         COUNT(*) QUANTITY
         FROM PRO1100 A
         JOIN PRO1000 B ON A.ITEM_ID = B.ITEM_ID
@@ -172,7 +173,8 @@
         PROD_BAR_NUM,
         D.MODIFY_DTM,
         D.REG_DTM,
-        D.INITIAL_CONTRACT_DATE
+        D.INITIAL_CONTRACT_DATE,
+        D.CUSTOM_RENTAL_PRICE
         FROM PRO1100 A
         JOIN PRO1000 B ON A.ITEM_ID = B.ITEM_ID
         JOIN PRO1102 C ON C.PROD_ID = A.PROD_ID AND C.DEL_YN = 'N'
@@ -281,7 +283,8 @@
         D.PROD_SIZE,
         D.PROD_OPTION,
         D.PROD_BAR_NUM,
-        D.INITIAL_CONTRACT_DATE
+        D.INITIAL_CONTRACT_DATE,
+        D.CUSTOM_RENTAL_PRICE
         FROM PRO1100 A
         JOIN PRO1000 B ON A.ITEM_ID = B.ITEM_ID
         JOIN PRO1102 C ON C.PROD_ID = A.PROD_ID AND C.DEL_YN = 'N'
@@ -352,9 +355,8 @@
         <if test='prodManuDate != null and !prodManuDate.equals("")'>,PROD_MANU_DATE = #{prodManuDate}</if>
         <if test='stoMemo != null and !stoMemo.equals("")'>,STO_MEMO = #{stoMemo}</if>
         <if test='delYn != null and !delYn.equals("")'>,DEL_YN = #{delYn}</if>
-        <if test='initialContractDate != null and !initialContractDate.equals("")'>,INITIAL_CONTRACT_DATE =
-            #{initialContractDate}
-        </if>
+        <if test='initialContractDate != null and !initialContractDate.equals("")'>,INITIAL_CONTRACT_DATE = #{initialContractDate}</if>
+        <if test='customRentalPrice != null and !customRentalPrice.equals("")'>,CUSTOM_RENTAL_PRICE = #{customRentalPrice}</if>
         WHERE STO_ID = #{stoId}
     </update>
 
