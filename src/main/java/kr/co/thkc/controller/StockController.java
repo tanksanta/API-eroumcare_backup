@@ -144,7 +144,7 @@ public class StockController {
                 BaseRequest prodRequest = new BaseRequest(prod);
 
                 prodRequest.addRequiredField("stoId", BaseRequest.TYPE_STRING);
-                prodRequest.addRequiredField("prodBarNum", BaseRequest.TYPE_STRING);
+
                 // requiredField check
                 prodRequest.validRequiredField();
             }

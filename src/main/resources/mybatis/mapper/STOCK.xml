@@ -347,7 +347,7 @@
         ,MODIFY_USR_ID = #{usrId}
         ,MODIFY_USR_IP = #{accessIp}
         <if test='ppcId != null and !ppcId.equals("")'>,PPC_ID= #{ppcId}</if>
-        ,PROD_BAR_NUM= #{prodBarNum}
+        <if test='prodBarNum != null'>,PROD_BAR_NUM= #{prodBarNum}</if>
         <if test='stateCd != null and !stateCd.equals("")'>,STATE_CD = #{stateCd}</if>
         <if test='prodColor != null and !prodColor.equals("")'>,PROD_COLOR = #{prodColor}</if>
         <if test='prodSize != null and !prodSize.equals("")'>,PROD_SIZE = #{prodSize}</if>
