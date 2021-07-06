@@ -381,8 +381,9 @@
         VALUES ( #{penId}
                , #{penNm}, #{penLtmNum}, #{penRecGraCd}
                , #{penGender}, #{penBirth}, #{penJumin}, #{penTypeCd}, #{penConNum}, #{penConPnum}
-               , #{penExpiStDtm, jdbcType=DATE}, #{penExpiEdDtm, jdbcType=DATE}, #{penAppStDtm1}, #{penAppEdDtm1}
-               , #{penAppStDtm2}, #{penAppEdDtm2}, #{penAppStDtm3}, #{penAppEdDtm3}, #{penRecDtm}, #{penAppDtm}
+               , #{penExpiStDtm, jdbcType=DATE}, #{penExpiEdDtm, jdbcType=DATE}, #{penAppStDtm1, jdbcType=DATE}
+               , #{penAppEdDtm1, jdbcType=DATE}, #{penAppStDtm2, jdbcType=DATE}, #{penAppEdDtm2, jdbcType=DATE}
+               , #{penAppStDtm3, jdbcType=DATE}, #{penAppEdDtm3, jdbcType=DATE}, #{penRecDtm, jdbcType=DATE}, #{penAppDtm, jdbcType=DATE}
                , #{penZip}, #{penAddr}, #{penAddrDtl}
                , #{penProTypeCd}, #{penProNm}, #{penProBirth}, #{penProRel}, #{penProConNum}, #{penProConPnum}
                , #{penProEmail}, #{penProRelEtc}, #{penProZip}, #{penProAddr}, #{penProAddrDtl}
@@ -390,6 +391,7 @@
                , #{entId}, #{entUsrId}, #{appCd}, #{caCenYn}, 'N'
                , CURRENT_TIMESTAMP, #{usrId}, #{accessIp}, CURRENT_TIMESTAMP, #{usrId}, #{accessIp})
     </insert>
+
     <!--예비수급자 추가-->
     <insert id="insertSpareRecipient" parameterType="hashmap">
         INSERT INTO PEN1001
@@ -519,6 +521,7 @@
         <if test='delYn != null and !delYn.equals("")'>,DEL_YN = #{delYn}</if>
         WHERE PEN_ID = #{penId}
     </update>
+
     <!--예비 수급자 업데이트-->
     <update id="updateSpareRecipient" parameterType="hashmap">
         UPDATE PEN1001 SET
