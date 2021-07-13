@@ -289,7 +289,7 @@
             ) AS A
         WHERE
             QUANTITY > 0
-            AND ORDER_QUANTITY > 0
+            OR (QUANTITY = 0 AND ORDER_QUANTITY > 0)
     </select>
     <select id="selectStockNotEmptyListForEnt" parameterType="hashmap" resultType="camelMap" fetchSize="10000">
         SELECT
@@ -330,7 +330,7 @@
             ) AS A
         WHERE
             QUANTITY > 0
-            AND ORDER_QUANTITY > 0
+            OR (QUANTITY = 0 AND ORDER_QUANTITY > 0)
         ORDER BY
             REG_DTM, PROD_BAR_NUM, PPC_ID ASC
         <if test="pageSize > 0 and pageNum > 0">
