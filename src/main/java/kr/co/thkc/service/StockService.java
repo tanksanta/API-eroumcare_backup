@@ -103,6 +103,33 @@ public class StockService extends BaseService {
     }
 
     /**
+     * 사업소별 재고 목록 조회
+     */
+    public BaseResponse selectStockNotEmptyListForEnt(Map<String, Object> params) throws SQLException {
+        BaseResponse response = new BaseResponse();
+
+        //페이징 처리
+        int pageNum = MapUtils.getIntValue(params, "pageNum");
+        int pageSize = MapUtils.getIntValue(params, "pageSize");
+
+        int offset = pageSize * (pageNum - 1);
+
+        params.put("pageSize", pageSize);
+        params.put("pageNum", pageNum);
+        params.put("offset", offset);
+
+        //제품목록
+        Integer total = (Integer) abstractDAO.selectOne("stock.selectStockNotEmptyListForEntCnt", params);
+        List result = abstractDAO.selectList("stock.selectStockNotEmptyListForEnt", params);
+
+        response.setTotal(total == null ? 0 : total);
+        response.setResultData(result);
+        response.setResult(ResultCode.RC_OK);
+
+        return response;
+    }
+
+    /**
      * 재고목록 상세 조회
      */
     public BaseResponse selectStockDetailList(Map<String, Object> params) throws SQLException {

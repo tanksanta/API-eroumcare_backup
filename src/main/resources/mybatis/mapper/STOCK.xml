@@ -213,52 +213,129 @@
 
     <!--사업소별 재고 목록-->
     <select id="selectStockListForEntCnt" parameterType="hashmap" resultType="int">
-        SELECT COUNT(*) FROM(
-        SELECT
-        COUNT(*)
-        FROM PRO1100 A
-        JOIN PRO1000 B ON A.ITEM_ID = B.ITEM_ID
-        JOIN PRO1102 C ON C.PROD_ID = A.PROD_ID AND C.DEL_YN = 'N'
-        JOIN PRO1103 D ON D.PPC_ID = C.PPC_ID AND D.DEL_YN = 'N'
-        WHERE D.DEL_YN = 'N'
-        <if test="entId!=null and !entId.equals('')">AND C.ENT_ID = #{entId}</if>
-        <if test="prodNm!=null and !prodNm.equals('')">AND A.PROD_NM like concat('%',#{prodNm},'%')</if>
-        <if test="prodId!=null and !prodId.equals('')">AND A.PROD_ID = #{prodId}</if>
-        <if test="prodPayCode!=null and !prodPayCode.equals('')">AND A.PROD_PAY_CODE = #{prodPayCode}</if>
-        <if test="gubun!=null and !gubun.equals('')">AND A.GUBUN = #{gubun}</if>
-        <if test="taxInfoCd!=null and !taxInfoCd.equals('')">AND A.TAX_INFO_CD = #{taxInfoCd}</if>
-        GROUP BY A.PROD_ID
-        ) A
+        SELECT COUNT(*)
+        FROM (SELECT
+                COUNT(*)
+              FROM PRO1100 A
+              JOIN PRO1000 B ON A.ITEM_ID = B.ITEM_ID
+              JOIN PRO1102 C ON C.PROD_ID = A.PROD_ID AND C.DEL_YN = 'N'
+              JOIN PRO1103 D ON D.PPC_ID = C.PPC_ID AND D.DEL_YN = 'N'
+                WHERE D.DEL_YN = 'N'
+                <if test="entId!=null and !entId.equals('')">AND C.ENT_ID = #{entId}</if>
+                <if test="prodNm!=null and !prodNm.equals('')">AND A.PROD_NM like concat('%',#{prodNm},'%')</if>
+                <if test="prodId!=null and !prodId.equals('')">AND A.PROD_ID = #{prodId}</if>
+                <if test="prodPayCode!=null and !prodPayCode.equals('')">AND A.PROD_PAY_CODE = #{prodPayCode}</if>
+                <if test="gubun!=null and !gubun.equals('')">AND A.GUBUN = #{gubun}</if>
+                <if test="taxInfoCd!=null and !taxInfoCd.equals('')">AND A.TAX_INFO_CD = #{taxInfoCd}</if>
+                GROUP BY A.PROD_ID
+                ) A
     </select>
     <select id="selectStockListForEnt" parameterType="hashmap" resultType="camelMap" fetchSize="10000">
         SELECT
-        C.ENT_ID,
-        C.PPC_ID,
-        A.PROD_ID,
-        A.PROD_NM,
-        A.GUBUN,
-        B.ITEM_ID,
-        B.ITEM_NM,
-        A.PROD_SUP_YN,
-        A.PROD_PAY_CODE,
-        SUM(CASE WHEN STATE_CD='01' THEN 1 ELSE 0 END) AS QUANTITY,
-        SUM(CASE WHEN (STATE_CD='02' OR STATE_CD='07' ) THEN 1 ELSE 0 END) AS ORDER_QUANTITY
+            C.ENT_ID,
+            C.PPC_ID,
+            A.PROD_ID,
+            A.PROD_NM,
+            A.GUBUN,
+            B.ITEM_ID,
+            B.ITEM_NM,
+            A.PROD_SUP_YN,
+            A.PROD_PAY_CODE,
+            SUM(CASE WHEN STATE_CD='01' THEN 1 ELSE 0 END) AS QUANTITY,
+            SUM(CASE WHEN (STATE_CD='02' OR STATE_CD='07' ) THEN 1 ELSE 0 END) AS ORDER_QUANTITY
         FROM PRO1100 A
-        JOIN PRO1000 B ON A.ITEM_ID = B.ITEM_ID
-        JOIN PRO1102 C ON C.PROD_ID = A.PROD_ID AND C.DEL_YN = 'N'
-        JOIN PRO1103 D ON D.PPC_ID = C.PPC_ID AND D.DEL_YN = 'N'
+            JOIN PRO1000 B ON A.ITEM_ID = B.ITEM_ID
+            JOIN PRO1102 C ON C.PROD_ID = A.PROD_ID AND C.DEL_YN = 'N'
+            JOIN PRO1103 D ON D.PPC_ID = C.PPC_ID AND D.DEL_YN = 'N'
         WHERE D.DEL_YN = 'N'
-        <if test="entId!=null and !entId.equals('')">AND C.ENT_ID = #{entId}</if>
-        <if test="prodNm!=null and !prodNm.equals('')">AND A.PROD_NM like concat('%',#{prodNm},'%')</if>
-        <if test="prodId!=null and !prodId.equals('')">AND A.PROD_ID = #{prodId}</if>
-        <if test="prodPayCode!=null and !prodPayCode.equals('')">AND A.PROD_PAY_CODE = #{prodPayCode}</if>
-        <if test="gubun!=null and !gubun.equals('')">AND A.GUBUN = #{gubun}</if>
-        <if test="taxInfoCd!=null and !taxInfoCd.equals('')">AND A.TAX_INFO_CD = #{taxInfoCd}</if>
+            <if test="entId!=null and !entId.equals('')">AND C.ENT_ID = #{entId}</if>
+            <if test="prodNm!=null and !prodNm.equals('')">AND A.PROD_NM like concat('%',#{prodNm},'%')</if>
+            <if test="prodId!=null and !prodId.equals('')">AND A.PROD_ID = #{prodId}</if>
+            <if test="prodPayCode!=null and !prodPayCode.equals('')">AND A.PROD_PAY_CODE = #{prodPayCode}</if>
+            <if test="gubun!=null and !gubun.equals('')">AND A.GUBUN = #{gubun}</if>
+            <if test="taxInfoCd!=null and !taxInfoCd.equals('')">AND A.TAX_INFO_CD = #{taxInfoCd}</if>
         GROUP BY A.PROD_ID
         ORDER BY A.REG_DTM, PROD_BAR_NUM ASC
         <if test="pageSize > 0 and pageNum > 0">
-            LIMIT #{pageSize}
-            OFFSET #{offset}
+        LIMIT #{pageSize}
+        OFFSET #{offset}
+        </if>
+    </select>
+
+    <select id="selectStockNotEmptyListForEntCnt" parameterType="hashmap" resultType="int">
+        SELECT
+            COUNT(*)
+        FROM (
+            SELECT
+                SUM(CASE WHEN STATE_CD='01' THEN 1 ELSE 0 END) AS QUANTITY,
+                SUM(CASE WHEN (STATE_CD='02' OR STATE_CD='07' ) THEN 1 ELSE 0 END) AS ORDER_QUANTITY
+            FROM
+                PRO1100 A
+            JOIN PRO1000 B
+                ON A.ITEM_ID = B.ITEM_ID
+            JOIN PRO1102 C
+                ON C.PROD_ID = A.PROD_ID AND C.DEL_YN = 'N'
+            JOIN PRO1103 D
+                ON D.PPC_ID = C.PPC_ID AND D.DEL_YN = 'N'
+            WHERE
+                  D.DEL_YN = 'N'
+            <if test="entId!=null and !entId.equals('')">AND C.ENT_ID = #{entId}</if>
+            <if test="prodNm!=null and !prodNm.equals('')">AND A.PROD_NM like concat('%',#{prodNm},'%')</if>
+            <if test="prodId!=null and !prodId.equals('')">AND A.PROD_ID = #{prodId}</if>
+            <if test="prodPayCode!=null and !prodPayCode.equals('')">AND A.PROD_PAY_CODE = #{prodPayCode}</if>
+            <if test="gubun!=null and !gubun.equals('')">AND A.GUBUN = #{gubun}</if>
+            <if test="taxInfoCd!=null and !taxInfoCd.equals('')">AND A.TAX_INFO_CD = #{taxInfoCd}</if>
+            GROUP BY A.PROD_ID
+            ) AS A
+        WHERE
+            QUANTITY > 0
+            AND ORDER_QUANTITY > 0
+    </select>
+    <select id="selectStockNotEmptyListForEnt" parameterType="hashmap" resultType="camelMap" fetchSize="10000">
+        SELECT
+            *
+        FROM (
+            SELECT
+                C.ENT_ID,
+                C.PPC_ID,
+                A.PROD_ID,
+                A.PROD_NM,
+                A.GUBUN,
+                B.ITEM_ID,
+                B.ITEM_NM,
+                A.PROD_SUP_YN,
+                A.PROD_PAY_CODE,
+                A.REG_DTM,
+                D.PROD_BAR_NUM,
+                SUM(CASE WHEN STATE_CD='01' THEN 1 ELSE 0 END) AS QUANTITY,
+                SUM(CASE WHEN (STATE_CD='02' OR STATE_CD='07' ) THEN 1 ELSE 0 END) AS ORDER_QUANTITY
+            FROM
+                PRO1100 A
+            JOIN PRO1000 B
+                ON A.ITEM_ID = B.ITEM_ID
+            JOIN PRO1102 C
+                ON C.PROD_ID = A.PROD_ID AND C.DEL_YN = 'N'
+            JOIN PRO1103 D
+                ON D.PPC_ID = C.PPC_ID AND D.DEL_YN = 'N'
+            WHERE
+                D.DEL_YN = 'N'
+                <if test="entId!=null and !entId.equals('')">AND C.ENT_ID = #{entId}</if>
+                <if test="prodNm!=null and !prodNm.equals('')">AND A.PROD_NM like concat('%',#{prodNm},'%')</if>
+                <if test="prodId!=null and !prodId.equals('')">AND A.PROD_ID = #{prodId}</if>
+                <if test="prodPayCode!=null and !prodPayCode.equals('')">AND A.PROD_PAY_CODE = #{prodPayCode}</if>
+                <if test="gubun!=null and !gubun.equals('')">AND A.GUBUN = #{gubun}</if>
+                <if test="taxInfoCd!=null and !taxInfoCd.equals('')">AND A.TAX_INFO_CD = #{taxInfoCd}</if>
+            GROUP BY
+                A.PROD_ID
+            ) AS A
+        WHERE
+            QUANTITY > 0
+            AND ORDER_QUANTITY > 0
+        ORDER BY
+            REG_DTM, PROD_BAR_NUM, PPC_ID ASC
+        <if test="pageSize > 0 and pageNum > 0">
+        LIMIT #{pageSize}
+        OFFSET #{offset}
         </if>
     </select>
 
