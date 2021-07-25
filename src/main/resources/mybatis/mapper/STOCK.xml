@@ -409,7 +409,7 @@
         <foreach collection="list" item="item" separator=",">
             (
             #{item.stoId}
-            ,#{item.ppcId}, '06', #{item.prodBarNum}
+            ,#{item.ppcId}, #{item.stateCd}, #{item.prodBarNum}
             ,#{item.prodColor}, #{item.prodSize}, #{item.prodOption}
             ,#{item.prodManuDate}, #{item.stoMemo}, 'N'
             ,CURRENT_TIMESTAMP, #{item.usrId}, #{item.accessIp}

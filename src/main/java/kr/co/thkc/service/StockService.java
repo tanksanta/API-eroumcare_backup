@@ -222,6 +222,14 @@ public class StockService extends BaseService {
             prod.put("prodSize", MapUtils.getString(prodList.get(i), "prodSize"));
             prod.put("prodOption", MapUtils.getString(prodList.get(i), "prodOption"));
 
+            // 상태
+            String stateCd = MapUtils.getString(prodList.get(i), "stateCd");
+            if (stateCd == null || stateCd.equals("")) {
+                prod.put("stateCd", "06");
+            } else {
+                prod.put("stateCd", stateCd);
+            }
+
             //취급제품인지 체크
             ppcId = abstractDAO.selectOne("stock.selectPpc", prod);
             if (ppcId == null) {    //취급제품 없으면 추가
