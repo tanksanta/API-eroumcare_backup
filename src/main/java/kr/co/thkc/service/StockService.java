@@ -275,11 +275,6 @@ public class StockService extends BaseService {
         String stoId = MapUtils.getString(params, "stoId");
         String entId = MapUtils.getString(params, "entId");
 
-        // 옵션
-        String prodSize = MapUtils.getString(params, "prodSize");
-        String prodColor = MapUtils.getString(params, "prodColor");
-        String prodOption = MapUtils.getString(params, "prodOption");
-
         //결과값 리턴을 위한
         List<Map> stockList = new ArrayList<>();
         //수정할 재고 가져오기
@@ -290,11 +285,6 @@ public class StockService extends BaseService {
                 prod.put("usrId", usrId);
                 prod.put("accessIp", accessIp);
                 prod.put("entId", entId);
-
-                // 옵션
-                prod.put("prodSize", prodSize);
-                prod.put("prodColor", prodColor);
-                prod.put("prodOption", prodOption);
 
                 // 재고 수정
                 abstractDAO.update("stock.updateStock", prod);
