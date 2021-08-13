@@ -40,9 +40,9 @@
                    ELSE
                        CASE
                            WHEN B.CUSTOM_RENTAL_PRICE = -1 THEN
-                               FN_MONTH_RENTAL_PRICE((SELECT RENTAL_PRICE FROM PRO1100 WHERE PROD_ID = A.PROD_ID), A.ORD_LEND_STR_DTM)
+                               FN_TOTAL_RENTAL_PRICE((SELECT RENTAL_PRICE FROM PRO1100 WHERE PROD_ID = A.PROD_ID), A.ORD_LEND_STR_DTM, A.ORD_LEND_END_DTM)
                            ELSE
-                               FN_MONTH_RENTAL_PRICE(B.CUSTOM_RENTAL_PRICE, A.ORD_LEND_STR_DTM)
+                               FN_TOTAL_RENTAL_PRICE(B.CUSTOM_RENTAL_PRICE, A.ORD_LEND_STR_DTM, A.ORD_LEND_END_DTM)
                            END
                    END         AS PROD_PRICE,
                CASE
@@ -51,9 +51,9 @@
                    ELSE
                        CASE
                            WHEN B.CUSTOM_RENTAL_PRICE = -1 THEN
-                               GET_PEN_PRICE(A.PEN_ID, FN_MONTH_RENTAL_PRICE((SELECT RENTAL_PRICE FROM PRO1100 WHERE PROD_ID = A.PROD_ID), A.ORD_LEND_STR_DTM))
+                               GET_PEN_PRICE(A.PEN_ID, FN_TOTAL_RENTAL_PRICE((SELECT RENTAL_PRICE FROM PRO1100 WHERE PROD_ID = A.PROD_ID), A.ORD_LEND_STR_DTM, A.ORD_LEND_END_DTM))
                            ELSE
-                               GET_PEN_PRICE(A.PEN_ID, FN_MONTH_RENTAL_PRICE(B.CUSTOM_RENTAL_PRICE, A.ORD_LEND_STR_DTM))
+                               GET_PEN_PRICE(A.PEN_ID, FN_TOTAL_RENTAL_PRICE(B.CUSTOM_RENTAL_PRICE, A.ORD_LEND_STR_DTM, A.ORD_LEND_END_DTM))
                            END
                    END         AS PEN_PRICE
         FROM pen5000 A
