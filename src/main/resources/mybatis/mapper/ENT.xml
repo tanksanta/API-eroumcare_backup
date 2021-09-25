@@ -236,7 +236,7 @@
 
     <!--사업소 회원 usrId 수정 로그 추가-->
     <insert id="insertUsrIdChangeLog" parameterType="hashmap">
-        INSERT INTO ENT1100
+        INSERT INTO ENT1100_USERID_CHANGE_LOG
             ( ENT_ID, PREV_USR_ID, AFTER_USR_ID, MODIFY_USR_ID, MODIFY_USR_IP )
         VALUES
             ( #{entId}, #{usrId}, #{toUsrId}, #{usrId}, #{accessIp} )
