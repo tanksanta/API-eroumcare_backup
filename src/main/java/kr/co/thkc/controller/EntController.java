@@ -136,4 +136,22 @@ public class EntController {
         // bussiness logic
         return entService.updateEntAccount(request.bindRequest());
     }
+
+    /**
+     * 사업소 회원 아이디 수정 (쇼핑몰 back 전용)
+     */
+    @PostMapping(value = "updateUsrId")
+    public BaseResponse updateUsrId(@RequestBody BaseRequest request) throws Exception {
+
+        // requiredField add
+        request.addRequiredField("entId", request.TYPE_STRING);
+        request.addRequiredField("usrId", request.TYPE_STRING);
+
+        request.addRequiredField("toUsrId", request.TYPE_STRING);
+
+        request.validRequiredField();
+
+        // bussiness logic
+        return entService.updateUsrId(request.bindRequest());
+    }
 }

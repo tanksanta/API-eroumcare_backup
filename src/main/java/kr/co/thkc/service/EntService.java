@@ -321,4 +321,40 @@ public class EntService extends BaseService {
 
         return response;
     }
+
+
+    /**
+     * 사업소 userId 수정
+     */
+    public BaseResponse updateUsrId(Map<String, Object> params) throws Exception {
+        BaseResponse response = new BaseResponse();
+
+        int entUsrCnt = (int) abstractDAO.selectOne("ent.selectDuplicatedEntIdCnt", params);
+
+        if (entUsrCnt == 0) {
+            throw new Exception("존재하지 않는 아이디입니다.");
+        }
+
+        Map<String, Object> tempData = new HashMap<>();
+        tempData.put("usrId", params.get("toUsrId"));
+
+        int duplicateEntUsrIdCnt = (int) abstractDAO.selectOne("ent.selectDuplicatedEntIdCnt", tempData);
+
+        if (duplicateEntUsrIdCnt > 0) {
+            throw new Exception("변경하려는 아이디는 이미 존재하는 아이디입니다.");
+        }
+
+        // 사업소 회원아이디 수정
+        abstractDAO.update("ent.updateUsrId", params);
+
+        // 수급자 피벗테이블 entUsrId 수정
+        abstractDAO.update("ent.updateEntUsrIdForEntPen1000", params);
+
+        // 로그 추가
+        abstractDAO.insert("ent.insertUsrIdChangeLog", params);
+
+        response.setResult(ResultCode.RC_OK);
+
+        return response;
+    }
 }

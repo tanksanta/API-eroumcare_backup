@@ -209,4 +209,36 @@
         AND USR_ID = #{entUsrId}
     </update>
 
+    <!-- 사업소 회원 usrId 수정 -->
+    <update id="updateUsrId" parameterType="hashmap">
+        UPDATE
+            ENT1100
+        SET
+            MODIFY_DTM = CURRENT_TIMESTAMP,
+            MODIFY_USR_ID = #{usrId},
+            MODIFY_USR_IP = #{accessIp},
+            USR_ID = #{toUsrId}
+        WHERE
+            ENT_ID = #{entId} AND USR_ID = #{usrId}
+    </update>
+
+    <!-- 사업소 회원 usrId 수정 -->
+    <update id="updateEntUsrIdForEntPen1000" parameterType="hashmap">
+        UPDATE
+            ENTPEN1000
+        SET
+            MODIFY_DTM = CURRENT_TIMESTAMP,
+            MODIFY_USR_ID = #{usrId},
+            ENT_USR_ID = #{toUsrId}
+        WHERE
+            ENT_ID = #{entId} AND ENT_USR_ID = #{usrId}
+    </update>
+
+    <!--사업소 회원 usrId 수정 로그 추가-->
+    <insert id="insertUsrIdChangeLog" parameterType="hashmap">
+        INSERT INTO ENT1100
+            ( ENT_ID, PREV_USR_ID, AFTER_USR_ID, MODIFY_USR_ID, MODIFY_USR_IP )
+        VALUES
+            ( #{entId}, #{usrId}, #{toUsrId}, #{usrId}, #{accessIp} )
+    </insert>
 </mapper>
