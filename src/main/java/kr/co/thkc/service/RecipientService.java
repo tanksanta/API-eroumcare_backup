@@ -144,9 +144,9 @@ public class RecipientService extends BaseService {
         String penRecDtm = MapUtils.getString(params, "penRecDtm");
         String penAppDtm = MapUtils.getString(params, "penAppDtm");
 
-        if (penConNum != null && !penConNum.equals("")) params.put("penNm", sdb.encrypt(penNm));
-        if (penConNum != null && !penConNum.equals("")) params.put("penProNm", sdb.encrypt(penProNm));
-        if (penConNum != null && !penConNum.equals("")) params.put("penLtmNum", sdb.encrypt(penLtmNum));
+        if (penNm != null && !penNm.equals("")) params.put("penNm", sdb.encrypt(penNm));
+        if (penProNm != null && !penProNm.equals("")) params.put("penProNm", sdb.encrypt(penProNm));
+        if (penLtmNum != null && !penLtmNum.equals("")) params.put("penLtmNum", sdb.encrypt(penLtmNum));
 
         if (penConNum != null && !penConNum.equals("")) params.put("penConNum", sdb.encrypt(penConNum));
         if (penConPnum != null && !penConPnum.equals("")) params.put("penConPnum", sdb.encrypt(penConPnum));
@@ -211,9 +211,9 @@ public class RecipientService extends BaseService {
         String penRecDtm = MapUtils.getString(params, "penRecDtm");
         String penAppDtm = MapUtils.getString(params, "penAppDtm");
 
-        if (penConNum != null && !penConNum.equals("")) params.put("penNm", sdb.encrypt(penNm));
-        if (penConNum != null && !penConNum.equals("")) params.put("penProNm", sdb.encrypt(penProNm));
-        if (penConNum != null && !penConNum.equals("")) params.put("penLtmNum", sdb.encrypt(penLtmNum));
+        if (penNm != null && !penNm.equals("")) params.put("penNm", sdb.encrypt(penNm));
+        if (penProNm != null && !penProNm.equals("")) params.put("penProNm", sdb.encrypt(penProNm));
+        if (penLtmNum != null && !penLtmNum.equals("")) params.put("penLtmNum", sdb.encrypt(penLtmNum));
 
         if (penConNum != null && !penConNum.equals("")) params.put("penConNum", sdb.encrypt(penConNum));
         if (penConPnum != null && !penConPnum.equals("")) params.put("penConPnum", sdb.encrypt(penConPnum));
@@ -290,9 +290,9 @@ public class RecipientService extends BaseService {
         String penProConNum = MapUtils.getString(params, "penProConNum");
         String penProConPnum = MapUtils.getString(params, "penProConPnum");
 
-        if (penConNum != null && !penConNum.equals("")) params.put("penNm", sdb.encrypt(penNm));
-        if (penConNum != null && !penConNum.equals("")) params.put("penProNm", sdb.encrypt(penProNm));
-        if (penConNum != null && !penConNum.equals("")) params.put("penLtmNum", sdb.encrypt(penLtmNum));
+        if (penNm != null && !penNm.equals("")) params.put("penNm", sdb.encrypt(penNm));
+        if (penProNm != null && !penProNm.equals("")) params.put("penProNm", sdb.encrypt(penProNm));
+        if (penLtmNum != null && !penLtmNum.equals("")) params.put("penLtmNum", sdb.encrypt(penLtmNum));
 
         if (penConNum != null && !penConNum.equals("")) params.put("penConNum", sdb.encrypt(penConNum));
         if (penConPnum != null && !penConPnum.equals("")) params.put("penConPnum", sdb.encrypt(penConPnum));
@@ -324,9 +324,9 @@ public class RecipientService extends BaseService {
         String penProConNum = MapUtils.getString(params, "penProConNum");
         String penProConPnum = MapUtils.getString(params, "penProConPnum");
 
-        if (penConNum != null && !penConNum.equals("")) params.put("penNm", sdb.encrypt(penNm));
-        if (penConNum != null && !penConNum.equals("")) params.put("penProNm", sdb.encrypt(penProNm));
-        if (penConNum != null && !penConNum.equals("")) params.put("penLtmNum", sdb.encrypt(penLtmNum));
+        if (penNm != null && !penNm.equals("")) params.put("penNm", sdb.encrypt(penNm));
+        if (penProNm != null && !penProNm.equals("")) params.put("penProNm", sdb.encrypt(penProNm));
+        if (penLtmNum != null && !penLtmNum.equals("")) params.put("penLtmNum", sdb.encrypt(penLtmNum));
 
         if (penConNum != null && !penConNum.equals("")) params.put("penConNum", sdb.encrypt(penConNum));
         if (penConPnum != null && !penConPnum.equals("")) params.put("penConPnum", sdb.encrypt(penConPnum));
