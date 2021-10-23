@@ -121,8 +121,12 @@ public class RecipientService extends BaseService {
      **/
     public BaseResponse insertRecipient(Map<String, Object> params) throws SQLException {
         BaseResponse response = new BaseResponse();
-        //전화번호 암호화
+        //암호화
         SDBCryptUtil sdb = new SDBCryptUtil();
+
+        String penNm = MapUtils.getString(params, "penNm");
+        String penProNm = MapUtils.getString(params, "penProNm");
+        String penLtmNum = MapUtils.getString(params, "penLtmNum");
 
         String penConNum = MapUtils.getString(params, "penConNum");
         String penConPnum = MapUtils.getString(params, "penConPnum");
@@ -139,6 +143,10 @@ public class RecipientService extends BaseService {
         String penAppEdDtm3 = MapUtils.getString(params, "penAppEdDtm3");
         String penRecDtm = MapUtils.getString(params, "penRecDtm");
         String penAppDtm = MapUtils.getString(params, "penAppDtm");
+
+        if (penConNum != null && !penConNum.equals("")) params.put("penNm", sdb.encrypt(penNm));
+        if (penConNum != null && !penConNum.equals("")) params.put("penProNm", sdb.encrypt(penProNm));
+        if (penConNum != null && !penConNum.equals("")) params.put("penLtmNum", sdb.encrypt(penLtmNum));
 
         if (penConNum != null && !penConNum.equals("")) params.put("penConNum", sdb.encrypt(penConNum));
         if (penConPnum != null && !penConPnum.equals("")) params.put("penConPnum", sdb.encrypt(penConPnum));
@@ -180,8 +188,12 @@ public class RecipientService extends BaseService {
      **/
     public BaseResponse insertSpareRecipient(Map<String, Object> params) throws SQLException {
         BaseResponse response = new BaseResponse();
-        //전화번호 암호화
+        //암호화
         SDBCryptUtil sdb = new SDBCryptUtil();
+
+        String penNm = MapUtils.getString(params, "penNm");
+        String penProNm = MapUtils.getString(params, "penProNm");
+        String penLtmNum = MapUtils.getString(params, "penLtmNum");
 
         String penConNum = MapUtils.getString(params, "penConNum");
         String penConPnum = MapUtils.getString(params, "penConPnum");
@@ -198,6 +210,10 @@ public class RecipientService extends BaseService {
         String penAppEdDtm3 = MapUtils.getString(params, "penAppEdDtm3");
         String penRecDtm = MapUtils.getString(params, "penRecDtm");
         String penAppDtm = MapUtils.getString(params, "penAppDtm");
+
+        if (penConNum != null && !penConNum.equals("")) params.put("penNm", sdb.encrypt(penNm));
+        if (penConNum != null && !penConNum.equals("")) params.put("penProNm", sdb.encrypt(penProNm));
+        if (penConNum != null && !penConNum.equals("")) params.put("penLtmNum", sdb.encrypt(penLtmNum));
 
         if (penConNum != null && !penConNum.equals("")) params.put("penConNum", sdb.encrypt(penConNum));
         if (penConPnum != null && !penConPnum.equals("")) params.put("penConPnum", sdb.encrypt(penConPnum));
@@ -262,13 +278,21 @@ public class RecipientService extends BaseService {
     public BaseResponse updateRecipient(Map<String, Object> params) throws SQLException {
         BaseResponse response = new BaseResponse();
 
-        //전화번호 암호화
+        //암호화
         SDBCryptUtil sdb = new SDBCryptUtil();
+
+        String penNm = MapUtils.getString(params, "penNm");
+        String penProNm = MapUtils.getString(params, "penProNm");
+        String penLtmNum = MapUtils.getString(params, "penLtmNum");
 
         String penConNum = MapUtils.getString(params, "penConNum");
         String penConPnum = MapUtils.getString(params, "penConPnum");
         String penProConNum = MapUtils.getString(params, "penProConNum");
         String penProConPnum = MapUtils.getString(params, "penProConPnum");
+
+        if (penConNum != null && !penConNum.equals("")) params.put("penNm", sdb.encrypt(penNm));
+        if (penConNum != null && !penConNum.equals("")) params.put("penProNm", sdb.encrypt(penProNm));
+        if (penConNum != null && !penConNum.equals("")) params.put("penLtmNum", sdb.encrypt(penLtmNum));
 
         if (penConNum != null && !penConNum.equals("")) params.put("penConNum", sdb.encrypt(penConNum));
         if (penConPnum != null && !penConPnum.equals("")) params.put("penConPnum", sdb.encrypt(penConPnum));
@@ -288,13 +312,21 @@ public class RecipientService extends BaseService {
     public BaseResponse updateSpareRecipient(Map<String, Object> params) throws SQLException {
         BaseResponse response = new BaseResponse();
 
-        //전화번호 암호화
+        //암호화
         SDBCryptUtil sdb = new SDBCryptUtil();
+
+        String penNm = MapUtils.getString(params, "penNm");
+        String penProNm = MapUtils.getString(params, "penProNm");
+        String penLtmNum = MapUtils.getString(params, "penLtmNum");
 
         String penConNum = MapUtils.getString(params, "penConNum");
         String penConPnum = MapUtils.getString(params, "penConPnum");
         String penProConNum = MapUtils.getString(params, "penProConNum");
         String penProConPnum = MapUtils.getString(params, "penProConPnum");
+
+        if (penConNum != null && !penConNum.equals("")) params.put("penNm", sdb.encrypt(penNm));
+        if (penConNum != null && !penConNum.equals("")) params.put("penProNm", sdb.encrypt(penProNm));
+        if (penConNum != null && !penConNum.equals("")) params.put("penLtmNum", sdb.encrypt(penLtmNum));
 
         if (penConNum != null && !penConNum.equals("")) params.put("penConNum", sdb.encrypt(penConNum));
         if (penConPnum != null && !penConPnum.equals("")) params.put("penConPnum", sdb.encrypt(penConPnum));
