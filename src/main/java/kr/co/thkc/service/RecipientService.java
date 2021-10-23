@@ -29,6 +29,17 @@ public class RecipientService extends BaseService {
     public BaseResponse selectRecipient(Map<String, Object> params) throws SQLException {
         BaseResponse response = new BaseResponse();
 
+        //검색어 암호화
+        SDBCryptUtil sdb = new SDBCryptUtil();
+
+        String penNm = MapUtils.getString(params, "penNm");
+        String penProNm = MapUtils.getString(params, "penProNm");
+        String penLtmNum = MapUtils.getString(params, "penLtmNum");
+
+        if (penNm != null && !penNm.equals("")) params.put("penNm", sdb.encrypt(penNm));
+        if (penProNm != null && !penProNm.equals("")) params.put("penProNm", sdb.encrypt(penProNm));
+        if (penLtmNum != null && !penLtmNum.equals("")) params.put("penLtmNum", sdb.encrypt(penLtmNum));
+
         //페이징 처리
         int pageNum = MapUtils.getIntValue(params, "pageNum");
         int pageSize = MapUtils.getIntValue(params, "pageSize");
@@ -68,6 +79,17 @@ public class RecipientService extends BaseService {
      */
     public BaseResponse selectSpareRecipient(Map<String, Object> params) throws SQLException {
         BaseResponse response = new BaseResponse();
+
+        //검색어 암호화
+        SDBCryptUtil sdb = new SDBCryptUtil();
+
+        String penNm = MapUtils.getString(params, "penNm");
+        String penProNm = MapUtils.getString(params, "penProNm");
+        String penLtmNum = MapUtils.getString(params, "penLtmNum");
+
+        if (penNm != null && !penNm.equals("")) params.put("penNm", sdb.encrypt(penNm));
+        if (penProNm != null && !penProNm.equals("")) params.put("penProNm", sdb.encrypt(penProNm));
+        if (penLtmNum != null && !penLtmNum.equals("")) params.put("penLtmNum", sdb.encrypt(penLtmNum));
 
         //페이징 처리
         int pageNum = MapUtils.getIntValue(params, "pageNum");
