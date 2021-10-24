@@ -58,6 +58,7 @@ public class CamelListMap extends ListOrderedMap<Object, Object> {
                 SDBCryptUtil sdb = new SDBCryptUtil();
                 value = sdb.decrypt(value.toString());
 
+                /*
                 // 이름
                 if (Arrays.asList(NAME).contains(key.toString()) && value.toString().length() > 1) {
                     value = nameMasking(value.toString());
@@ -70,6 +71,7 @@ public class CamelListMap extends ListOrderedMap<Object, Object> {
                 if (Arrays.asList(PHONE).contains(key.toString()) && value.toString().length() > 5) {
                     value = phoneMasking(formatPhone(value.toString()));
                 }
+                 */
 
                 // 키 원래대로 수정
                 key = key.toString().replaceFirst(decryptCode, "");

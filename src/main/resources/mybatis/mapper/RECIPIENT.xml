@@ -117,7 +117,7 @@
             AND T1.APP_CD = #{appCd}
         </if>
         <if test="penNm!=null and !penNm.equals('')">
-            AND ( T1.PEN_NM LIKE CONCAT('%', #{penNm}, '%') OR T1.PEN_PRO_NM LIKE CONCAT('%', #{penNm}, '%') )
+            AND ( T1.SDB_PEN_NM LIKE CONCAT('%', #{penNm}, '%') OR T1.SDB_PEN_PRO_NM LIKE CONCAT('%', #{penNm}, '%') )
         </if>
         <if test="penTypeCd!=null and !penTypeCd.equals('')">
             AND T1.PEN_TYPE_CD = #{penTypeCd}
@@ -134,88 +134,86 @@
         ORDER BY REG_DTM DESC
     </sql>
 
-    <!--수급자조회-->
+    <!--수급자 조회-->
     <sql id="recipientList">
         SELECT
-        T1.* ,
-        (SELECT USR_NM FROM ENT1100 WHERE USR_ID = T1.USR_ID ) AS USR_NM ,
-        DATEDIFF(T1.PEN_APP_ED_DTM , DATE_FORMAT(NOW(),'%Y%m%d')) AS PEN_APP_REM_DAY
+            T1.* ,
+            (SELECT USR_NM FROM ENT1100 WHERE USR_ID = T1.USR_ID ) AS USR_NM ,
+            DATEDIFF(T1.PEN_APP_ED_DTM , DATE_FORMAT(NOW(),'%Y%m%d')) AS PEN_APP_REM_DAY
         FROM (
-        SELECT
-        A.PEN_ID ,
-        C.ENT_ID ,
-        A.PEN_NM SDB_PEN_NM ,
-        A.PEN_LTM_NUM SDB_PEN_LTM_NUM,
-        A.PEN_REC_GRA_CD,
-        (SELECT SUB_CD_NM FROM CMM1100 WHERE MST_CD = 'PEN00001' AND SUB_CD = A.PEN_REC_GRA_CD) AS PEN_REC_GRA_NM ,
-        A.PEN_TYPE_CD ,
-        (SELECT SUB_CD_NM FROM CMM1100 WHERE MST_CD = 'PEN00002' AND SUB_CD = A.PEN_TYPE_CD ) AS PEN_TYPE_NM ,
-        A.PEN_CNM_TYPE_CD ,
-        (SELECT PEN_CNM_TYPE_CD FROM CMM1100 WHERE MST_CD = 'PEN00004' AND SUB_CD = A.PEN_CNM_TYPE_CD ) AS
-        PEN_CNM_TYPE_NM ,
-        A.PEN_REC_TYPE_CD,
-        A.PEN_REC_TYPE_TXT,
-        A.PEN_REMARK,
-        A.PEN_EXPI_ST_DTM ,
-        A.PEN_EXPI_ED_DTM ,
-        CONCAT(DATE_FORMAT(A.PEN_EXPI_ST_DTM, '%Y-%m-%d') , ' ~ ' , DATE_FORMAT(A.PEN_EXPI_ED_DTM, '%Y-%m-%d')) AS
-        PEN_EXPI_DTM ,
-        DATEDIFF(DATE_FORMAT(NOW(),'%Y%m%d') ,A.PEN_EXPI_ST_DTM) AS PEN_EXPI_REM_DAY,
-        A.PEN_GENDER ,
-        (SELECT SUB_CD_NM FROM CMM1100 WHERE MST_CD = 'CMM00002' AND SUB_CD = A.PEN_GENDER) AS PEN_GENDER_NM ,
-        A.PEN_BIRTH ,
-        TRUNCATE((TO_DAYS(NOW()) - TO_DAYS(DATE_FORMAT(A.PEN_BIRTH, '%Y-%m-%d'))) / 365, 0) AS PEN_AGE ,
-        CASE
-        WHEN A.PEN_APP_ED_DTM3 IS NOT NULL THEN A.PEN_APP_ED_DTM3
-        WHEN A.PEN_APP_ED_DTM3 IS NULL AND A.PEN_APP_ED_DTM2 IS NOT NULL THEN PEN_APP_ED_DTM2
-        ELSE A.PEN_APP_ED_DTM1
-        END PEN_APP_ED_DTM ,
-        A.PEN_JUMIN,
-        A.PEN_ZIP,
-        A.PEN_ADDR ,
-        A.PEN_ADDR_DTL ,
-        A.PEN_CON_NUM SDB_PEN_CON_NUM,
-        A.PEN_CON_PNUM SDB_PEN_CON_PNUM ,
-        A.PEN_PRO_TYPE_CD,
-        (SELECT SUB_CD_NM FROM CMM1100 WHERE MST_CD = 'PEN00016' AND SUB_CD = A.PEN_PRO_TYPE_CD) AS PEN_PRO_TYPE_NM ,
-        A.PEN_PRO_NM SDB_PEN_PRO_NM,
-        A.PEN_PRO_ZIP ,
-        A.PEN_PRO_ADDR ,
-        A.PEN_PRO_ADDR_DTL ,
-        A.PEN_PRO_CON_NUM SDB_PEN_PRO_CON_NUM,
-        A.PEN_PRO_CON_PNUM SDB_PEN_PRO_CON_PNUM,
-        A.PEN_PRO_BIRTH,
-        A.PEN_PRO_REL,
-        A.PEN_PRO_REL_ETC,
-        A.PEN_PRO_EMAIL SDB_PEN_PRO_EMAIL,
-        C.ENT_USR_ID AS USR_ID,
-        A.APP_CD ,
-        (SELECT SUB_CD_NM FROM CMM1100 WHERE MST_CD = 'PEN00007' AND SUB_CD = A.APP_CD) AS APP_CD_NM ,
-        A.CA_CEN_YN ,
-        A.REG_DTM ,
-        DATE_FORMAT(A.REG_DTM, '%Y.%m.%d') AS REG_DT ,
-        B.ORD_LEND_END_DTM ,
-        DATEDIFF(B.ORD_LEND_END_DTM, DATE_FORMAT(NOW(),'%Y%m%d')) AS ORD_LEND_REM_DAY,
-        CASE WHEN REC_ID IS NULL THEN 'N' ELSE 'Y' END AS REC_YN
-        FROM (
-        SELECT *
-        FROM ENTPEN1000
-        WHERE ENT_ID = #{entId}
-        AND DEL_YN = 'N') C
-        LEFT JOIN PEN1000 A ON C.PEN_ID = A.PEN_ID
-        LEFT JOIN pen1500 P15 ON P15.PEN_ID = A.PEN_ID
-        LEFT OUTER JOIN (
-        SELECT B.PEN_ID, B.ORD_LEND_END_DTM
-        FROM (
-        SELECT PEN_ID,
-        ORD_LEND_END_DTM ,
-        ROW_NUMBER() OVER ( PARTITION BY PEN_ID ORDER BY ORD_LEND_END_DTM DESC ) RN
-        FROM PEN5000
-        WHERE ORD_STATUS = '01'
-        AND STA_ORD_CD = '03'
-        ) B
-        WHERE B.RN = '1'
-        ) B ON B.PEN_ID = A.PEN_ID
+            SELECT
+                A.PEN_ID ,
+                C.ENT_ID ,
+                A.PEN_NM SDB_PEN_NM ,
+                A.PEN_LTM_NUM SDB_PEN_LTM_NUM,
+                A.PEN_REC_GRA_CD,
+                (SELECT SUB_CD_NM FROM CMM1100 WHERE MST_CD = 'PEN00001' AND SUB_CD = A.PEN_REC_GRA_CD) AS PEN_REC_GRA_NM ,
+                A.PEN_TYPE_CD ,
+                (SELECT SUB_CD_NM FROM CMM1100 WHERE MST_CD = 'PEN00002' AND SUB_CD = A.PEN_TYPE_CD ) AS PEN_TYPE_NM ,
+                A.PEN_CNM_TYPE_CD ,
+                (SELECT PEN_CNM_TYPE_CD FROM CMM1100 WHERE MST_CD = 'PEN00004' AND SUB_CD = A.PEN_CNM_TYPE_CD ) AS
+                PEN_CNM_TYPE_NM ,
+                A.PEN_REC_TYPE_CD,
+                A.PEN_REC_TYPE_TXT,
+                A.PEN_REMARK,
+                A.PEN_EXPI_ST_DTM ,
+                A.PEN_EXPI_ED_DTM ,
+                CONCAT(DATE_FORMAT(A.PEN_EXPI_ST_DTM, '%Y-%m-%d') , ' ~ ' , DATE_FORMAT(A.PEN_EXPI_ED_DTM, '%Y-%m-%d')) AS
+                PEN_EXPI_DTM ,
+                DATEDIFF(DATE_FORMAT(NOW(),'%Y%m%d') ,A.PEN_EXPI_ST_DTM) AS PEN_EXPI_REM_DAY,
+                A.PEN_GENDER ,
+                (SELECT SUB_CD_NM FROM CMM1100 WHERE MST_CD = 'CMM00002' AND SUB_CD = A.PEN_GENDER) AS PEN_GENDER_NM ,
+                A.PEN_BIRTH ,
+                TRUNCATE((TO_DAYS(NOW()) - TO_DAYS(DATE_FORMAT(A.PEN_BIRTH, '%Y-%m-%d'))) / 365, 0) AS PEN_AGE ,
+                CASE
+                WHEN A.PEN_APP_ED_DTM3 IS NOT NULL THEN A.PEN_APP_ED_DTM3
+                WHEN A.PEN_APP_ED_DTM3 IS NULL AND A.PEN_APP_ED_DTM2 IS NOT NULL THEN PEN_APP_ED_DTM2
+                ELSE A.PEN_APP_ED_DTM1
+                END PEN_APP_ED_DTM ,
+                A.PEN_JUMIN,
+                A.PEN_ZIP,
+                A.PEN_ADDR ,
+                A.PEN_ADDR_DTL ,
+                A.PEN_CON_NUM SDB_PEN_CON_NUM,
+                A.PEN_CON_PNUM SDB_PEN_CON_PNUM ,
+                A.PEN_PRO_TYPE_CD,
+                (SELECT SUB_CD_NM FROM CMM1100 WHERE MST_CD = 'PEN00016' AND SUB_CD = A.PEN_PRO_TYPE_CD) AS PEN_PRO_TYPE_NM ,
+                A.PEN_PRO_NM SDB_PEN_PRO_NM,
+                A.PEN_PRO_ZIP ,
+                A.PEN_PRO_ADDR ,
+                A.PEN_PRO_ADDR_DTL ,
+                A.PEN_PRO_CON_NUM SDB_PEN_PRO_CON_NUM,
+                A.PEN_PRO_CON_PNUM SDB_PEN_PRO_CON_PNUM,
+                A.PEN_PRO_BIRTH,
+                A.PEN_PRO_REL,
+                A.PEN_PRO_REL_ETC,
+                A.PEN_PRO_EMAIL SDB_PEN_PRO_EMAIL,
+                C.ENT_USR_ID AS USR_ID,
+                A.APP_CD ,
+                (SELECT SUB_CD_NM FROM CMM1100 WHERE MST_CD = 'PEN00007' AND SUB_CD = A.APP_CD) AS APP_CD_NM ,
+                A.CA_CEN_YN ,
+                A.REG_DTM ,
+                DATE_FORMAT(A.REG_DTM, '%Y.%m.%d') AS REG_DT ,
+                B.ORD_LEND_END_DTM ,
+                DATEDIFF(B.ORD_LEND_END_DTM, DATE_FORMAT(NOW(),'%Y%m%d')) AS ORD_LEND_REM_DAY,
+                CASE WHEN REC_ID IS NULL THEN 'N' ELSE 'Y' END AS REC_YN
+            FROM (
+                SELECT *
+                FROM ENTPEN1000
+                WHERE ENT_ID = #{entId} AND DEL_YN = 'N') C
+            LEFT JOIN PEN1000 A ON C.PEN_ID = A.PEN_ID
+            LEFT JOIN pen1500 P15 ON P15.PEN_ID = A.PEN_ID
+            LEFT OUTER JOIN (
+                            SELECT B.PEN_ID, B.ORD_LEND_END_DTM
+                            FROM (
+                                SELECT
+                                    PEN_ID,
+                                    ORD_LEND_END_DTM ,
+                                    ROW_NUMBER() OVER ( PARTITION BY PEN_ID ORDER BY ORD_LEND_END_DTM DESC ) RN
+                                FROM PEN5000
+                                WHERE ORD_STATUS = '01' AND STA_ORD_CD = '03'
+                                ) B
+                            WHERE B.RN = '1') B ON B.PEN_ID = A.PEN_ID
         WHERE 1=1
         AND A.DEL_YN = 'N'
         ) T1
@@ -224,13 +222,13 @@
             AND T1.APP_CD = #{appCd}
         </if>
         <if test="penNm!=null and !penNm.equals('')">
-            AND T1.PEN_NM LIKE CONCAT('%', #{penNm}, '%')
+            AND T1.SDB_PEN_NM LIKE CONCAT('%', #{penNm}, '%')
         </if>
         <if test="penProNm!=null and !penProNm.equals('')">
-            AND T1.PEN_PRO_NM LIKE CONCAT('%', #{penProNm}, '%')
+            AND T1.SDB_PEN_PRO_NM LIKE CONCAT('%', #{penProNm}, '%')
         </if>
         <if test="penLtmNum!=null and !penLtmNum.equals('')">
-            AND T1.PEN_LTM_NUM LIKE CONCAT('%', #{penLtmNum}, '%')
+            AND T1.SDB_PEN_LTM_NUM LIKE CONCAT('%', #{penLtmNum}, '%')
         </if>
         <if test="penTypeCd!=null and !penTypeCd.equals('')">
             AND T1.PEN_TYPE_CD = #{penTypeCd}
@@ -614,4 +612,67 @@
           AND PEN_ID = #{penId}
     </delete>
 
+    <!--수급자 비암호화 리스트-->
+    <select id="selectNotEncryptList1000" parameterType="hashmap" resultType="camelMap" fetchSize="10000">
+        <![CDATA[
+        SELECT *
+        FROM pen1000 #
+        WHERE (PEN_NM NOT LIKE '%=' AND LENGTH(PEN_NM) > 0)
+           OR (PEN_LTM_NUM NOT LIKE '%=' AND LENGTH(PEN_LTM_NUM) > 0)
+           OR (PEN_CON_NUM NOT LIKE '%=' AND LENGTH(PEN_CON_NUM) > 0)
+           OR (PEN_CON_PNUM NOT LIKE '%=' AND LENGTH(PEN_CON_PNUM) > 0)
+           OR (PEN_PRO_NM NOT LIKE '%=' AND LENGTH(PEN_PRO_NM) > 0)
+           OR (PEN_PRO_CON_NUM NOT LIKE '%=' AND LENGTH(PEN_PRO_CON_NUM) > 0)
+           OR (PEN_PRO_CON_PNUM NOT LIKE '%=' AND LENGTH(PEN_PRO_CON_PNUM) > 0)
+        ]]>
+    </select>
+
+    <!--예비 수급자 비암호화 리스트-->
+    <select id="selectNotEncryptList1001" parameterType="hashmap" resultType="camelMap" fetchSize="10000">
+        <![CDATA[
+        SELECT *
+        FROM pen1001 #
+        WHERE (PEN_NM NOT LIKE '%=' AND LENGTH(PEN_NM) > 0)
+           OR (PEN_LTM_NUM NOT LIKE '%=' AND LENGTH(PEN_LTM_NUM) > 0)
+           OR (PEN_CON_NUM NOT LIKE '%=' AND LENGTH(PEN_CON_NUM) > 0)
+           OR (PEN_CON_PNUM NOT LIKE '%=' AND LENGTH(PEN_CON_PNUM) > 0)
+           OR (PEN_PRO_NM NOT LIKE '%=' AND LENGTH(PEN_PRO_NM) > 0)
+           OR (PEN_PRO_CON_NUM NOT LIKE '%=' AND LENGTH(PEN_PRO_CON_NUM) > 0)
+           OR (PEN_PRO_CON_PNUM NOT LIKE '%=' AND LENGTH(PEN_PRO_CON_PNUM) > 0)
+        ]]>
+    </select>
+
+    <!--수급자 암호화 업데이트-->
+    <update id="updateNotEncryptList1000" parameterType="hashmap">
+        UPDATE
+            PEN1000
+        SET
+            PEN_ID = #{penId}
+            <if test='penNm != null and !penNm.equals("")'>,PEN_NM= #{penNm}</if>
+            <if test='penLtmNum != null and !penLtmNum.equals("")'>,PEN_LTM_NUM= #{penLtmNum}</if>
+            <if test='penConNum != null and !penConNum.equals("")'>,PEN_CON_NUM = #{penConNum}</if>
+            <if test='penConPnum != null and !penConPnum.equals("")'>,PEN_CON_PNUM = #{penConPnum}</if>
+            <if test='penProNm != null and !penProNm.equals("")'>,PEN_PRO_NM = #{penProNm}</if>
+            <if test='penProConNum != null and !penProConNum.equals("")'>,PEN_PRO_CON_NUM = #{penProConNum}</if>
+            <if test='penProConPnum != null and !penProConPnum.equals("")'>,PEN_PRO_CON_PNUM = #{penProConPnum}</if>
+        WHERE
+            PEN_ID = #{penId}
+    </update>
+
+    <!--수급자 암호화 업데이트-->
+    <update id="updateNotEncryptList1001" parameterType="hashmap">
+        UPDATE
+            PEN1001
+        SET
+            PEN_ID = #{penId}
+            <if test='penNm != null and !penNm.equals("")'>,PEN_NM= #{penNm}</if>
+            <if test='penLtmNum != null and !penLtmNum.equals("")'>,PEN_LTM_NUM= #{penLtmNum}</if>
+            <if test='penConNum != null and !penConNum.equals("")'>,PEN_CON_NUM = #{penConNum}</if>
+            <if test='penConPnum != null and !penConPnum.equals("")'>,PEN_CON_PNUM = #{penConPnum}</if>
+            <if test='penProNm != null and !penProNm.equals("")'>,PEN_PRO_NM = #{penProNm}</if>
+            <if test='penProConNum != null and !penProConNum.equals("")'>,PEN_PRO_CON_NUM = #{penProConNum}</if>
+            <if test='penProConPnum != null and !penProConPnum.equals("")'>,PEN_PRO_CON_PNUM = #{penProConPnum}</if>
+        WHERE
+            PEN_ID = #{penId}
+    </update>
 </mapper>

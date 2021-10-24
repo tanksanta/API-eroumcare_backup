@@ -207,7 +207,8 @@ public class RecipientController {
     /**
      * 데이터 암호화
      */
-    @PostMapping(value = "encrpyt")
+    @Deprecated
+//    @PostMapping(value = "encrypt")
     public BaseResponse updateEncrypt(@RequestBody BaseRequest request) throws Exception {
         // bussiness logic
         return recipientService.updateEncrypt(request.bindRequest());

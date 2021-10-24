@@ -415,24 +415,50 @@ public class RecipientService extends BaseService {
     public BaseResponse updateEncrypt(Map<String, Object> params) throws SQLException {
         BaseResponse response = new BaseResponse();
 
-        //전화번호 암호화 모듈
         SDBCryptUtil sdb = new SDBCryptUtil();
 
-        List<Map> mapList = (List<Map>) abstractDAO.selectList("recipient.selectConNum", null);
+        List<Map> mapList = (List<Map>) abstractDAO.selectList("recipient.selectNotEncryptList1001", null);
+        HashMap<String, String> updateData = new HashMap<>();
 
         for (Map map : mapList) {
+            String penId = MapUtils.getString(map, "penId");
+            String penNm = MapUtils.getString(map, "penNm");
+            String penProNm = MapUtils.getString(map, "penProNm");
+            String penLtmNum = MapUtils.getString(map, "penLtmNum");
             String penConNum = MapUtils.getString(map, "penConNum");
             String penConPnum = MapUtils.getString(map, "penConPnum");
             String penProConNum = MapUtils.getString(map, "penProConNum");
             String penProConPnum = MapUtils.getString(map, "penProConPnum");
 
-            if (penConNum != null && !penConNum.equals("")) map.put("penConNum", sdb.encrypt(penConNum));
-            if (penConPnum != null && !penConPnum.equals("")) map.put("penConPnum", sdb.encrypt(penConPnum));
-            if (penProConNum != null && !penProConNum.equals("")) map.put("penProConNum", sdb.encrypt(penProConNum));
-            if (penProConPnum != null && !penProConPnum.equals(""))
-                map.put("penProConPnum", sdb.encrypt(penProConPnum));
+            updateData.put("penId", penId);
 
-            abstractDAO.update("recipient.updateRecipient", params);
+            if (penNm != null && !penNm.endsWith("=") && penNm.length() > 0) {
+                updateData.put("penNm", sdb.encrypt(penNm));
+            }
+            if (penProNm != null && !penProNm.endsWith("=") && penProNm.length() > 0) {
+                updateData.put("penProNm", sdb.encrypt(penProNm));
+            }
+            if (penLtmNum != null && !penLtmNum.endsWith("=") && penLtmNum.length() > 0) {
+                updateData.put("penLtmNum", sdb.encrypt(penLtmNum));
+            }
+            if (penConNum != null && !penConNum.endsWith("=") && penConNum.length() > 0) {
+                updateData.put("penConNum", sdb.encrypt(penConNum));
+            }
+            if (penConPnum != null && !penConPnum.endsWith("=") && penConPnum.length() > 0) {
+                updateData.put("penConPnum", sdb.encrypt(penConPnum));
+            }
+            if (penProConNum != null && !penProConNum.endsWith("=") && penProConNum.length() > 0) {
+                updateData.put("penProConNum", sdb.encrypt(penProConNum));
+            }
+            if (penProConPnum != null && !penProConPnum.endsWith("=") && penProConPnum.length() > 0) {
+                updateData.put("penProConPnum", sdb.encrypt(penProConPnum));
+            }
+
+            if (updateData.size() > 1) {
+                abstractDAO.update("recipient.updateNotEncryptList1001", updateData);
+            }
+
+            updateData.clear();
         }
         response.setResult(ResultCode.RC_OK);
 
