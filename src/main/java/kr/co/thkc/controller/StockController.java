@@ -59,7 +59,7 @@ public class StockController {
     }
 
     /**
-     * 사업소별 재고 목록 조회 (재고 & 판매완료 1개 이상만)
+     * 사업소별 재고 목록 조회 (QUANTITY > 0 OR (QUANTITY = 0 AND ORDER_QUANTITY > 0))
      */
     @PostMapping(value = "selectNotEmptyListForEnt")
     public BaseResponse selectStockNotEmptyListForEnt(@RequestBody BaseRequest request) throws Exception {

@@ -307,6 +307,7 @@
                 A.PROD_PAY_CODE,
                 A.REG_DTM,
                 D.PROD_BAR_NUM,
+                MAX(D.MODIFY_DTM) AS LAST_ADD_DTM,
                 SUM(CASE WHEN STATE_CD='01' THEN 1 ELSE 0 END) AS QUANTITY,
                 SUM(CASE WHEN (STATE_CD='02' OR STATE_CD='07' ) THEN 1 ELSE 0 END) AS ORDER_QUANTITY
             FROM
@@ -329,10 +330,17 @@
                 A.PROD_ID
             ) AS A
         WHERE
-            QUANTITY > 0
-            OR (QUANTITY = 0 AND ORDER_QUANTITY > 0)
+            QUANTITY > 0 OR (QUANTITY = 0 AND ORDER_QUANTITY > 0)
         ORDER BY
-            REG_DTM DESC, PROD_BAR_NUM, PPC_ID ASC
+            CASE WHEN QUANTITY > 0 THEN 0 ELSE 1 END ASC,
+            <choose>
+                <when test="sort == 'add'">LAST_ADD_DTM DESC, </when>
+                <when test="sort == 'itemNm'">ITEM_NM ASC, </when>
+                <when test="sort == 'prodNm'">PROD_NM ASC, </when>
+                <when test="sort == 'qty'">QUANTITY DESC, </when>
+                <otherwise>LAST_ADD_DTM DESC, </otherwise>
+            </choose>
+            REG_DTM DESC, QUANTITY DESC, PROD_BAR_NUM, PPC_ID ASC
         <if test="pageSize > 0 and pageNum > 0">
         LIMIT #{pageSize}
         OFFSET #{offset}
