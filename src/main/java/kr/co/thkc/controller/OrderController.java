@@ -107,4 +107,45 @@ public class OrderController extends BaseController {
         // bussiness logic
         return orderService.deleteOrder(request.bindRequest());
     }
+
+    /**
+     * 주문-재고 수정
+     */
+
+    @PostMapping(value = "editOrder")
+    public BaseResponse editOrder(@RequestBody BaseRequest request) throws Exception {
+        // requiredField add
+        request.addRequiredField("penOrdId", request.TYPE_STRING);
+        request.addRequiredField("usrId", request.TYPE_STRING);
+        request.addRequiredField("penId", request.TYPE_STRING);
+        request.addRequiredField("ordCont", request.TYPE_STRING);
+        request.addRequiredField("ordZip", request.TYPE_STRING);
+        request.addRequiredField("ordAddr", request.TYPE_STRING);
+        request.addRequiredField("finPayment", request.TYPE_STRING);
+        request.addRequiredField("payMehCd", request.TYPE_STRING);
+        request.addRequiredField("eformType", request.TYPE_STRING);
+        request.addRequiredField("returnUrl", request.TYPE_STRING);
+        request.validRequiredField();
+
+        List<Map> prods = new ArrayList<>();
+
+        if (request.getParams().containsKey("prods")) {
+            prods = new ObjectMapper().convertValue(request.getParams().get("prods"), List.class);
+            if (prods == null) throw new Exception("Request is null");
+            for (Map prod : prods) {
+                BaseRequest prodRequest = new BaseRequest(prod);
+
+                prodRequest.addRequiredField("prodId", BaseRequest.TYPE_STRING);
+                prodRequest.addRequiredField("flag", BaseRequest.TYPE_STRING);
+                // requiredField check
+                prodRequest.validRequiredField();
+            }
+        } else {
+            throw new Exception("requiredField [prods] is not contain ");
+        }
+
+        // bussiness logic
+        return orderService.editOrder(request.bindRequest());
+    }
+
 }

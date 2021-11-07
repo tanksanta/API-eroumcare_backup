@@ -172,4 +172,17 @@
         WHERE PEN_ORD_ID = #{penOrdId}
         <if test="penStaSeq!=null and !penStaSeq.equals('')">AND PEN_STA_SEQ = #{penStaSeq}</if>
     </delete>
+
+    <select id="selectMaxPenStaSeq" parameterType="string" resultType="int">
+        SELECT max(PEN_STA_SEQ)
+        FROM pen5000
+        WHERE PEN_ORD_ID = #{penOrdId}
+    </select>
+
+    <delete id="deleteOrderByPenOrdIdAndStoId" parameterType="hashmap">
+        DELETE
+        FROM PEN5000
+        WHERE PEN_ORD_ID = #{penOrdId}
+            AND STO_ID = #{stoId}
+    </delete>
 </mapper>

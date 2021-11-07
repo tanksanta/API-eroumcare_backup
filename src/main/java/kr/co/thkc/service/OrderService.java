@@ -330,4 +330,210 @@ public class OrderService extends BaseService {
 
         return response;
     }
+
+    /**
+     * 주문-재고 수정
+     */
+    public BaseResponse editOrder(Map<String, Object> params) throws Exception {
+        BaseResponse response = new BaseResponse();
+
+        //EntId 조회 (사업자 조회)
+        Map account = (Map) abstractDAO.selectOne("ent.selectEntAccount", params);
+        String entId = MapUtils.getString(account, "entId");
+        String accessIp = MapUtils.getString(account, "accessIp");
+        String usrId = MapUtils.getString(params, "usrId");
+        String penId = MapUtils.getString(params, "penId");
+        String delGbnCd = MapUtils.getString(params, "delGbnCd");
+        String ordWayNum = MapUtils.getString(params, "ordWayNum");
+        String ordNm = MapUtils.getString(params, "ordNm");
+        String ordCont = MapUtils.getString(params, "ordCont");
+        String ordMeno = MapUtils.getString(params, "ordMeno");
+        String ordZip = MapUtils.getString(params, "ordZip");
+        String ordAddr = MapUtils.getString(params, "ordAddr");
+        String ordAddrDtl = MapUtils.getString(params, "ordAddrDtl");
+        String payMehCd = MapUtils.getString(params, "payMehCd");
+        String uuid = UUID.randomUUID().toString();         //전자계약서 UUID 생성
+        String extnYn = MapUtils.getString(params, "extnYn");
+        String prodDetail = MapUtils.getString(params, "prodDetail");
+        String returnUrl = MapUtils.getString(params, "returnUrl");
+        String penOrdId = MapUtils.getString(params, "penOrdId");
+
+        //수급자별 할인율 계산 후 최종결제금액 저장
+        Integer discount = (Integer) abstractDAO.selectOne("order.selectDiscount", params);
+
+        prodDetail = StringEscapeUtils.unescapeHtml4(prodDetail);  //escape문자 변형
+        returnUrl = StringEscapeUtils.unescapeHtml4(returnUrl);
+
+        if (extnYn == null || extnYn.equals("")) extnYn = "N";  //연장대여 기본값
+
+        //파라미터 세팅
+        params.put("uuid", uuid);
+        params.put("penOrdId", penOrdId);
+        params.put("entId", entId);
+        params.put("extnYn", extnYn);
+        params.put("prodDetail", prodDetail);
+        params.put("returnUrl", returnUrl);
+
+
+        //추가해야할 재고가 있을때 사용할 신규재고 목록
+        List<Map> newStockList = new ArrayList();
+        List<Map> deleteStockList = new ArrayList();
+        List<Map> newOrderList = new ArrayList();
+
+        // 마지막 시퀸스 + 1
+        int penStaSeq = (int) abstractDAO.selectOne("order.selectMaxPenStaSeq", penOrdId) + 1;
+
+        List<Map> prodList = (List<Map>) MapUtils.getObject(params, "prods");
+
+        for (int i = 0; i < prodList.size(); i++) {
+            Map prod = new HashMap(prodList.get(i));
+            // 상품정보 가져오기 gubun,prodNm,itemId,subItem,prodSupPrice,prodOflPrice,rentalPrice
+            Map prodInfo = (Map) abstractDAO.selectOne("prod.selectProdNonOptionInfo", prod);
+            prod.putAll(prodInfo);
+            prod.put("itemNm", MapUtils.getString(prodInfo, "itemNm"));
+            prod.put("entId", entId);
+            prod.remove("penStaSeq");
+
+            // 주문 등록 파람설정
+            Map newOrderMap = new HashMap();
+            newOrderMap.put("entId", entId);
+            newOrderMap.put("accessIp", accessIp);
+            newOrderMap.put("usrId", usrId);
+            newOrderMap.put("penId", penId);
+            newOrderMap.put("delGbnCd", delGbnCd);
+            newOrderMap.put("ordWayNum", ordWayNum);
+            newOrderMap.put("ordNm", ordNm);
+            newOrderMap.put("ordCont", ordCont);
+            newOrderMap.put("ordMeno", ordMeno);
+            newOrderMap.put("ordZip", ordZip);
+            newOrderMap.put("ordAddr", ordAddr);
+            newOrderMap.put("ordAddrDtl", ordAddrDtl);
+            newOrderMap.put("payMehCd", payMehCd);
+            newOrderMap.put("uuid", uuid);
+            newOrderMap.put("penOrdId", penOrdId);
+            newOrderMap.put("extnYn", extnYn);
+            newOrderMap.put("prodDetail", prodDetail);
+            newOrderMap.put("ordStatus", MapUtils.getString(prod, "gubun"));
+            // 쇼핑몰의 재고값 매핑을 위한 id
+            newOrderMap.put("ct_id", MapUtils.getString(prod, "ct_id"));
+
+            Map stock = new HashMap();
+
+            // stoId 없을때 재고추가
+            String stoId = MapUtils.getString(prod, "stoId");
+            String flag = MapUtils.getString(prod, "flag");
+            if ((stoId == null || stoId.equals("")) && (flag != null && flag.equals("insert"))) {
+                newStockList.add(prod);
+                newOrderMap.putAll(prod);
+
+                newOrderList.add(newOrderMap);
+            }
+
+            // stoId 있을때 주문, 재고 삭제
+            if ((stoId != null && !stoId.equals("")) && (flag != null && flag.equals("delete"))) {
+                // 주문 삭제
+                Map deleteOrderParam = new HashMap();
+                deleteOrderParam.put("penOrdId", penOrdId);
+                deleteOrderParam.put("stoId", stoId);
+                abstractDAO.delete("order.deleteOrderByPenOrdIdAndStoId", deleteOrderParam);
+
+                // 삭제 재고 목록 추가
+                prod.put("delYn", "Y");
+                deleteStockList.add(prod);
+            }
+        }
+
+        // 재고 테이블 추가
+        List<Map> insertStockList = new ArrayList();
+        if (newStockList != null && newStockList.size() > 0) {
+            //재고 변경, 등록 파라미터 세팅
+            Map insertStockParam = new HashMap();
+            insertStockParam.put("accessIp", accessIp);
+            insertStockParam.put("usrId", usrId);
+            insertStockParam.put("entId", entId);
+            insertStockParam.put("prods", newStockList);
+            insertStockList = (List<Map>) stockService.insertStock(insertStockParam).getData();
+        }
+
+        // 재고 테이블 제거
+        if (deleteStockList != null && deleteStockList.size() > 0) {
+            Map deleteStockParam = new HashMap();
+            deleteStockParam.put("accessIp", accessIp);
+            deleteStockParam.put("usrId", usrId);
+            deleteStockParam.put("entId", entId);
+            deleteStockParam.put("prods", deleteStockList);
+
+            // 재고 삭제 (delYn = Y 업뎃)
+            stockService.updateStock(deleteStockParam);
+        }
+
+        // 금액추가 및 시퀀스 등록
+        List<Map> resultInsertedStock = new ArrayList();
+
+        for (Map newOrder : newOrderList) {
+            // 재고 등록하고 리턴값으로 재고정보를 주므로 그대로 업데이트할 재고목록에 추가
+            if (MapUtils.getString(newOrder, "stoId") == null || MapUtils.getString(newOrder, "stoId").equals("")) {
+                newOrder.putAll(newStockList.remove(0));
+                newOrder.putAll(insertStockList.remove(0));
+            }
+
+            int finPayment = MapUtils.getIntValue(newOrder, "prodOflPrice"); // 판매가
+            int price = 0; // 판매가 (수급자에 부과되는 가격)
+            double rentalCnt = 1;
+
+            if (MapUtils.getString(newOrder, "ordStatus").equals("00")) {
+                // 판매일때
+                price = MapUtils.getIntValue(newOrder, "prodSupPrice"); // 급여가
+            } else {
+                // 대여일때
+                String ordLendStrDtm = MapUtils.getString(newOrder, "ordLendStrDtm");       // 수정 하려는 대여일자
+                String ordLendEndDtm = MapUtils.getString(newOrder, "ordLendEndDtm");       // 수정 하려는 대여일자
+                price = MapUtils.getIntValue(newOrder, "rentalPrice");
+                // 대여일자 계산해서 결제금액 계산
+                if (ordLendStrDtm != null && ordLendEndDtm != null) {
+                    rentalCnt = DateUtil.getDateDiffOrder(ordLendStrDtm, ordLendEndDtm);
+                }
+                price = (int) (price * rentalCnt);
+                finPayment = (int) (finPayment * rentalCnt);
+            }
+
+            newOrder.put("prodOflPrice", price);
+            newOrder.put("finPayment", finPayment);
+
+            // 주문시퀀스 등록
+            newOrder.put("penStaSeq", penStaSeq++);
+
+            resultInsertedStock.add(new HashMap() {{
+                put("stoId", newOrder.get("stoId"));
+                put("ct_id", newOrder.get("ct_id"));
+            }});
+        }
+
+        // 주문 추가
+        if (newOrderList.size() > 0) {
+            abstractDAO.insert("order.insertOrder_multi", newOrderList);
+        }
+
+        if (discount != null && discount == 0) {
+            abstractDAO.insert("recipient.insertRecipientReq", params);
+        }
+
+        // 기준년도, 기준월
+        Calendar cal = Calendar.getInstance();
+        params.put("baseYear", String.valueOf(cal.get(Calendar.YEAR)));
+        params.put("baseMonth", String.format("%02d", cal.get(Calendar.MONTH) + 1));
+
+        // 전자계약서
+        eformService.insertEform(params);
+
+        Map resultData = new HashMap() {{
+            put("uuid", uuid);
+            put("penOrdId", penOrdId);
+            put("stockList", resultInsertedStock);
+        }};
+        response.setData(resultData);
+        response.setResult(ResultCode.RC_OK);
+
+        return response;
+    }
 }
