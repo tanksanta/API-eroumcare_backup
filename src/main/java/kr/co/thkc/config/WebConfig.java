@@ -1,5 +1,6 @@
 package kr.co.thkc.config;
 
+import kr.co.thkc.interceptor.WhiteListInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -9,10 +10,7 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.support.StandardServletMultipartResolver;
 import org.springframework.web.servlet.ViewResolver;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.*;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 import javax.servlet.Filter;
@@ -37,8 +35,17 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/**").addResourceLocations("classpath:/static/", "classpath:/mybatis/");
     }
 
+  @Override
+  public void addInterceptors(InterceptorRegistry registry) {
+      registry.addInterceptor(whiteListInterceptor());
+  }
 
-    @Order(Ordered.HIGHEST_PRECEDENCE)
+  @Bean
+  public WhiteListInterceptor whiteListInterceptor() {
+    return new WhiteListInterceptor();
+  }
+
+  @Order(Ordered.HIGHEST_PRECEDENCE)
     @Bean
     public Filter encodingFilter() {
         CharacterEncodingFilter characterEncodingFilter = new CharacterEncodingFilter();
