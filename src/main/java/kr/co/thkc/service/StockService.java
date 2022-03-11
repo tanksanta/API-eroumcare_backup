@@ -255,7 +255,11 @@ public class StockService extends BaseService {
         }
         if (stockList.size() == 0) throw new Exception("추가된 재고가 없습니다.");
 
-        abstractDAO.insert("stock.insertStock_multi", stockList);
+        try {
+          abstractDAO.insert("stock.insertStock_multi", stockList);
+        } catch(Exception e) {
+          throw new Exception("재고 추가 도중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+        }
 
         response.setResultData(stockList);
         response.setResult(ResultCode.RC_OK);
