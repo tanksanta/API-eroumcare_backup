@@ -278,6 +278,7 @@ public class StockService extends BaseService {
         String accessIp = MapUtils.getString(params, "accessIp");
         String stoId = MapUtils.getString(params, "stoId");
         String entId = MapUtils.getString(params, "entId");
+        String ppcId; // 취급제품 ID
 
         //결과값 리턴을 위한
         List<Map> stockList = new ArrayList<>();
@@ -289,6 +290,15 @@ public class StockService extends BaseService {
                 prod.put("usrId", usrId);
                 prod.put("accessIp", accessIp);
                 prod.put("entId", entId);
+
+                // 취급제품 ID 검색
+                ppcId = (String) abstractDAO.selectOne("stock.selectPpc", prod);
+                if (ppcId == null) {    //취급제품 없으면 추가
+                  prod.put("ppcId", newPpcId());
+                  abstractDAO.insert("prod.insertPpc", prod);
+                } else {
+                  prod.put("ppcId", ppcId);
+                }
 
                 // 재고 수정
                 abstractDAO.update("stock.updateStock", prod);
