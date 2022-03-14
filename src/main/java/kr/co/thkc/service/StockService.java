@@ -291,13 +291,15 @@ public class StockService extends BaseService {
                 prod.put("accessIp", accessIp);
                 prod.put("entId", entId);
 
-                // 취급제품 ID 검색
-                ppcId = (String) abstractDAO.selectOne("stock.selectPpc", prod);
-                if (ppcId == null) {    //취급제품 없으면 추가
-                  prod.put("ppcId", newPpcId());
-                  abstractDAO.insert("prod.insertPpc", prod);
-                } else {
-                  prod.put("ppcId", ppcId);
+                // 상품 아이디 있을 경우 취급제품 ID 검색하여 PPC까지 업데이트 처리 (= 상품 변경 시)
+                if (prod.get("prodId") != null && prod.get("prodId").toString().startsWith("PRO")) {
+                  ppcId = (String) abstractDAO.selectOne("stock.selectPpc", prod);
+                  if (ppcId == null) {    //취급제품 없으면 추가
+                    prod.put("ppcId", newPpcId());
+                    abstractDAO.insert("prod.insertPpc", prod);
+                  } else {
+                    prod.put("ppcId", ppcId);
+                  }
                 }
 
                 // 재고 수정
