@@ -349,4 +349,23 @@
         WHERE PPC_ID = #{ppcId}
     </update>
 
+    <select id="selectPro2000ProdItem" parameterType="hashmap" resultType="camelMap" fetchSize="10000">
+        SELECT *
+        FROM PRO1102 A
+        LEFT JOIN PRO1103 B ON B.PPC_ID = A.PPC_ID
+        WHERE 1=1
+        <if test='prodId != null and !prodId.equals("")'>
+            AND A.PROD_ID = #prodId#
+        </if>
+        <if test='regUsrId != null and !regUsrId.equals("")'>
+            AND A.REG_USR_ID = #regUsrId#
+        </if>
+        <if test='stoId != null and !stoId.equals("")'>
+            AND B.STO_ID IN
+            <foreach item="item" index="index" collection="stoId" open=" (" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        ORDER BY A.REG_DTM DESC
+    </select>
 </mapper>

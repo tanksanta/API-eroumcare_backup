@@ -11,6 +11,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import static kr.co.thkc.filter.ModifyRequestWrapper.EROUM_PARAMS_NAME;
@@ -202,5 +206,19 @@ public class ProdController {
 
         // bussiness logic
         return prodService.deletePpc(request.bindRequest());
+    }
+
+
+    /**
+     * 재고 조회 - (시스템 API 이전)
+     */
+    @PostMapping(value="selectPro2000ProdInfoAjaxByShop.do")
+    public BaseResponse selectPro2000ProdInfoAjaxByShop(@RequestBody BaseRequest request) throws Exception {
+
+        request.addRequiredField("stoId", request.TYPE_STRING);
+
+        request.validRequiredField();
+
+        return prodService.selectPro2000ProdItem(request.bindRequest());
     }
 }

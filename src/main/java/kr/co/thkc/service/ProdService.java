@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -235,4 +236,17 @@ public class ProdService extends BaseService {
         return response;
     }
 
+    public BaseResponse selectPro2000ProdItem(Map<String, Object> params) throws Exception {
+        BaseResponse response = new BaseResponse();
+
+        String stoIdStr = params.get("stoId").toString();
+        params.put("stoId", Arrays.asList(stoIdStr.split("\\|")));
+
+        List prodList = abstractDAO.selectList("prod.selectPro2000ProdItem", params);
+
+        response.setResultData(prodList);
+        response.setResult(ResultCode.RC_OK);
+
+        return response;
+    }
 }
