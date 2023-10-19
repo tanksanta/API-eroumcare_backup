@@ -193,6 +193,7 @@
                 (SELECT SUB_CD_NM FROM CMM1100 WHERE MST_CD = 'PEN00007' AND SUB_CD = A.APP_CD) AS APP_CD_NM ,
                 A.CA_CEN_YN ,
                 A.REG_DTM ,
+                A.MODIFY_DTM,
                 DATE_FORMAT(A.REG_DTM, '%Y.%m.%d') AS REG_DT ,
                 B.ORD_LEND_END_DTM ,
                 DATEDIFF(B.ORD_LEND_END_DTM, DATE_FORMAT(NOW(),'%Y%m%d')) AS ORD_LEND_REM_DAY,

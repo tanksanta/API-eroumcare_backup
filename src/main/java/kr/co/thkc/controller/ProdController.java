@@ -81,6 +81,32 @@ public class ProdController {
 
 
     /**
+     * 상품분류코드 추가
+     */
+    @PostMapping(value = "insertCategory")
+    public BaseResponse insertCategory(@RequestBody BaseRequest request) throws Exception {
+       
+        // bussiness logic
+        return prodService.insertCategory(request.bindRequest());
+    }
+
+    /**
+     * 상품분류코드 수정
+     */
+    @PostMapping(value = "updateCategory")
+    public BaseResponse updateCategory(@RequestBody BaseRequest request) throws Exception {
+       
+        //requiredField add
+        request.addRequiredField("itemId", request.TYPE_STRING);
+        request.validRequiredField();
+
+        // bussiness logic
+        return prodService.updateCategory(request.bindRequest());
+    }
+
+
+
+    /**
      * 상품 목록 추가
      */
     @PostMapping(value = "insert")

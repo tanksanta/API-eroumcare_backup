@@ -101,6 +101,37 @@
     </select>
 
 
+    <!-- 분류(카테고리) 추가-->
+    <insert id="insertCategory" parameterType="hashmap">
+        INSERT INTO PRO1000
+            SET ITEM_ID       = #{itemId}
+	            ,ITEM_NM      = #{ca_name}
+	            ,ITEM_TYPE_CD = #{gubun}
+	            ,USE_YEAR     = #{ca_limit_month}
+	            ,USE_NUM      = #{ca_limit_num}
+	            ,USE_CD       = #{ca_use}
+	            ,REG_DTM      = CURRENT_TIMESTAMP
+	            ,REG_USR_ID   = #{usrId}
+	            ,REG_USR_IP   = #{accessIp}
+    </insert>
+
+
+    <!-- 분류(카테고리) 변경 -->
+    <update id="updateCategory" parameterType="hashmap">
+        UPDATE PRO1000
+            SET 
+	            MODIFY_DTM        = CURRENT_TIMESTAMP
+	            ,MODIFY_USR_ID    = #{usrId}
+	            ,MODIFY_USR_IP    = #{accessIp}
+                <if test='ca_name != null and !ca_name.equals("")'>                 ,ITEM_NM      = #{ca_name}</if>
+	            <if test='gubun != null and !gubun.equals("")'>                     ,ITEM_TYPE_CD = #{gubun}</if>
+	            <if test='ca_limit_month != null and !ca_limit_month.equals("")'>   ,USE_YEAR     = #{ca_limit_month}</if>
+	            <if test='ca_limit_num != null and !ca_limit_num.equals("")'>       ,USE_NUM      = #{ca_limit_num}</if>
+	            <if test='ca_use != null and !ca_use.equals("")'>                   ,USE_CD       = #{ca_use}</if>
+        WHERE ITEM_ID = #{itemId}
+    </update>
+
+
     <!--상품 추가-->
     <insert id="insertProd" parameterType="hashmap">
         INSERT INTO PRO1100
@@ -136,6 +167,7 @@
         )
     </insert>
 
+
     <!--상품 수정 테이블 추가-->
     <insert id="insertProdModify" parameterType="hashmap">
         INSERT INTO PRO1101
@@ -170,6 +202,7 @@
         ,CURRENT_TIMESTAMP, #{usrId}, #{accessIp}
         )
     </insert>
+
 
     <!--상품옵션 추가-->
     <insert id="insertOptionProd" parameterType="List">
@@ -222,6 +255,7 @@
         WHERE 1=1
         AND PROD_ID = #{prodId}
     </update>
+
 
     <update id="updateProdModify" parameterType="hashmap">
         UPDATE PRO1101 SET

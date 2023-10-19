@@ -71,6 +71,36 @@ public class ProdService extends BaseService {
         return response;
     }
 
+    
+    /**
+     * 상품 카테고리 추가
+     */
+    public BaseResponse insertCategory(Map<String, Object> params) throws Exception {
+        BaseResponse response = new BaseResponse();
+
+        //취급제품 추가
+        abstractDAO.insert("prod.insertCategory", params);
+
+        response.setData(params);
+        response.setResult(ResultCode.RC_OK);
+
+        return response;
+    }
+    
+    /**
+     * 상품 카테고리 수정
+     */
+    public BaseResponse updateCategory(Map<String, Object> params) throws Exception {
+        BaseResponse response = new BaseResponse();
+
+        abstractDAO.insert("prod.updateCategory", params);
+
+        response.setData(params);
+        response.setResult(ResultCode.RC_OK);
+
+        return response;
+    }
+
 
     public BaseResponse insertProd(Map<String, Object> params, Map<String, MultipartFile> fileMap) throws Exception {
         BaseResponse response = new BaseResponse();
